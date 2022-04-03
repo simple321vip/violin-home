@@ -1,0 +1,74 @@
+import { createRouter, createMemoryHistory, RouteRecordRaw } from 'vue-router'
+
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/",
+    component: () => import('../components/layout/layout.vue'),
+    children: [
+      {
+        path: '/home',
+        component: () => import('../view/dashboard/index.vue'),
+        meta: {
+          name: '控制台'
+        }
+      },
+      {
+        path: '/tools',
+        component: () => import('../view/tools/index.vue'),
+        meta: {
+          name: '工具'
+        }
+      },
+      {
+        path: '/blog',
+        component: () => import('../view/blog/index.vue'),
+        meta: {
+          name: '博客'
+        }
+      },
+      {
+        path: '/bookmark',
+        component: () => import('../view/bookmark/index.vue'),
+        meta: {
+          name: '书签'
+        }
+      },
+      {
+        path: '/school',
+        component: () => import('../view/school/index.vue'),
+        meta: {
+          name: '学习'
+        }
+      },
+      {
+        path: '/thinking',
+        component: () => import('../view/thinking/index.vue'),
+        meta: {
+          name: '感悟人生'
+        }
+      },
+      {
+        path: '/cloud',
+        component: () => import('../view/cloud/index.vue'),
+        meta: {
+          name: '个人云盘'
+        }
+      },
+      {
+        path: '/recommend',
+        component: () => import('../view/recommend/index.vue'),
+        meta: {
+          name: '推荐中'
+        }
+      },
+    ]
+  }
+]
+
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes
+})
+
+export default router
