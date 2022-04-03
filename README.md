@@ -22,5 +22,11 @@
     // instand of vuex
     npm install pinia -S
 
+# element-plus
+    npm install element-plus -S
+
+# js-cookie
+    npm install js-cookie -S
+
 
   

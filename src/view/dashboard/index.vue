@@ -1,7 +1,5 @@
 <template>
-  <div class="dashboard">
-    dashboard
-  </div>
+  <div class="dashboard">just a dashboard</div>
 </template>
 
 <script setup lang="ts">

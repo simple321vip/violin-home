@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">blog</div>
+  <div class="dashboard">我会把 简书 博客园 github中的blog搬回来</div>
 </template>
 
 <script setup lang="ts">

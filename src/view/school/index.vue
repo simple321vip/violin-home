@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">study</div>
+  <div class="dashboard">这里记述了我的学习笔记</div>
 </template>
 
 <script setup lang="ts">

@@ -61,6 +61,13 @@ const routes: Array<RouteRecordRaw> = [
           name: '推荐中'
         }
       },
+      {
+        path: '/download',
+        component: () => import('../view/download/index.vue'),
+        meta: {
+          name: '一键打包'
+        }
+      },
     ]
   }
 ]
