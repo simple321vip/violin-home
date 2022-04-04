@@ -29,7 +29,7 @@
           type="success"
           v-for="(item) in bookmark_types"
           @click="doSearch(item.id)"
-        >{{ item.type }}</el-tag>
+        >{{ item.bk_type_name }}</el-tag>
       </div>
     </el-form>
     <div></div>
@@ -47,12 +47,11 @@
       <el-table-column class="click-icon" prop="url" label="url" />
       <el-table-column class="click-icon" prop label="操作">
         <template #default="scope">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-          <el-button
-            size="small"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)"
-          >Delete</el-button>
+          <el-icon :size="20" @click="copyNumber(scope.row)" class="click-icon">
+            <CopyDocument />
+          </el-icon>
+          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -60,6 +59,7 @@
       <el-button @click="toggleSelection([tableData[1], tableData[2]])">反选</el-button>
       <el-button @click="toggleSelection()">清除</el-button>
     </div>
+
     <el-dialog v-model="dialogFormVisible" title="添加书签">
       <bookmark_dialog
         :dialog_form="currentDialogData"
@@ -69,15 +69,24 @@
         @on-submit="doSubmit"
       ></bookmark_dialog>
     </el-dialog>
+
+    <el-dialog v-model="dialogVisible">
+      <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { search_bookmark } from '../../api/bookmark'
+import { search_bookmark, delete_bookmark } from '../../api/bookmark'
 import { bookmark_type } from '../../api/master'
 import bookmark_dialog from './dialog.vue'
+import delete_dialog from '../../components/operate/deleteDialog.vue'
 import type { ElTable } from 'element-plus'
+import { CopyDocument } from "@element-plus/icons-vue";
+import { ElNotification } from 'element-plus'
+import copy from 'copy-to-clipboard';
+import { h } from 'vue'
 
 
 const bookmark_types = reactive<any[]>([])
@@ -94,15 +103,13 @@ bookmark_type().then(response => {
 
 // 定义书签格式
 type Bookmark = {
-  id: number,
+  bk_id: number,
   bk_type_id: number,
   bk_type_name: String,
   comment: String,
   url: String
 }
 
-// dialog表示flag
-let dialogFormVisible = ref(false)
 // 操作code
 let operate = ref<String>('')
 const search_data = reactive({
@@ -112,9 +119,9 @@ const search_data = reactive({
 const tableData = reactive<Bookmark[]>([])
 // 响应式dialog数据
 const currentDialogData = reactive<Bookmark>({
-  id: 0,
-  bk_type_id: 0,
-  bk_type_name: '',
+  bk_id: -1,
+  bk_type_id: 1,
+  bk_type_name: '未分类',
   comment: '',
   url: ''
 })
@@ -134,15 +141,27 @@ const toggleSelection = (rows?: Bookmark[]) => {
 }
 
 
+// dialog表示flag
+let dialogFormVisible = ref(false)
+let dialogVisible = ref(false)
+
+// 操作-》添加
 const handleInsert = () => {
   operate.value = '0'
-  // currentDialogData
+  currentDialogData.bk_id = -1
+  currentDialogData.bk_type_id = 1
+  currentDialogData.bk_type_name = '未分类'
+  currentDialogData.comment = ''
+  currentDialogData.url = ''
   dialogFormVisible.value = true
 }
+// 操作-》删除
 const handleDelete = (index: number, bookmark: Bookmark) => {
+  Object.assign(currentDialogData, bookmark)
   operate.value = '2'
-  dialogFormVisible.value = true
+  dialogVisible.value = true
 }
+// 操作-》编辑
 const handleEdit = (index: number, bookmark: Bookmark) => {
   Object.assign(currentDialogData, bookmark)
   operate.value = '1'
@@ -150,7 +169,6 @@ const handleEdit = (index: number, bookmark: Bookmark) => {
 }
 
 const handleSelectionChange = (val: Bookmark[]) => {
-  console.log(val)
   multipleSelection.value = val
 }
 
@@ -165,7 +183,7 @@ const doSearch = (type_id: String) => {
     response.data.forEach((item: Bookmark, index: number) => {
       console.log(item)
       const row = {
-        id: index + 1,
+        bk_id: item.bk_id,
         bk_type_id: item.bk_type_id,
         bk_type_name: item.bk_type_name,
         comment: item.comment,
@@ -176,15 +194,31 @@ const doSearch = (type_id: String) => {
   })
 }
 
+const doDelete = (delete_id: any) => {
+  let query = delete_id
+  delete_bookmark(query).then(response => {
+    dialogVisible.value = false
+  })
+  dialogVisible.value = false
+}
+
 const closeDialog = () => {
   dialogFormVisible.value = false
 }
-const doSubmit = (form: any) => {
+const doSubmit = () => {
   dialogFormVisible.value = false
+}
+// 复制转换成功的数值，并提示 复制成功 信息
+const copyNumber = (record: Bookmark) => {
+  copy(record.url + "")
+  ElNotification({
+    title: '',
+    message: h('i', { style: 'color: teal' }, '复制成功'),
+  })
 }
 </script>
 
-<style>
+<style scoped>
 /* .dashboard {
   background-color: beige;
 } */

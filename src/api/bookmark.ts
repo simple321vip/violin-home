@@ -24,12 +24,10 @@ const update_bookmark = (params: Object) => {
   })
 }
 
-const delete_bookmark = (params: Object) => {
+const delete_bookmark = (query: number) => {
   return request({
-    url: '/bookmark',
+    url: '/bookmark/delete/' + query,
     method: 'delete',
-    headers: {},
-    data: params
   })
 }
 

@@ -2,10 +2,11 @@
   <div class="dashboard">
     <el-form :model="dialog_form">
       <el-form-item label="分类" :label-width="formLabelWidth">
-        <el-select v-model="dialog_form.bk_type_id" placeholder="请选择">
+        <el-select v-model="dialog_form.bk_type_name" placeholder>
           <el-option
             v-for="(item, index) in types"
             :key="index"
+            :selected="index == 1 ? 'selected' : ''"
             :value="item.bk_type_id"
             :label="item.bk_type_name"
           />
@@ -28,7 +29,9 @@
 </template>
 
 <script setup lang="ts">
+import { reactive } from 'vue';
 import { update_bookmark, put_bookmark } from '../../api/bookmark'
+import type { FormInstance } from 'element-plus'
 const formLabelWidth = '140px'
 
 type Props = {
@@ -43,7 +46,6 @@ const concel = () => {
   emit('on-concel')
 }
 const submit = () => {
-
   const params = {
     bk_id: props.dialog_form.bk_id,
     bk_type_id: props.dialog_form.bk_type_id,
@@ -53,15 +55,15 @@ const submit = () => {
 
   if (props.operate_code == '0') {
     put_bookmark(params).then(response => {
-      emit('on-submit', props.dialog_form)
+      emit('on-submit')
     })
   } else if (props.operate_code == '1') {
     update_bookmark(params).then(response => {
-      emit('on-submit', props.dialog_form)
+      emit('on-submit')
     })
   } else if (props.operate_code == '2') {
     update_bookmark(params).then(response => {
-      emit('on-submit', props.dialog_form)
+      emit('on-submit')
     })
   }
 }
