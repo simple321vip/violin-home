@@ -4,15 +4,22 @@ const search_bookmark = (params: Object) => {
     url: '/bookmark',
     method: 'get',
     headers: {},
-    // data: params
+    params: params
   })
 }
 
 const put_bookmark = (params: Object) => {
   return request({
-    url: '/bookmark',
+    url: '/bookmark/insert',
     method: 'put',
-    headers: {},
+    data: params
+  })
+}
+
+const update_bookmark = (params: Object) => {
+  return request({
+    url: '/bookmark/update',
+    method: 'post',
     data: params
   })
 }
@@ -35,4 +42,4 @@ const delete_bookmarks = (params: Object) => {
   })
 }
 
-export { search_bookmark, put_bookmark, delete_bookmark, delete_bookmarks }
+export { search_bookmark, put_bookmark, delete_bookmark, delete_bookmarks, update_bookmark }

@@ -3,8 +3,8 @@
     <el-form>
       <el-row>
         <el-col :span="6">
-          <!-- <el-form-item>
-            <el-autocomplete
+          <el-form-item>
+            <!-- <el-autocomplete
               v-model="search_data.drug"
               poper-class="my-autocomplete"
               :fetch-suggestions="query"
@@ -15,20 +15,22 @@
               <template slot-scope="{item}">
                 <span class="value">{{ item.value }}</span>
               </template>
-            </el-autocomplete>
-          </el-form-item>-->
+            </el-autocomplete>-->
+          </el-form-item>
         </el-col>
         <el-col>
-          <el-button type="primary" @click="doSearch">检索</el-button>
+          <el-button type="primary" @click="doSearch('')">检索</el-button>
+          <el-button type="primary" @click="handleInsert">添加</el-button>
         </el-col>
       </el-row>
-      <el-row>
-        <el-tag class="ml-2 click-icon" type="success">Java</el-tag>
-        <el-tag class="ml-2 click-icon" type="success">Xml</el-tag>
-        <el-tag class="ml-2 click-icon" type="success">Html</el-tag>
-        <el-tag class="ml-2 click-icon" type="success">ddo</el-tag>
-        <el-button type="primary" @click="openDialog">添加</el-button>
-      </el-row>
+      <div class="tag_list">
+        <el-tag
+          class="ml-2 click-icon"
+          type="success"
+          v-for="(item) in bookmark_types"
+          @click="doSearch(item.id)"
+        >{{ item.type }}</el-tag>
+      </div>
     </el-form>
     <div></div>
 
@@ -40,7 +42,7 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column type="index" label="index" width="180" />
-      <el-table-column prop="type" label="分类" width="180" />
+      <el-table-column prop="bk_type_name" label="分类" width="180" />
       <el-table-column prop="comment" label="名称" width="180" />
       <el-table-column class="click-icon" prop="url" label="url" />
       <el-table-column class="click-icon" prop label="操作">
@@ -60,7 +62,9 @@
     </div>
     <el-dialog v-model="dialogFormVisible" title="添加书签">
       <bookmark_dialog
-        :inputdata="currentDialogData"
+        :dialog_form="currentDialogData"
+        :operate_code="operate"
+        :types="bookmark_types"
         @on-concel="closeDialog"
         @on-submit="doSubmit"
       ></bookmark_dialog>
@@ -70,20 +74,37 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { query } from '../../service/search'
-import { search_bookmark, put_bookmark } from '../../api/bookmark'
+import { search_bookmark } from '../../api/bookmark'
+import { bookmark_type } from '../../api/master'
 import bookmark_dialog from './dialog.vue'
 import type { ElTable } from 'element-plus'
+
+
+const bookmark_types = reactive<any[]>([])
+bookmark_type().then(response => {
+  response.data.forEach((element: String) => {
+    const item = element.split("|")
+    const row = {
+      bk_type_id: item[0],
+      bk_type_name: item[1]
+    }
+    bookmark_types.push(row)
+  })
+})
 
 // 定义书签格式
 type Bookmark = {
   id: number,
-  type: String,
+  bk_type_id: number,
+  bk_type_name: String,
   comment: String,
   url: String
 }
 
+// dialog表示flag
 let dialogFormVisible = ref(false)
+// 操作code
+let operate = ref<String>('')
 const search_data = reactive({
   drug: '1'
 })
@@ -91,8 +112,9 @@ const search_data = reactive({
 const tableData = reactive<Bookmark[]>([])
 // 响应式dialog数据
 const currentDialogData = reactive<Bookmark>({
-  id: -1,
-  type: '',
+  id: 0,
+  bk_type_id: 0,
+  bk_type_name: '',
   comment: '',
   url: ''
 })
@@ -111,13 +133,20 @@ const toggleSelection = (rows?: Bookmark[]) => {
   }
 }
 
+
+const handleInsert = () => {
+  operate.value = '0'
+  // currentDialogData
+  dialogFormVisible.value = true
+}
+const handleDelete = (index: number, bookmark: Bookmark) => {
+  operate.value = '2'
+  dialogFormVisible.value = true
+}
 const handleEdit = (index: number, bookmark: Bookmark) => {
   Object.assign(currentDialogData, bookmark)
-  openDialog()
-}
-
-const handleDelete = (index: number, bookmark: Bookmark) => {
-
+  operate.value = '1'
+  dialogFormVisible.value = true
 }
 
 const handleSelectionChange = (val: Bookmark[]) => {
@@ -125,14 +154,20 @@ const handleSelectionChange = (val: Bookmark[]) => {
   multipleSelection.value = val
 }
 
-const doSearch = () => {
+
+const doSearch = (type_id: String) => {
+  console.log(type_id)
+  const param = {
+    type_id: type_id
+  }
   tableData.splice(0, tableData.length)
-  search_bookmark(1).then(response => {
-    console.log(response.data)
+  search_bookmark(param).then(response => {
     response.data.forEach((item: Bookmark, index: number) => {
+      console.log(item)
       const row = {
         id: index + 1,
-        type: item.type,
+        bk_type_id: item.bk_type_id,
+        bk_type_name: item.bk_type_name,
         comment: item.comment,
         url: item.url
       }
@@ -140,25 +175,27 @@ const doSearch = () => {
     })
   })
 }
-const openDialog = () => {
-  dialogFormVisible.value = true
-}
+
 const closeDialog = () => {
   dialogFormVisible.value = false
 }
 const doSubmit = (form: any) => {
-  put_bookmark(form).then(response => {
-
-  })
   dialogFormVisible.value = false
 }
 </script>
 
 <style>
-.dashboard {
+/* .dashboard {
   background-color: beige;
+} */
+.tag_list {
+  display: flex;
+  border-top: 1px solid rgba(151, 151, 151, 0.3);
+  border-bottom: 1px solid rgba(151, 151, 151, 0.3);
 }
 .click-icon {
+  width: 40px;
+  margin: 10px;
   cursor: pointer;
 }
 </style>
