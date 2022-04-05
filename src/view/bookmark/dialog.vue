@@ -2,11 +2,10 @@
   <div class="dashboard">
     <el-form :model="dialog_form">
       <el-form-item label="分类" :label-width="formLabelWidth">
-        <el-select v-model="dialog_form.bk_type_name" placeholder>
+        <el-select v-model="dialog_form.bk_type_id" placeholder>
           <el-option
-            v-for="(item, index) in types"
-            :key="index"
-            :selected="index == 1 ? 'selected' : ''"
+            v-for="(item) in types"
+            :key="item.bk_type_id"
             :value="item.bk_type_id"
             :label="item.bk_type_name"
           />

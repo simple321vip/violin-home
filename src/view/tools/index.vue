@@ -22,11 +22,9 @@
 import { ref } from 'vue'
 import type { TabsPaneContext } from 'element-plus'
 import frame from './frame.vue'
-console.log('tools')
 const activeName = ref('first')
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
-  console.log(tab, event)
 }
 </script>
 

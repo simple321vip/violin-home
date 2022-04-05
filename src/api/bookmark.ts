@@ -1,10 +1,13 @@
 import request from '../utils/request'
+import Qs from 'qs'
 const search_bookmark = (params: Object) => {
   return request({
     url: '/bookmark',
     method: 'get',
-    headers: {},
-    params: params
+    params: params,
+    paramsSerializer: (params) => {
+      return Qs.stringify(params, { arrayFormat: 'repeat' })
+    },
   })
 }
 

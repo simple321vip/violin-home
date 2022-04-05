@@ -1,38 +1,28 @@
 <template>
-  <div class="dashboard">
+  <div class="bookmark">
     <el-form>
       <el-row>
         <el-col :span="6">
           <el-form-item>
-            <!-- <el-autocomplete
-              v-model="search_data.drug"
-              poper-class="my-autocomplete"
-              :fetch-suggestions="query"
-              placeholder="xxx"
-              label=":"
-              :poper-append-to-body="false"
-            >
-              <template slot-scope="{item}">
-                <span class="value">{{ item.value }}</span>
-              </template>
-            </el-autocomplete>-->
+            <el-input v-model="search_form.comment" placeholder="请输入" clearable />
           </el-form-item>
         </el-col>
-        <el-col>
-          <el-button type="primary" @click="doSearch('')">检索</el-button>
-          <el-button type="primary" @click="handleInsert">添加</el-button>
+        <el-col :span="6">
+          <el-button type="primary" @click="doSearch">检索</el-button>
         </el-col>
       </el-row>
       <div class="tag_list">
         <el-tag
           class="ml-2 click-icon"
-          type="success"
+          :type="item.clicked ? 'danger' : 'info'"
           v-for="(item) in bookmark_types"
-          @click="doSearch(item.id)"
+          @click="handleTags(item)"
         >{{ item.bk_type_name }}</el-tag>
       </div>
     </el-form>
-    <div></div>
+    <div class="create_dialog">
+      <el-button type="primary" @click="handleInsert">新建</el-button>
+    </div>
 
     <el-table
       ref="multipleTableRef"
@@ -44,13 +34,17 @@
       <el-table-column type="index" label="index" width="180" />
       <el-table-column prop="bk_type_name" label="分类" width="180" />
       <el-table-column prop="comment" label="名称" width="180" />
-      <el-table-column class="click-icon" prop="url" label="url" />
-      <el-table-column class="click-icon" prop label="操作">
+      <el-table-column class="click-icon" prop="url" label="url">
+        <template #default="scope">
+          <span style="cursor: pointer" @click="openUrl(scope.row.url)">{{ scope.row.url }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop label="操作">
         <template #default="scope">
           <el-icon :size="20" @click="copyNumber(scope.row)" class="click-icon">
             <CopyDocument />
           </el-icon>
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -87,6 +81,7 @@ import { CopyDocument } from "@element-plus/icons-vue";
 import { ElNotification } from 'element-plus'
 import copy from 'copy-to-clipboard';
 import { h } from 'vue'
+const formLabelWidth = '140px'
 
 
 const bookmark_types = reactive<any[]>([])
@@ -94,8 +89,9 @@ bookmark_type().then(response => {
   response.data.forEach((element: String) => {
     const item = element.split("|")
     const row = {
-      bk_type_id: item[0],
-      bk_type_name: item[1]
+      bk_type_id: Number(item[0]),
+      bk_type_name: item[1],
+      clicked: false
     }
     bookmark_types.push(row)
   })
@@ -109,11 +105,17 @@ type Bookmark = {
   comment: String,
   url: String
 }
+// 定义 表单格式
+type Searchform = {
+  bk_type_ids: number[],
+  comment: String
+}
 
 // 操作code
 let operate = ref<String>('')
-const search_data = reactive({
-  drug: '1'
+const search_form = reactive<Searchform>({
+  bk_type_ids: [],
+  comment: ''
 })
 // 响应式table数据
 const tableData = reactive<Bookmark[]>([])
@@ -168,20 +170,37 @@ const handleEdit = (index: number, bookmark: Bookmark) => {
   dialogFormVisible.value = true
 }
 
+// 
+const handleTags = (tag: any) => {
+  if (tag.clicked) {
+    tag.clicked = false
+    search_form.bk_type_ids.forEach(function (item, index, arr) {
+      if (item == tag.bk_type_id) {
+        arr.splice(index, 1);
+      }
+    });
+  } else {
+    tag.clicked = true
+    search_form.bk_type_ids.push(tag.bk_type_id)
+  }
+
+}
 const handleSelectionChange = (val: Bookmark[]) => {
   multipleSelection.value = val
 }
 
+const openUrl = (url: string) => {
+  window.open("https://www.runoob.com");
+}
 
-const doSearch = (type_id: String) => {
-  console.log(type_id)
+const doSearch = () => {
   const param = {
-    type_id: type_id
+    comment: search_form.comment,
+    type_id: search_form.bk_type_ids
   }
   tableData.splice(0, tableData.length)
   search_bookmark(param).then(response => {
     response.data.forEach((item: Bookmark, index: number) => {
-      console.log(item)
       const row = {
         bk_id: item.bk_id,
         bk_type_id: item.bk_type_id,
@@ -219,9 +238,6 @@ const copyNumber = (record: Bookmark) => {
 </script>
 
 <style scoped>
-/* .dashboard {
-  background-color: beige;
-} */
 .tag_list {
   display: flex;
   border-top: 1px solid rgba(151, 151, 151, 0.3);
@@ -231,5 +247,12 @@ const copyNumber = (record: Bookmark) => {
   width: 40px;
   margin: 10px;
   cursor: pointer;
+}
+.create_dialog {
+  margin: 10px;
+}
+.bookmark {
+  border-top: 1px solid rgba(151, 151, 151, 0.3);
+  padding-top: 20px;
 }
 </style>

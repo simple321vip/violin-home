@@ -2,20 +2,18 @@ import axios from 'axios'
 
 const service = axios.create(
   {
-    baseURL: 'http://localhost:8081',
+    // baseURL: 'http://localhost:8081',
+    baseURL: 'http://49.233.4.79:8081',
     timeout: 5000
   }
 )
 
-
-
-
 // service.interceptors.request.use(
 //   config => {
-//     if (true) {
-//       config.headers['Authorization'] = 'Bearer' + getToken('user-token')
-//     }
-//     return config
+//     // if (true) {
+//     //   config.headers['Authorization'] = 'Bearer' + getToken('user-token')
+//     // }
+//     // return config
 //   },
 //   error => {
 //     console.log(error)

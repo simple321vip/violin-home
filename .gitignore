@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# 配置文件信息不能暴露
+.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
