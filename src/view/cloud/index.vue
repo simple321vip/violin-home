@@ -6,7 +6,4 @@
 </script>
 
 <style>
-.dashboard {
-  background-color: beige;
-}
 </style>

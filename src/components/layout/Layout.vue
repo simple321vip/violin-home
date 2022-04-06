@@ -5,7 +5,9 @@
         <SideBar></SideBar>
       </el-aside>
       <el-container>
-        <el-header>
+        <el-header
+          style="border-bottom-style:solid; border-bottom-width: 0.5px; border-bottom-color:rgba(151, 151, 151, 0.3);"
+        >
           <NavBar></NavBar>
         </el-header>
         <el-main>
@@ -13,8 +15,8 @@
         </el-main>
         <el-footer>
           <span>
-            小管设计
-            <br />一个执着于小提琴学习的垃圾程序员
+            小管设计8
+            <br />一个执着于小提琴学习的垃圾程序员1
           </span>
         </el-footer>
       </el-container>
@@ -28,14 +30,16 @@ import NavBar from "../layout/NavBar.vue";
 import SideBar from "../layout/SideBar.vue";
 </script>
 
-<style>
+<style scoped>
 /* .el-header,
 .el-footer {
-  background-color: #b8d1b3;
+
   color: rgb(51, 51, 51);
   text-align: center;
   line-height: 60px;
-}
+} */
+/* 
+
 
 .el-aside {
   background-color: #e9eef3;

@@ -32,7 +32,7 @@ closeStyle {
 .side-main {
   width: 200px;
 }
-.el-menu-item {
+/* .el-menu-item {
   background-color: #01dfd7;
-}
+} */
 </style>

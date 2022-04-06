@@ -19,6 +19,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "lodash-unified": "^1.0.2",
+    "md-editor-v3": "^1.11.6",
     "moment": "^2.29.1",
     "pinia": "^2.0.13",
     "qs": "^6.10.3",

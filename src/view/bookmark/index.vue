@@ -251,8 +251,4 @@ const copyNumber = (record: Bookmark) => {
 .create_dialog {
   margin: 10px;
 }
-.bookmark {
-  border-top: 1px solid rgba(151, 151, 151, 0.3);
-  padding-top: 20px;
-}
 </style>
