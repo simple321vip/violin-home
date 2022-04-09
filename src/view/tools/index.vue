@@ -11,6 +11,7 @@
         <frame />
       </el-tab-pane>
       <el-tab-pane label="JSON格式化">JSON格式化</el-tab-pane>
+      <el-tab-pane label="颜色识别">颜色识别</el-tab-pane>
       <el-tab-pane label="SQL格式化">SQL格式化</el-tab-pane>
       <el-tab-pane label="SQL生成器">SQL生成器</el-tab-pane>
       <el-tab-pane label="XML格式化">XML生成器</el-tab-pane>
