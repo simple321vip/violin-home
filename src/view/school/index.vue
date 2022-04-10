@@ -1,11 +1,15 @@
 <template>
   <div class="one_note">
-    <el-tabs class="demo-tabs" style="width: 80px;" tab-position="left">
-      <el-tab-pane label="图书馆"></el-tab-pane>
-      <el-tab-pane label="检索"></el-tab-pane>
-      <el-tab-pane label="历史"></el-tab-pane>
-    </el-tabs>
-    <div class="section_tabs">
+    <div class="nav_tabs common_box">
+      <NavTab
+        :row_key="index"
+        :checked="nav == index ? true : false"
+        :nav_name="item"
+        @click="onclickNav(index)"
+        v-for="(item, index) in nav_list"
+      ></NavTab>
+    </div>
+    <div class="section_tabs common_box">
       <div>
         <SectionTab
           :row_key="item.section_id"
@@ -15,43 +19,33 @@
           v-for="(item, index) in data_sections"
         ></SectionTab>
       </div>
-      <el-button @click="addSection">+</el-button>
+      <el-button class="plus_button" @click="addSection">+</el-button>
     </div>
 
-    <div class="page_tabs">
+    <div class="page_tabs common_box">
       <div>
         <PageTab
-          :row_key="index"
+          :row_key="item.page_id"
           v-show="item.section_id == section.section_id ? true : false"
-          @click="onclickPage(index)"
-          :checked="index === page ? true : false"
+          @click="onclickPage(item.page_id)"
+          :checked="item.page_id === page ? true : false"
           :page_data="item"
           v-for="(item, index) in current_page_list"
         ></PageTab>
       </div>
 
-      <el-button @click="addPage">+</el-button>
+      <el-button class="plus_button" @click="addPage">+</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import PageTab from '../../components/layout/PageTab.vue'
-import SectionTab from '../../components/layout/SectionTab.vue'
+import PageTab from './PageTab.vue'
+import SectionTab from './SectionTab.vue'
+import NavTab from './NavTab.vue'
 import { get_notes, insert_section, insert_page } from '../../api/onenote'
 import { reactive, ref } from 'vue';
-
-let page = ref(0)
-let section = reactive<Section>(<Section>{})
-
-const onclickPage = (index: number) => {
-  page.value = index
-
-}
-const onclickSection = (section_id: string, index: number) => {
-  section.section_id = section_id
-  Object.assign(current_page_list, data_sections[index].page_list)
-}
+// type 定義
 type Section = {
   section_id: string,
   section_name: string,
@@ -63,10 +57,14 @@ type Page = {
   section_id: string,
   page_name: string
 }
-
+// 変数定義
+let nav = ref(0)
+let page = ref("")
+let section = reactive<Section>(<Section>{})
 const data_sections = reactive<Section[]>([])
 const current_page_list = reactive<Page[]>([])
-
+const nav_list = reactive<any>(["图书馆", "检索", "历史"])
+// API 呼び出す
 get_notes({}).then(response => {
   response.data.forEach((item: any) => {
     const section: Section = {
@@ -85,9 +83,20 @@ get_notes({}).then(response => {
     data_sections.push(section)
   });
 }).then(() => {
-  console.log(data_sections)
   Object.assign(current_page_list, data_sections[0].page_list)
 });
+
+// アクション
+const onclickNav = (index: number) => {
+  nav.value = index
+}
+const onclickPage = (index: string) => {
+  page.value = index
+}
+const onclickSection = (section_id: string, index: number) => {
+  section.section_id = section_id
+  Object.assign(current_page_list, data_sections[index].page_list)
+}
 const addSection = () => {
   insert_section().then(response => {
     const data = response.data
@@ -113,12 +122,12 @@ const addPage = () => {
       section_id: data.section_id,
       page_name: data.page_name
     }
-    console.log(section.page_list)
+    current_page_list.push(page)
   })
 }
 </script>
 
-<style scoped>
+<style  scoped>
 .one_note {
   display: flex;
   align-items: stretch;
@@ -129,12 +138,27 @@ const addPage = () => {
   flex-direction: column;
   justify-content: space-between;
   width: 90px;
-  background-color: white;
 }
 
-.demo-tabs {
+.nav_tabs {
   display: flex;
   flex-direction: column;
+  width: 70px;
   padding: 0px;
+}
+
+.common_box {
+  background-color: white;
+
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: antiquewhite;
+}
+.plus_button {
+  border-top: 1px solid antiquewhite;
+  border-bottom: 1px solid antiquewhite;
+  border-left: 0px solid antiquewhite;
+  border-right: 0px solid antiquewhite;
+  border-radius: 0px;
 }
 </style>

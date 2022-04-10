@@ -24,7 +24,7 @@ import { reactive, ref, watch } from 'vue'
 import { update_page } from '../../api/onenote'
 
 type Props = {
-  row_key: number,
+  row_key: string,
   checked: boolean,
   page_data: any
 }
@@ -47,7 +47,7 @@ if (props.checked) {
   back_color.value = "background-color: #d0d0d0;"
   prex_back_color.value = "background-color: blueviolet;"
 }
-const editPage = (row_key: number) => {
+const editPage = (row_key: string) => {
   is_edit.value = !is_edit.value
   const inputt: any = document.getElementById("input_edit" + row_key)
   setTimeout(() => inputt.focus())
