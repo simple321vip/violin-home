@@ -1,0 +1,19 @@
+<template>
+  <md-editor v-model="text" previewOnly />
+</template>
+
+<script setup lang="ts">
+import MdEditor from 'md-editor-v3';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router'
+import { get_blog } from '../../api/blog'
+let text = ref<string>('')
+const route = useRoute()
+get_blog(route.query).then(response => {
+  console.log(response.data)
+})
+
+</script>
+
+<style>
+</style>

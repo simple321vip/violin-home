@@ -36,6 +36,7 @@
 
       <el-button class="plus_button" @click="addPage">+</el-button>
     </div>
+    <div></div>
   </div>
 </template>
 
@@ -143,7 +144,7 @@ const addPage = () => {
 .nav_tabs {
   display: flex;
   flex-direction: column;
-  width: 70px;
+  width: 55px;
   padding: 0px;
 }
 

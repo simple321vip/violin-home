@@ -69,6 +69,10 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
     ]
+  },
+  {
+    path: "/feedback",
+    component: () => import('../view/blog/mdview.vue')
   }
 ]
 

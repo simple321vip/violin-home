@@ -81,6 +81,7 @@ const onLeave = () => {
   align-items: center;
   width: 90px;
   height: 35px;
+  padding-left: 15px;
 }
 .page_title {
   font-size: 14px;

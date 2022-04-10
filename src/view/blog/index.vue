@@ -11,6 +11,8 @@ import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { reactive, ref } from 'vue';
 import { get_blogs } from '../../api/blog'
+import router from '../../router/index'
+
 
 type Blog = {
   blog_id: number,
@@ -36,7 +38,10 @@ text.value = "开始吧肿瘤"
 
 
 const openBlog = () => {
-  window.open("11111")
+  const { href } = router.resolve({
+    path: '/blog=1'
+  });
+  window.open(href, '_blank');
 }
 
 </script>

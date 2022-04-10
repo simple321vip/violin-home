@@ -14,5 +14,31 @@ let app = createApp(App)
 app.use(router)
 app.use(ElementPlus)
 app.use(store)
+
+
+const whiteList = ['/', '/blog']
+let url = window.location.href
+console.log(url)
+if (url != 'http://localhost:3000/' && url.search("blog=") != -1) {
+  let blog = {
+    blog_id: 1
+  }
+  router.push({
+    path: '/feedback',
+    query: blog
+  })
+}
+router.beforeEach((to, from, next) => {
+  console.log(to.path, from.path)
+
+
+  if (whiteList.includes(to.path)) {
+    next()
+  } else {
+    next()
+  }
+})
+
+
 app.mount('#app')
 
