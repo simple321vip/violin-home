@@ -15,13 +15,13 @@ app.use(router)
 app.use(ElementPlus)
 app.use(store)
 
-
+import { getToken } from './utils/auth'
 const whiteList = ['/', '/blog']
 let url = window.location.href
 console.log(url)
 if (url != 'http://localhost:3000/' && url.search("blog=") != -1) {
   let blog = {
-    blog_id: 1
+    blog_id: url.split("=")[1]
   }
   router.push({
     path: '/feedback',
@@ -30,6 +30,10 @@ if (url != 'http://localhost:3000/' && url.search("blog=") != -1) {
 }
 router.beforeEach((to, from, next) => {
   console.log(to.path, from.path)
+  if (to.path === '/login') {
+    next()
+  }
+
 
 
   if (whiteList.includes(to.path)) {

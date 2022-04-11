@@ -12,13 +12,13 @@
         <el-dropdown-item>删除</el-dropdown-item>
       </el-dropdown-menu>-->
     </el-dropdown>
-    <span>小管</span>
-  </div>
+    <span @click="doLogin">登录</span>  </div>
 </template>
 
 <script setup lang='ts'>
 import $moment from "moment";
 import { ref } from "vue";
+import router from '../../router'
 
 const getTime = () => {
   return $moment().format("YYYY年MM月DD日　HH:mm:ss");
@@ -30,6 +30,12 @@ const timeChange = () => {
   time.value = getTime();
 };
 setInterval(timeChange, 1000);
+
+const doLogin = () => {
+  router.push({
+    path: '/login'
+  })
+}
 </script>
 
 <style>
@@ -37,6 +43,7 @@ setInterval(timeChange, 1000);
   background: url("../../assets/logo.png") center no-repeat;
   background-size: cover;
 }
+
 .nav-main {
   float: right;
 }

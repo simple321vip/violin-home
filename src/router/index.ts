@@ -73,7 +73,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/feedback",
     component: () => import('../view/blog/mdview.vue')
-  }
+  },
+  {
+    path: "/login",
+    component: () => import('../components/login/login.vue')
+  },
 ]
 
 
