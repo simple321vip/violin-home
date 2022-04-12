@@ -12,24 +12,15 @@
         </el-col>
       </el-row>
       <div class="tag_list">
-        <el-tag
-          class="ml-2 click-icon"
-          :type="item.clicked ? 'danger' : 'info'"
-          v-for="(item) in bookmark_types"
-          @click="handleTags(item)"
-        >{{ item.bk_type_name }}</el-tag>
+        <el-tag class="ml-2 click-icon" :type="item.clicked ? 'danger' : 'info'" v-for="(item) in bookmark_types"
+          @click="handleTags(item)">{{ item.bk_type_name }}</el-tag>
       </div>
     </el-form>
     <div class="create_dialog">
       <el-button type="primary" @click="handleInsert">新建</el-button>
     </div>
 
-    <el-table
-      ref="multipleTableRef"
-      :data="tableData"
-      @selection-change="handleSelectionChange"
-      style="width: 100%"
-    >
+    <el-table ref="multipleTableRef" :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
       <el-table-column type="selection" width="55" />
       <el-table-column type="index" label="index" width="180" />
       <el-table-column prop="bk_type_name" label="分类" width="180" />
@@ -55,19 +46,13 @@
     </div>
 
     <el-dialog v-model="dialogFormVisible" title="添加书签">
-      <bookmark_dialog
-        :dialog_form="currentDialogData"
-        :operate_code="operate"
-        :types="bookmark_types"
-        @on-concel="closeDialog"
-        @on-submit="doSubmit"
-      ></bookmark_dialog>
+      <bookmark_dialog :dialog_form="currentDialogData" :operate_code="operate" :types="bookmark_types"
+        @on-concel="closeDialog" @on-submit="doSubmit"></bookmark_dialog>
     </el-dialog>
 
     <el-dialog v-model="dialogVisible">
       <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
-    </el-dialog>
-  </div>
+    </el-dialog>  </div>
 </template>
 
 <script setup lang="ts">
@@ -99,7 +84,7 @@ bookmark_type().then(response => {
 
 // 定义书签格式
 type Bookmark = {
-  bk_id: number,
+  bk_id: string,
   bk_type_id: number,
   bk_type_name: String,
   comment: String,
@@ -121,7 +106,7 @@ const search_form = reactive<Searchform>({
 const tableData = reactive<Bookmark[]>([])
 // 响应式dialog数据
 const currentDialogData = reactive<Bookmark>({
-  bk_id: -1,
+  bk_id: "-1",
   bk_type_id: 1,
   bk_type_name: '未分类',
   comment: '',
@@ -150,7 +135,7 @@ let dialogVisible = ref(false)
 // 操作-》添加
 const handleInsert = () => {
   operate.value = '0'
-  currentDialogData.bk_id = -1
+  currentDialogData.bk_id = "-1"
   currentDialogData.bk_type_id = 1
   currentDialogData.bk_type_name = '未分类'
   currentDialogData.comment = ''
@@ -190,7 +175,7 @@ const handleSelectionChange = (val: Bookmark[]) => {
 }
 
 const openUrl = (url: string) => {
-  window.open("https://www.runoob.com");
+  window.open(url);
 }
 
 const doSearch = () => {
@@ -243,11 +228,13 @@ const copyNumber = (record: Bookmark) => {
   border-top: 1px solid rgba(151, 151, 151, 0.3);
   border-bottom: 1px solid rgba(151, 151, 151, 0.3);
 }
+
 .click-icon {
   width: 40px;
   margin: 10px;
   cursor: pointer;
 }
+
 .create_dialog {
   margin: 10px;
 }

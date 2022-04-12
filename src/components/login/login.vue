@@ -1,15 +1,19 @@
 <template>
   <div class="yuliu"></div>
   <el-card class="box-card">
-    <el-form ref="ruleFormRef" :model="userForm" status-icon label-width="120px" class="demo-ruleForm">
+    <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
+      class="demo-ruleForm">
+      <div class="title-container">
+        <h3>私人空间</h3>
+      </div>
       <el-form-item label="用户名" prop="pass">
-        <el-input v-model="userForm.user_id" type="password" autocomplete="off" />
+        <el-input v-model="loginForm.user_id" type="password" autocomplete="off" />
       </el-form-item>
       <el-form-item label="用户凭证" prop="checkPass">
-        <el-input v-model="userForm.password" type="password" autocomplete="off" />
+        <el-input v-model="loginForm.password" type="password" autocomplete="off" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="dologin">login</el-button>
+        <el-button type="primary" @click="dologin(ruleFormRef)">login</el-button>
       </el-form-item>
     </el-form>
     ------------------------------------------------------------
@@ -24,23 +28,49 @@
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { authorize } from '../../api/user';
+import { useUserStore } from '../../store/user'
+import router from '../../router'
+const user = useUserStore()
 
-const userForm = reactive({
+const ruleFormRef = ref<FormInstance>()
+const loginForm = reactive({
   user_id: '',
   password: ''
 })
 
+const validateUserName = (rule: any, value: string, callback: Function) => {
+  if (!value) {
+    callback(new Error("请输入的用户名"))
+  } else {
+    callback()
+  }
+}
+const validatePassword = (rule: any, value: string, callback: Function) => {
+  if (!value) {
+    callback(new Error("请输入密码"))
+  } else {
+    callback()
+  }
+}
+const loginRules = reactive({
+  user_id: [{ validator: validateUserName, trigger: 'blur' }],
+  password: [{ validator: validatePassword, trigger: 'blur' }]
+})
 
-const dologin = (form: FormInstance | undefined) => {
 
-  if (!form) return
-  form.validate((valid) => {
+const dologin = (form: FormInstance) => {
+
+  if (!form)
+    return
+  form.validate((valid: any) => {
     if (valid) {
-      let validForm = {
-      }
-      authorize(validForm).then(response => {
-
+      user.login(loginForm.user_id, loginForm.password).then(res => {
+        console.log(1)
+        router.push({
+          path: '/home'
+        })
       })
+
     } else {
       return false
     }
@@ -51,6 +81,10 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
 }
+
+
+
+
 </script>
 <style scoped>
 .text {

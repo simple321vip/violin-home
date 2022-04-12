@@ -9,8 +9,12 @@ const setToken = (token: String) => {
   Cookies.set('token', token)
 }
 
+const setUserInfo = (userinfo: any) => {
+  Cookies.set('userinfo', userinfo)
+}
+
 const resetToken = (token: String) => {
   Cookies.set('token', "")
 }
 
-export { getToken, setToken, resetToken }
+export { getToken, setToken, resetToken, setUserInfo }

@@ -1,22 +1,17 @@
 <template>
   <div class="blog_list" v-for="item in data_list">
-    <span style="cursor: pointer;" @click="openBlog">{{ item.blog_title }}</span>
-    <span style="font-size: 12px;">{{ item.blog_prex }}</span>
-  </div>
-  <!-- <md-editor v-model="text" previewOnly /> -->
+    <h3 style="cursor: pointer;" @click="openBlog">{{ item.blog_title }}</h3>
+    <span style="font-size: 12px;">{{ item.blog_prex }}</span>  </div>
 </template>
 
 <script setup lang="ts">
-import MdEditor from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
 import { reactive, ref } from 'vue';
 import { get_blogs } from '../../api/blog'
 import router from '../../router/index'
 
-
 type Blog = {
-  blog_id: number,
-  blog_type_id: number,
+  blog_id: String,
+  blog_type_id: String,
   blog_type_name: string,
   blog_title: string,
   blog_prex: string
