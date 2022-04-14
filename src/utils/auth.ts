@@ -1,20 +1,24 @@
 import Cookies from 'js-cookie'
 
 const getToken = () => {
-  const token = Cookies.get('token')
-  return token
+  return Cookies.get('token')
 }
 
 const setToken = (token: String) => {
   Cookies.set('token', token)
 }
 
-const setUserInfo = (userinfo: any) => {
-  Cookies.set('userinfo', userinfo)
+const setUser = (user: object) => {
+  Cookies.set('user', JSON.stringify(user))
 }
 
-const resetToken = (token: String) => {
-  Cookies.set('token', "")
+const getUser = () => {
+  return Cookies.get('user')
 }
 
-export { getToken, setToken, resetToken, setUserInfo }
+const resetToken = () => {
+  Cookies.remove('token')
+  Cookies.remove('user')
+}
+
+export { getToken, setToken, resetToken, setUser, getUser }

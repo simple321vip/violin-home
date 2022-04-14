@@ -1,37 +1,23 @@
 <template>
   <div class="one_note">
     <div class="nav_tabs common_box">
-      <NavTab
-        :row_key="index"
-        :checked="nav == index ? true : false"
-        :nav_name="item"
-        @click="onclickNav(index)"
-        v-for="(item, index) in nav_list"
-      ></NavTab>
+      <NavTab :row_key="index" :checked="nav == index ? true : false" :nav_name="item" @click="onclickNav(index)"
+        v-for="(item, index) in nav_list"></NavTab>
     </div>
     <div class="section_tabs common_box">
       <div>
-        <SectionTab
-          :row_key="item.section_id"
-          @click="onclickSection(item.section_id, index)"
-          :checked="item.section_id === section.section_id ? true : false"
-          :section_data="item"
-          v-for="(item, index) in data_sections"
-        ></SectionTab>
+        <SectionTab :row_key="item.section_id + ''" @click="onclickSection(item.section_id, index)"
+          :checked="item.section_id === section.section_id ? true : false" :section_data="item"
+          v-for="(item, index) in data_sections"></SectionTab>
       </div>
       <el-button class="plus_button" @click="addSection">+</el-button>
     </div>
 
     <div class="page_tabs common_box">
       <div>
-        <PageTab
-          :row_key="item.page_id"
-          v-show="item.section_id == section.section_id ? true : false"
-          @click="onclickPage(item.page_id)"
-          :checked="item.page_id === page ? true : false"
-          :page_data="item"
-          v-for="(item, index) in current_page_list"
-        ></PageTab>
+        <PageTab :row_key="item.page_id + ''" v-show="item.section_id == section.section_id ? true : false"
+          @click="onclickPage(item.page_id)" :checked="item.page_id === page ? true : false" :page_data="item"
+          v-for="(item, index) in current_page_list"></PageTab>
       </div>
 
       <el-button class="plus_button" @click="addPage">+</el-button>
@@ -102,7 +88,7 @@ const addSection = () => {
   insert_section().then(response => {
     const data = response.data
     const section: Section = {
-      section_id: data.section_id,
+      section_id: data.section_id + '',
       section_name: data.section_name,
       page_list: data.page_list
     }
@@ -133,6 +119,7 @@ const addPage = () => {
   display: flex;
   align-items: stretch;
 }
+
 .section_tabs,
 .page_tabs {
   display: flex;
@@ -155,6 +142,7 @@ const addPage = () => {
   border-right-style: solid;
   border-right-color: antiquewhite;
 }
+
 .plus_button {
   border-top: 1px solid antiquewhite;
   border-bottom: 1px solid antiquewhite;

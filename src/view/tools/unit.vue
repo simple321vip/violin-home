@@ -1,27 +1,22 @@
 <template>
-  <div class="unit_tag" style="margin-bottom: 10px;">
-    <el-tag class="ml-2">from</el-tag>
-    <div v-for="(item, index) in colorup.list">
-      <el-tag
-        class="ml-2"
-        :style="item.style"
-        style
-        @click="onChange(item.binary, item.flg, index)"
-      >{{ item.text }}</el-tag>
+  <div>
+    <div class="unit_tag" style="margin-bottom: 10px;">
+      <el-tag class="ml-2">from</el-tag>
+      <div :class="'ml-1-' + index" v-for="(item, index) in colorup.list">
+        <el-tag class="ml-2" :style="item.style" style @click="onChange(item.binary, item.flg, index)">{{ item.text }}
+        </el-tag>
+      </div>
     </div>
-  </div>
-  <div class="unit_tag" style="margin-bottom: 10px; border-color: red;">
-    <el-tag class="ml-2" style="width: 47.625px">to</el-tag>
-    <div v-for="(item, index) in colordown.list">
-      <el-tag
-        class="ml-2"
-        :style="item.style"
-        @click="onChange(item.binary, item.flg, index)"
-      >{{ item.text }}</el-tag>
+    <div class="unit_tag" style="margin-bottom: 10px; border-color: red;">
+      <el-tag class="ml-2" style="width: 47.625px">to</el-tag>
+      <div :class="'ml-1-' + index" v-for="(item, index) in colordown.list">
+        <el-tag class="ml-2" :style="item.style" @click="onChange(item.binary, item.flg, index)">{{ item.text }}
+        </el-tag>
+      </div>
     </div>
-  </div>
-  <div class="test" style="margin-bottom: 10px; border-color: red;" v-for="(index) in total">
-    <Cal @on-clickplus="add" :data="t2t" :isPlus="total == index"></Cal>
+    <div class="test" style="margin-bottom: 10px; border-color: red;" v-for="(index) in total">
+      <Cal @on-clickplus="add" :data="t2t" :isPlus="total == index"></Cal>
+    </div>
   </div>
 </template>
 
@@ -77,9 +72,11 @@ const onChange = (binary: number, isFrom: boolean, index: number) => {
 .unit_tag {
   display: flex;
 }
+
 .test {
   display: flex;
 }
+
 .ml-2 {
   margin-right: 10px;
   margin-left: 10px;

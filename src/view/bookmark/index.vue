@@ -17,7 +17,7 @@
       </div>
     </el-form>
     <div class="create_dialog">
-      <el-button type="primary" @click="handleInsert">新建</el-button>
+      <el-button type="primary" @click="handleInsert" v-show="user.owner">新建</el-button>
     </div>
 
     <el-table ref="multipleTableRef" :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
@@ -30,13 +30,15 @@
           <span style="cursor: pointer" @click="openUrl(scope.row.url)">{{ scope.row.url }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop label="操作">
+      <el-table-column label="操作">
         <template #default="scope">
           <el-icon :size="20" @click="copyNumber(scope.row)" class="click-icon">
             <CopyDocument />
           </el-icon>
-          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)" v-show="user.owner">编辑
+          </el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-show="user.owner">删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,7 +54,8 @@
 
     <el-dialog v-model="dialogVisible">
       <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
-    </el-dialog>  </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -66,8 +69,9 @@ import { CopyDocument } from "@element-plus/icons-vue";
 import { ElNotification } from 'element-plus'
 import copy from 'copy-to-clipboard';
 import { h } from 'vue'
-const formLabelWidth = '140px'
-
+import { useUserStore } from '../../store/user'
+// obtain user infomation 
+const user = useUserStore()
 
 const bookmark_types = reactive<any[]>([])
 bookmark_type().then(response => {

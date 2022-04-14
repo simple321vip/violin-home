@@ -1,6 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { authorize } from '../api/user'
-import { getToken, setToken, resetToken, setUserInfo } from '../utils/auth'
+import { getToken, setToken, resetToken, setUser, getUser } from '../utils/auth'
 
 /**
  * Simulate a login
@@ -13,11 +13,17 @@ import { getToken, setToken, resetToken, setUserInfo } from '../utils/auth'
 //   return Promise.reject(new Error('invalid credentials'))
 // }
 
+type User = {
+  id: string,
+  username: string
+}
+
 export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
     name: '',
     token: '',
+    owner: false
   }),
 
   getters: {
@@ -28,8 +34,9 @@ export const useUserStore = defineStore({
       this.$patch({
         name: '',
         token: '',
+        owner: false
       })
-
+      resetToken()
       // we could do other stuff like redirecting the user
     },
 
@@ -43,10 +50,12 @@ export const useUserStore = defineStore({
       if (userData.data.token) {
         this.$patch({
           name: user_id,
+
           ...userData.data,
+          owner: true
         })
         setToken(userData.data.token)
-        setUserInfo(userData)
+        setUser(userData)
         console.log('authorize success!')
       }
       return new Promise((resolve, reject) => {
@@ -57,6 +66,17 @@ export const useUserStore = defineStore({
         }
       })
     },
+    async reflush() {
+      if (getToken()) {
+        const user = <User>(JSON.parse(getUser() as string))
+        const token = <string>getToken()
+        this.$patch({
+          name: user.id,
+          token: token,
+          owner: true
+        })
+      }
+    }
   },
 })
 

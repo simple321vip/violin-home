@@ -20,14 +20,13 @@
     <div>
       微信/支付宝
     </div>
-    </el-card>
+  </el-card>
 
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { authorize } from '../../api/user';
 import { useUserStore } from '../../store/user'
 import router from '../../router'
 const user = useUserStore()
@@ -58,7 +57,7 @@ const loginRules = reactive({
 })
 
 
-const dologin = (form: FormInstance) => {
+const dologin = (form: any) => {
 
   if (!form)
     return
@@ -76,14 +75,6 @@ const dologin = (form: FormInstance) => {
     }
   })
 }
-
-const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.resetFields()
-}
-
-
-
 
 </script>
 <style scoped>

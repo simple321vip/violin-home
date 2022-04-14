@@ -29,9 +29,15 @@ if (url != 'http://localhost:3000/' && url.search("blog=") != -1) {
   })
 }
 router.beforeEach((to, from, next) => {
-  console.log(to.path, from.path)
+  console.log(from.path, to.path)
+
+  const token = getToken()
   if (to.path === '/login') {
-    next()
+    if (token) {
+      next('/home')
+    } else {
+      next()
+    }
   }
 
 
