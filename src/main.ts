@@ -19,14 +19,26 @@ import { getToken } from './utils/auth'
 const whiteList = ['/', '/blog']
 let url = window.location.href
 console.log(url)
-if (url != 'http://localhost:3000/' && url.search("blog=") != -1) {
-  let blog = {
-    blog_id: url.split("=")[1]
+if (url != 'http://localhost:3000/') {
+  // if(url.search("blog=") != -1) {
+  //   let blog = {
+  //     blog_id: url.split("=")[1]
+  //   }
+  //   router.push({
+  //     path: '/feedback',
+  //     query: blog
+  //   })
+  // }
+  if (url.search("edit_blog=") != -1) {
+    let blog = {
+      blog_id: url.split("=")[1]
+    }
+    router.push({
+      path: '/BlogEditer',
+      query: blog
+    })
   }
-  router.push({
-    path: '/feedback',
-    query: blog
-  })
+
 }
 router.beforeEach((to, from, next) => {
   console.log(from.path, to.path)

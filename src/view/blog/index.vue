@@ -1,7 +1,11 @@
 <template>
+  <el-button @click="openBlogEditer">++++++</el-button>
   <div class="blog_list" v-for="item in data_list">
     <h3 style="cursor: pointer;" @click="openBlog">{{ item.blog_title }}</h3>
-    <span style="font-size: 12px;">{{ item.blog_prex }}</span>  </div>
+    <span style="font-size: 12px;">{{ item.blog_prex }}</span>
+  </div>
+
+
 </template>
 
 <script setup lang="ts">
@@ -9,13 +13,7 @@ import { reactive, ref } from 'vue';
 import { get_blogs } from '../../api/blog'
 import router from '../../router/index'
 
-type Blog = {
-  blog_id: String,
-  blog_type_id: String,
-  blog_type_name: string,
-  blog_title: string,
-  blog_prex: string
-}
+import { Blog, BlogType } from '../../entity/index'
 
 const data_list = reactive<Blog[]>([])
 
@@ -31,7 +29,6 @@ query()
 let text = ref<string>('')
 text.value = "开始吧肿瘤"
 
-
 const openBlog = () => {
   const { href } = router.resolve({
     path: '/blog=1'
@@ -39,6 +36,12 @@ const openBlog = () => {
   window.open(href, '_blank');
 }
 
+const openBlogEditer = () => {
+  const { href } = router.resolve({
+    path: '/edit_blog=1'
+  });
+  window.open(href, '_blank');
+}
 </script>
 
 <style>

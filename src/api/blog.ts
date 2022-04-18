@@ -18,4 +18,23 @@ const get_blog = (params: any) => {
   })
 }
 
-export { get_blogs, get_blog }
+const get_user_blogs = (params: Object) => {
+  return request({
+    url: '/blog',
+    method: 'get',
+    params: params,
+    paramsSerializer: (params) => {
+      return Qs.stringify(params, { arrayFormat: 'repeat' })
+    },
+  })
+}
+
+const update_blog_type = (params: Object) => {
+  return request({
+    url: '/blog/update_blog_type',
+    method: 'post',
+    data: params
+  })
+}
+
+export { get_blogs, get_blog, get_user_blogs, update_blog_type }
