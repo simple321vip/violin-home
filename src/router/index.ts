@@ -13,13 +13,6 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/tools',
-        component: () => import('../view/tools/index.vue'),
-        meta: {
-          name: '工具'
-        }
-      },
-      {
         path: '/blog',
         component: () => import('../view/blog/index.vue'),
         meta: {

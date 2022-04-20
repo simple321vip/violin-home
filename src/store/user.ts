@@ -1,6 +1,7 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { authorize } from '../api/user'
 import { getToken, setToken, resetToken, setUser, getUser } from '../utils/auth'
+import { User } from '../entity/index'
 
 /**
  * Simulate a login
@@ -12,11 +13,6 @@ import { getToken, setToken, resetToken, setUser, getUser } from '../utils/auth'
 //   if (p === 'ed') return Promise.resolve({ isAdmin: false })
 //   return Promise.reject(new Error('invalid credentials'))
 // }
-
-type User = {
-  id: string,
-  username: string
-}
 
 export const useUserStore = defineStore({
   id: 'user',

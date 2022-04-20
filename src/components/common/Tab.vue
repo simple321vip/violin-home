@@ -61,8 +61,8 @@ const emit = defineEmits(['on-click'])
 const clickTap = () => {
   is_edit.value = !is_edit.value
   const params = {
-    section_id: props.row_key,
-    section_name: props.tab_text
+    id: props.row_key,
+    name: props.tab_text
   }
   emit('on-click', params)
   onLeave()

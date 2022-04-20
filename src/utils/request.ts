@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken } from '../utils/auth'
 
 const service = axios.create(
   {
@@ -8,18 +9,18 @@ const service = axios.create(
   }
 )
 
-// service.interceptors.request.use(
-//   config => {
-//     // if (true) {
-//     //   config.headers['Authorization'] = 'Bearer' + getToken('user-token')
-//     // }
-//     // return config
-//   },
-//   error => {
-//     console.log(error)
-//     return Promise.reject(error)
-//   }
-// )
+service.interceptors.request.use(
+  config => {
+    if (typeof getToken() === 'string') {
+      (config as any).headers['Authorization'] = 'Bearer' + getToken()
+    }
+    return config
+  },
+  error => {
+    console.log(error)
+    return Promise.reject(error)
+  }
+)
 
 // service.interceptors.response.use(
 //   response => {

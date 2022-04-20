@@ -33,6 +33,9 @@ const update_blog_type = (params: Object) => {
   return request({
     url: '/blog/update_blog_type',
     method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    },
     data: params
   })
 }

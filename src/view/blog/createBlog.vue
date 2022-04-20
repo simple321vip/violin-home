@@ -43,24 +43,6 @@ let blog_tab = reactive<Tab>(<Tab>{
 const data_type_list = reactive<BlogType[]>([])
 let checkedIndex = ref<number>(0)
 
-data_type_list.push({
-  blog_type_id: '1',
-  blog_type_name: 'xxx',
-  blog_list: []
-})
-// data_type_list[0].blog_list.push({})
-data_type_list.push({
-  blog_type_id: '2',
-  blog_type_name: 'yyy',
-  blog_list: []
-})
-data_type_list.push({
-  blog_type_id: '3',
-  blog_type_name: 'zzz',
-  blog_list: []
-})
-
-
 const blog_type_list = reactive<BlogType[]>([])
 get_user_blogs({}).then(response => {
 
@@ -87,8 +69,11 @@ const handleCheck = (id: string) => {
   return type_tab.id == id
 }
 const saveType = (params: any) => {
-  console.log(params)
-  update_blog_type(1).then(response => {
+  const query = {
+    blog_type_id: params.id,
+    blog_type_name: params.name
+  }
+  update_blog_type(query).then(response => {
 
   })
 }

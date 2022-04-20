@@ -12,4 +12,9 @@ type BlogType = {
   blog_list: Blog[]
 }
 
-export { Blog, BlogType }
+type User = {
+  id: string,
+  username: string
+}
+
+export { Blog, BlogType, User }
