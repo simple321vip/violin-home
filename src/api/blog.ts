@@ -40,4 +40,16 @@ const update_blog_type = (params: Object) => {
   })
 }
 
-export { get_blogs, get_blog, get_user_blogs, update_blog_type }
+const insert_blog_type = (params: Object) => {
+  return request({
+    url: '/blog/insert_blog_type',
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    },
+    data: params
+  })
+}
+
+
+export { get_blogs, get_blog, get_user_blogs, update_blog_type, insert_blog_type }

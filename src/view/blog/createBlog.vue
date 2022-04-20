@@ -25,7 +25,7 @@ import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { get_user_blogs } from '../../api/blog'
 import { Blog, BlogType } from '../../entity/index'
-import { update_blog_type } from '../../api/blog'
+import { update_blog_type, insert_blog_type } from '../../api/blog'
 import Tab from '../../components/common/Tab.vue'
 
 let text = ref<string>("")
@@ -64,6 +64,21 @@ get_user_blogs({}).then(response => {
     });
     blog_type_list.push(blog_type)
   });
+}).then(() => {
+  if (blog_type_list.length == 0) {
+    const data = {
+      blog_type_name: '未分类'
+    }
+    insert_blog_type(data).then(response => {
+      if (response.data) {
+        blog_type_list.push({
+          blog_type_id: response.data.blog_type_id,
+          blog_type_name: response.data.blog_type_id,
+          blog_list: []
+        })
+      }
+    })
+  }
 })
 const handleCheck = (id: string) => {
   return type_tab.id == id
