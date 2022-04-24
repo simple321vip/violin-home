@@ -1,7 +1,12 @@
 <template>
-  <el-button @click="openBlogEditer">++++++</el-button>
+  <el-button @click="openBlogEditer">进入博客小作坊</el-button>
+  <el-button @click="test">获取博客内容</el-button>
+  <el-button @click="test1">新增博客</el-button>
+  <el-button @click="test2">更新博客</el-button>
+  <el-button @click="test3">削除博客</el-button>
+
   <div class="blog_list" v-for="item in data_list">
-    <h3 style="cursor: pointer;" @click="openBlog">{{ item.blog_title }}</h3>
+    <h3 style="cursor: pointer;" @click="openBlog">{{ item.title }}</h3>
     <span style="font-size: 12px;">{{ item.blog_prex }}</span>
   </div>
 
@@ -10,7 +15,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { get_blogs } from '../../api/blog'
+import { get_blogs, getContent, newBlog, updateContent, deleteContent } from '../../api/blog'
 import router from '../../router/index'
 
 import { Blog, BlogType } from '../../entity/index'
@@ -41,6 +46,36 @@ const openBlogEditer = () => {
     path: '/edit_blog=1'
   });
   window.open(href, '_blank');
+}
+const test = () => {
+  getContent('123456').then(response => {
+    console.log(response)
+  })
+}
+const test1 = () => {
+  const params = {
+    blog_type_id: "2808000",
+    title: "dddddddd"
+  }
+  newBlog(params).then(response => {
+    console.log(response)
+  })
+}
+const test2 = () => {
+  const params = {
+    bid: "22222",
+    title: "22222222222",
+    content: "dddddddddddddddddddddddddddd"
+  }
+  updateContent(params).then(response => {
+    console.log(response)
+  })
+}
+
+const test3 = () => {
+  deleteContent('22222').then(response => {
+    console.log(response)
+  })
 }
 </script>
 

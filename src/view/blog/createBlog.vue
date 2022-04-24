@@ -1,31 +1,29 @@
 <template>
   <div class="blog_editer">
     <div class="tab_list">
-      <Tab :row_key="item.blog_type_id" :checked="handleCheck(item.blog_type_id)" :tab_text="item.blog_type_name"
-        checked_color="" over_color="" leave_color="" @on-click="saveType"
-        @click="onclickTypeTab(item.blog_type_id, index)" v-for="(item, index) in data_type_list">
+      <Tab :row_key="item.btId" :checked="handleCheck(item.btId)" :tab_text="item.btName" checked_color="" over_color=""
+        leave_color="" @on-click="saveType" @click="onclickTypeTab(item.btId, index)"
+        v-for="(item, index) in blog_type_list">
       </Tab>
     </div>
     <div>
-      <Tab :row_key="item.blog_type_id" :checked="handleCheck(item.blog_type_id)" :tab_text="item.blog_type_name"
-        checked_color="" over_color="" leave_color="" @on-click="saveBlog"
-        @click="onclickBlogTab(item.blog_type_id, index)"
-        v-for="(item, index) in data_type_list[checkedIndex].blog_list">
+      <Tab :row_key="item.bid" :checked="handleCheck(item.bid)" :tab_text="item.title" checked_color="" over_color=""
+        leave_color="" @on-click="saveTitle" @click="onclickBlogTab(item.bid, index)"
+        v-for="(item, index) in blog_type_list[checkedIndex].blog_list">
       </Tab>
     </div>
     <div>
-      <md-editor v-model="text" />
+      <md-editor v-model="blog_type_list[checkedIndex].blog_list[checkedBlogIndex].content" @save="saveContent" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import MdEditor from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
-import { get_user_blogs } from '../../api/blog'
+import { reactive, ref } from 'vue'
+import MdEditor from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 import { Blog, BlogType } from '../../entity/index'
-import { update_blog_type, insert_blog_type } from '../../api/blog'
+import { updateBtName, updateContent, insert_blog_type, listAll } from '../../api/blog'
 import Tab from '../../components/common/Tab.vue'
 
 let text = ref<string>("")
@@ -36,34 +34,35 @@ type Tab = {
 let type_tab = reactive<Tab>(<Tab>{
   id: '1'
 })
-let blog_tab = reactive<Tab>(<Tab>{
-  id: '1'
-})
+let bid = ref("")
 
-const data_type_list = reactive<BlogType[]>([])
 let checkedIndex = ref<number>(0)
+let checkedBlogIndex = ref<number>(0)
 
 const blog_type_list = reactive<BlogType[]>([])
-get_user_blogs({}).then(response => {
-
+listAll().then(response => {
+  console.log(response)
   response.data.forEach((element: any) => {
     const blog_type: BlogType = {
-      blog_type_id: element.blog_type_id,
-      blog_type_name: element.blog_type_id,
+      btId: element.btId,
+      btName: element.btName,
       blog_list: []
     }
     element.blog_list.forEach((item: any) => {
       const blog: Blog = {
-        blog_id: item.blog_id,
-        blog_type_id: item.blog_type_id,
-        blog_type_name: item.blog_type_name,
-        blog_title: item.blog_title,
-        blog_prex: item.blog_prex
+        bid: item.bid,
+        btId: item.btId,
+        btName: item.btName,
+        title: item.title,
+        blog_prex: item.blog_prex,
+        content: item.content
       }
       blog_type.blog_list.push(blog)
     });
     blog_type_list.push(blog_type)
   });
+  bid.value = blog_type_list[0].blog_list[0].bid
+  text.value = blog_type_list[0].blog_list[0].content
 }).then(() => {
   if (blog_type_list.length == 0) {
     const data = {
@@ -72,8 +71,8 @@ get_user_blogs({}).then(response => {
     insert_blog_type(data).then(response => {
       if (response.data) {
         blog_type_list.push({
-          blog_type_id: response.data.blog_type_id,
-          blog_type_name: response.data.blog_type_id,
+          btId: response.data.btId,
+          btName: response.data.btNmae,
           blog_list: []
         })
       }
@@ -85,16 +84,28 @@ const handleCheck = (id: string) => {
 }
 const saveType = (params: any) => {
   const query = {
-    blog_type_id: params.id,
-    blog_type_name: params.name
+    btId: params.id,
+    btName: params.name
   }
-  update_blog_type(query).then(response => {
+  updateBtName(query).then(response => {
 
   })
 }
-const saveBlog = (params: any) => {
-  console.log(params)
-  update_blog_type(1).then(response => {
+const saveTitle = (params: any) => {
+  const query = {
+    bid: params.id,
+    title: params.name
+  }
+  updateContent(query).then(response => {
+
+  })
+}
+const saveContent = () => {
+  const query = {
+    bid: bid.value,
+    content: text.value
+  }
+  updateContent(query).then(response => {
 
   })
 }
@@ -103,7 +114,8 @@ const onclickTypeTab = (id: string, index: number) => {
   type_tab.id = id
 }
 const onclickBlogTab = (id: string, index: number) => {
-  blog_tab.id = id
+  bid.value = id
+  checkedBlogIndex.value = index
 }
 </script>
 

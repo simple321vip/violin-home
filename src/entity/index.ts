@@ -1,14 +1,15 @@
 type Blog = {
-  blog_id: string,
-  blog_type_id: string,
-  blog_type_name: string,
-  blog_title: string,
-  blog_prex: string
+  bid: string,
+  btId: string,
+  btName: string,
+  title: string,
+  blog_prex: string,
+  content: string
 }
 
 type BlogType = {
-  blog_type_id: string,
-  blog_type_name: string,
+  btId: string,
+  btName: string,
   blog_list: Blog[]
 }
 

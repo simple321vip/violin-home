@@ -18,20 +18,19 @@ const get_blog = (params: any) => {
   })
 }
 
-const get_user_blogs = (params: Object) => {
+const listAll = () => {
   return request({
-    url: '/blog',
+    url: '/author/blog/list',
     method: 'get',
-    params: params,
-    paramsSerializer: (params) => {
-      return Qs.stringify(params, { arrayFormat: 'repeat' })
-    },
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    }
   })
 }
 
-const update_blog_type = (params: Object) => {
+const updateBtName = (params: Object) => {
   return request({
-    url: '/blog/update_blog_type',
+    url: '/author/blog/update_blog_type',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charsetset=UTF-8'
@@ -51,5 +50,47 @@ const insert_blog_type = (params: Object) => {
   })
 }
 
+const getContent = (id: string) => {
+  return request({
+    url: '/author/blog/' + id + '/content',
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    }
+  })
+}
 
-export { get_blogs, get_blog, get_user_blogs, update_blog_type, insert_blog_type }
+const newBlog = (params: Object) => {
+  return request({
+    url: '/author/blog/createContent',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    },
+    data: params
+  })
+}
+
+const updateContent = (params: Object) => {
+  return request({
+    url: '/author/blog/updateContent',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    },
+    data: params
+  })
+}
+
+const deleteContent = (params: string) => {
+  return request({
+    url: '/author/blog/delete/' + params,
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json;charsetset=UTF-8'
+    }
+  })
+}
+
+
+export { get_blogs, get_blog, listAll, updateBtName, insert_blog_type, getContent, newBlog, updateContent, deleteContent }

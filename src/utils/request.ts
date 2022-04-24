@@ -3,8 +3,7 @@ import { getToken } from '../utils/auth'
 
 const service = axios.create(
   {
-    baseURL: 'http://localhost:8081',
-    // baseURL: 'http://49.233.4.79:8081',
+    baseURL: import.meta.env.VITE_APP_URL as string,
     timeout: 5000
   }
 )

@@ -16,51 +16,40 @@ import { getToken, getUser } from './utils/auth'
 import { User } from './entity/index'
 const whiteList = ['/login']
 let url = window.location.href
-console.log(url)
-if (url != 'http://localhost:3000/') {
-  // if(url.search("blog=") != -1) {
-  //   let blog = {
-  //     blog_id: url.split("=")[1]
-  //   }
-  //   router.push({
-  //     path: '/feedback',
-  //     query: blog
-  //   })
-  // }
-  if (url.search("edit_blog=") != -1) {
-    let blog = {
-      blog_id: url.split("=")[1]
-    }
-    router.push({
-      path: '/BlogEditer',
-      query: blog
-    })
-  }
 
-}
+/**
+ * ルーター監視
+ * １、トーケン取得
+ * ２、トーケンなし場合はログイン画面に遷移
+ * ３、トーケンあり場合：
+ * 　既にログイン場合はデフォルト　/ 　に遷移
+ * 　
+ */
 router.beforeEach((to, from, next) => {
   console.log(from.path, to.path)
 
   const token = getToken()
+
+
   if (typeof token === 'string') {
-    if (to.path === '/login') {
-      if (token) {
+    switch (to.path) {
+      case '/login':
         next('/')
-      }
-    } else if (to.path === '/') {
-      const user = <User>(JSON.parse(getUser() as string))
-      console.log(user)
-      if (user) {
-        router.push({
-          path: '/home',
-          query: user
-        })
-      }
-    } else {
-      next()
+        break;
+      case '/':
+        const user = <User>(JSON.parse(getUser() as string))
+        if (url.search("edit_blog") != -1) {
+          next('/BlogEditer')
+        } else {
+          router.push({
+            path: '/home',
+            query: user
+          })
+        }
+        break;
+      default:
+        next()
     }
-
-
   } else {
     if (whiteList.includes(to.path)) {
       next()
@@ -69,7 +58,6 @@ router.beforeEach((to, from, next) => {
     }
 
   }
-
 })
 
 
