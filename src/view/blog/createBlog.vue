@@ -1,95 +1,115 @@
 <template>
-  <div class="blog_editer">
-    <div class="tab_list">
-      <Tab :row_key="item.btId" :checked="handleCheck(item.btId)" :tab_text="item.btName" checked_color="" over_color=""
-        leave_color="" @on-click="saveType" @click="onclickTypeTab(item.btId, index)"
-        v-for="(item, index) in blog_type_list">
-      </Tab>
+  <div class="blog_editer" v-if="isReady">
+    <div class="bt_section">
+      <el-button>增加</el-button>
+      <el-button class="bts" v-for="(value, key) of blogTypes" :key="key" @click="onclickBlogTab(value[0])">
+        <el-dropdown trigger="click">
+          <el-icon>
+            <edit />
+          </el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="handleEditBtName(value[1])">修改</el-dropdown-item>
+              <el-dropdown-item @click="true">退出</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        {{ value[1].btName }}
+      </el-button>
+    </div>
+    <div class="b_section">
+      <el-button @click="insertBlogType">增加</el-button>
+      <el-button v-for="(blog, index) of blogTypes.get(checkedBlogIndex)?.blogs" @click="onclickTypeTab(blog[0])">
+        {{ blog[1].title }}
+      </el-button>
     </div>
     <div>
-      <Tab :row_key="item.bid" :checked="handleCheck(item.bid)" :tab_text="item.title" checked_color="" over_color=""
-        leave_color="" @on-click="saveTitle" @click="onclickBlogTab(item.bid, index)"
-        v-for="(item, index) in blog_type_list[checkedIndex].blog_list">
-      </Tab>
+      <md-editor theme="light" v-model="blog.content" @save="saveContent" />
     </div>
-    <div>
-      <md-editor v-model="blog_type_list[checkedIndex].blog_list[checkedBlogIndex].content" @save="saveContent" />
-    </div>
+    <el-dialog v-model="dialogVisible" title="Tips" width="30%">
+      <el-input v-model="(blogTypes.get(checkedBlogIndex) as BlogType).btName"></el-input>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="saveType">Confirm</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
 import MdEditor from 'md-editor-v3'
+import { Edit } from "@element-plus/icons-vue";
 import 'md-editor-v3/lib/style.css'
 import { Blog, BlogType } from '../../entity/index'
-import { updateBtName, updateContent, insert_blog_type, listAll } from '../../api/blog'
-import Tab from '../../components/common/Tab.vue'
+import { updateBtName, updateContent, listAll, insert_blog_type } from '../../api/blog'
 
-let text = ref<string>("")
-type Tab = {
-  id: string
-}
+// const MD_SETTING = () => {
+//   return {
+//     tools: [{ title: 'bold' }]
+//   }
+// }
 
-let type_tab = reactive<Tab>(<Tab>{
-  id: '1'
-})
+const blogTypes = reactive<Map<string, BlogType>>(new Map())
+const blog = reactive<Blog>({} as Blog)
 let bid = ref("")
+const dialogVisible = ref(false)
 
-let checkedIndex = ref<number>(0)
-let checkedBlogIndex = ref<number>(0)
-
-const blog_type_list = reactive<BlogType[]>([])
-listAll().then(response => {
-  console.log(response)
-  response.data.forEach((element: any) => {
-    const blog_type: BlogType = {
-      btId: element.btId,
-      btName: element.btName,
-      blog_list: []
-    }
-    element.blog_list.forEach((item: any) => {
-      const blog: Blog = {
-        bid: item.bid,
-        btId: item.btId,
-        btName: item.btName,
-        title: item.title,
-        blog_prex: item.blog_prex,
-        content: item.content
+let checkedIndex = ref<string>("")
+let checkedBlogIndex = ref<string>("")
+let isReady = ref(false)
+const getTestData = async () => {
+  await listAll().then(response => {
+    console.log(response)
+    response.data.forEach((element: any) => {
+      const blog_type: BlogType = {
+        btId: element.btId,
+        btName: element.btName,
+        blogs: new Map<string, Blog>()
       }
-      blog_type.blog_list.push(blog)
-    });
-    blog_type_list.push(blog_type)
-  });
-  bid.value = blog_type_list[0].blog_list[0].bid
-  text.value = blog_type_list[0].blog_list[0].content
-}).then(() => {
-  if (blog_type_list.length == 0) {
-    const data = {
-      blog_type_name: '未分类'
-    }
-    insert_blog_type(data).then(response => {
-      if (response.data) {
-        blog_type_list.push({
-          btId: response.data.btId,
-          btName: response.data.btNmae,
-          blog_list: []
-        })
-      }
+      blogTypes.set(element.btId, blog_type)
+      element.blog_list.forEach((item: any) => {
+        const blog: Blog = {
+          bid: item.bid,
+          btId: item.btId,
+          btName: item.btName,
+          title: item.title,
+          blog_prex: item.blog_prex,
+          content: item.content
+        }
+        blog_type.blogs.set(item.bid, blog)
+      })
     })
-  }
-})
-const handleCheck = (id: string) => {
-  return type_tab.id == id
+    console.log(blogTypes)
+  })
+  isReady.value = true
+  checkedBlogIndex.value = blogTypes.keys().next().value
 }
-const saveType = (params: any) => {
+getTestData()
+// watch(blogTypes, (newValue, oldValue) => {
+//   console.log(newValue, '新值', oldValue, '旧值')
+// }, { deep: true })
+const onclickTypeTab = (key: string) => {
+  checkedIndex.value = key
+}
+const onclickBlogTab = (key: string) => {
+  checkedBlogIndex.value = key
+}
+const handleEditBtName = (bt: BlogType) => {
+  dialogVisible.value = true
+}
+
+const saveType = () => {
   const query = {
-    btId: params.id,
-    btName: params.name
+    btId: checkedBlogIndex.value,
+    btName: (blogTypes.get(checkedBlogIndex.value) as BlogType).btName
   }
   updateBtName(query).then(response => {
-
+    dialogVisible.value = false
   })
+
 }
 const saveTitle = (params: any) => {
   const query = {
@@ -103,24 +123,42 @@ const saveTitle = (params: any) => {
 const saveContent = () => {
   const query = {
     bid: bid.value,
-    content: text.value
+    content: blog.content
   }
   updateContent(query).then(response => {
 
   })
 }
-const onclickTypeTab = (id: string, index: number) => {
-  checkedIndex.value = index
-  type_tab.id = id
+const insertBlogType = () => {
+  dialogVisible.value = true
 }
-const onclickBlogTab = (id: string, index: number) => {
-  bid.value = id
-  checkedBlogIndex.value = index
-}
+
 </script>
 
+<style scoped>
+.b_section {
+  display: flex;
+  flex-direction: column;
+  width: 80px;
+}
 
-<style>
+.bts {
+  margin-left: 0px;
+  padding-left: 0px;
+
+}
+
+.el-dropdown {
+  margin-right: 5px;
+}
+
+.bt_section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 80px;
+}
+
 .blog_editer {
   display: flex;
 }

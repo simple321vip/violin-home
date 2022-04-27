@@ -10,7 +10,7 @@ type Blog = {
 type BlogType = {
   btId: string,
   btName: string,
-  blog_list: Blog[]
+  blogs: Map<string, Blog>
 }
 
 type User = {

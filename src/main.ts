@@ -38,7 +38,7 @@ router.beforeEach((to, from, next) => {
         break;
       case '/':
         const user = <User>(JSON.parse(getUser() as string))
-        if (url.search("edit_blog") != -1) {
+        if (url.search("write") != -1) {
           next('/BlogEditer')
         } else {
           router.push({

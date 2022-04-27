@@ -43,7 +43,7 @@ const openBlog = () => {
 
 const openBlogEditer = () => {
   const { href } = router.resolve({
-    path: '/edit_blog=1'
+    path: '/write'
   });
   window.open(href, '_blank');
 }

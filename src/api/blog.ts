@@ -21,10 +21,7 @@ const get_blog = (params: any) => {
 const listAll = () => {
   return request({
     url: '/author/blog/list',
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    }
+    method: 'get'
   })
 }
 
