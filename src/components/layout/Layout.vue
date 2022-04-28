@@ -1,13 +1,12 @@
 <template>
-  <div>
+  <div class="4444">
     <el-container>
       <el-aside width="150px">
         <SideBar></SideBar>
       </el-aside>
       <el-container>
         <el-header
-          style="border-bottom-style:solid; border-bottom-width: 0.5px; border-bottom-color:rgba(151, 151, 151, 0.3);"
-        >
+          style="border-bottom-style:solid; border-bottom-width: 0.5px; border-bottom-color:rgba(151, 151, 151, 0.3);">
           <NavBar></NavBar>
         </el-header>
         <el-main>
@@ -28,6 +27,8 @@
 import MainApp from '../layout/MainApp.vue';
 import NavBar from "../layout/NavBar.vue";
 import SideBar from "../layout/SideBar.vue";
+
+console.log(window.innerHeight)
 </script>
 
 <style scoped>

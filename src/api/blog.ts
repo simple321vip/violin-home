@@ -57,14 +57,14 @@ const getContent = (id: string) => {
   })
 }
 
-const newBlog = (params: Object) => {
+const newBlog = (postData: Object) => {
   return request({
     url: '/author/blog/createContent',
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charsetset=UTF-8'
     },
-    data: params
+    data: postData
   })
 }
 
