@@ -17,9 +17,14 @@
 import { reactive, ref } from 'vue';
 import { get_blogs, getContent, newBlog, updateContent, deleteContent } from '../../api/blog'
 import router from '../../router/index'
-
-import { Blog, BlogType } from '../../entity/index'
-
+type Blog = {
+  bid: string,
+  btId: string,
+  btName: string,
+  title: string,
+  blog_prex: string,
+  content: string
+}
 const data_list = reactive<Blog[]>([])
 
 const query = () => {
