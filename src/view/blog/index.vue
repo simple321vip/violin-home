@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { get_blogs, getContent, newBlog, updateContent, deleteContent } from '../../api/blog'
+import { get_blogs, getContent, putBlog, updateContent, deleteContent } from '../../api/blog'
 import router from '../../router/index'
 type Blog = {
   bid: string,
@@ -62,7 +62,7 @@ const test1 = () => {
     blog_type_id: "2808000",
     title: "dddddddd"
   }
-  newBlog(params).then(response => {
+  putBlog(params).then(response => {
     console.log(response)
   })
 }

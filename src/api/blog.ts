@@ -1,9 +1,13 @@
 import request from '../utils/request'
 import Qs from 'qs'
+
+const headers = {
+  'Content-Type': 'application/json;charsetset=UTF-8'
+}
 const get_blogs = (params: Object) => {
   return request({
     url: '/blog',
-    method: 'get',
+    method: 'GET',
     params: params,
     paramsSerializer: (params) => {
       return Qs.stringify(params, { arrayFormat: 'repeat' })
@@ -11,83 +15,64 @@ const get_blogs = (params: Object) => {
   })
 }
 
-const get_blog = (params: any) => {
-  return request({
-    url: '/blog/' + params.blog_id,
-    method: 'get'
-  })
-}
-
 const listAll = () => {
   return request({
     url: '/author/blog/list',
-    method: 'get'
+    method: 'GET'
   })
 }
 
-const updateBtName = (params: Object) => {
+const updateBtName = (data: Object) => {
   return request({
-    url: '/author/blog/update_blog_type',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    },
-    data: params
+    url: '/author/blog_type',
+    method: 'POST',
+    headers: headers,
+    data: data
   })
 }
 
-const insert_blog_type = (params: Object) => {
+const putBlogType = (data: Object) => {
   return request({
-    url: '/blog/insert_blog_type',
-    method: 'put',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    },
-    data: params
+    url: '/author/blog_type',
+    method: 'PUT',
+    headers: headers,
+    data: data
   })
 }
 
 const getContent = (id: string) => {
   return request({
-    url: '/author/blog/' + id + '/content',
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    }
+    url: '/author/blog/content/' + id,
+    method: 'GET',
+    headers: headers,
   })
 }
 
-const newBlog = (postData: Object) => {
+const putBlog = (postData: Object) => {
   return request({
-    url: '/author/blog/createContent',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    },
+    url: '/author/blog/content',
+    method: 'PUT',
+    headers: headers,
     data: postData
   })
 }
 
-const updateContent = (params: Object) => {
+const updateContent = (postData: Object) => {
   return request({
-    url: '/author/blog/updateContent',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    },
-    data: params
+    url: '/author/blog/content',
+    method: 'POST',
+    headers: headers,
+    data: postData
   })
 }
 
-const deleteContent = (params: string) => {
+const deleteContent = (bid: string) => {
   return request({
-    url: '/author/blog/delete/' + params,
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json;charsetset=UTF-8'
-    }
+    url: '/author/blog/content/' + bid,
+    method: 'DELETE',
+    headers: headers,
   })
 }
 
 
-export { get_blogs, get_blog, listAll, updateBtName, insert_blog_type, getContent, newBlog, updateContent, deleteContent }
+export { get_blogs, listAll, updateBtName, putBlogType, getContent, putBlog, updateContent, deleteContent }

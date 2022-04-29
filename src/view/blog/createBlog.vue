@@ -1,15 +1,16 @@
 <template>
   <div class="blog_editer" v-if="isReady">
     <div class="bt_section" :style="btWholeStyle">
-      <el-button @click="insertBlogType">增加</el-button>
-      <el-button class="bts" v-for="(value, key) of blogTypes" :key="key" @click="onclickTypeTab(value[0])">
+      <el-button class="bt-input" @click="contentDialogVisible = true">增加</el-button>
+      <el-button class="bt-input" v-for="(value, key) of blogTypes" :key="key" @click="onclickTypeTab(value[0])">
         <el-dropdown trigger="click">
-          <el-icon>
+          <el-icon v-show="checkedBlogIndex == value[0]">
             <edit />
           </el-icon>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="handleEditBtName(value[1])">修改</el-dropdown-item>
+              <el-dropdown-item @click="dialogVisible = true">修改</el-dropdown-item>
+              <el-dropdown-item @click="btdeleteDialogVisible = true">删除</el-dropdown-item>
               <el-dropdown-item @click="true">退出</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -18,32 +19,51 @@
       </el-button>
     </div>
     <div class="b_section" :style="bWholeStyle">
-      <el-button @click="insertBlog">增加</el-button>
-      <el-button v-for="(blog, index) of blogTypes.get(checkedBlogIndex)?.blogs" @click="onclickBlogTab(blog[0])">
+      <el-button class="bt-input" @click="insertBlog">增加</el-button>
+      <el-button class="bt-input" v-for="(blog, index) of blogTypes.get(checkedBlogIndex)?.blogs"
+        @click="onclickBlogTab(blog[0])">
         {{ blog[1].title }}
       </el-button>
     </div>
-    <div :style="cWholeStyle">
-      <md-editor theme="light"
-        v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).content"
-        @save="saveContent" />
+    <div class="c_section">
+      <div class="title_style">
+        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title"
+          @keyup.enter.native="saveTitle" @blur="saveTitle">
+        </el-input>
+      </div>
+      <div :style="cWholeStyle">
+        <md-editor theme="light"
+          v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).content"
+          @save="saveContent" :style="{ height: innerHeight }" />
+      </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="Tips" width="30%">
+    <el-dialog v-model="dialogVisible" title="修改博客分类名称" width="30%">
       <el-input v-model="(blogTypes.get(checkedBlogIndex) as BlogType).btName"></el-input>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="saveType">Confirm</el-button>
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveType">确认</el-button>
         </span>
       </template>
     </el-dialog>
-    <el-dialog v-model="contentDialogVisible" title="Tips" width="30%">
-      <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title">
+    <el-dialog v-model="contentDialogVisible" title="新的博客分类" width="30%">
+      <el-input v-model="btName">
       </el-input>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="contentDialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="saveTitle">Confirm</el-button>
+          <el-button @click="contentDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="insertBlogType">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="btdeleteDialogVisible" title="删除博客分类" width="30%">
+      你正在对 {{ (blogTypes.get(checkedBlogIndex) as BlogType).btName }}
+      <el-input v-model="btName" :placeholder="'请输入<' + (blogTypes.get(checkedBlogIndex) as BlogType).btName + '>'">
+      </el-input>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="btdeleteDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="insertBlogType">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -51,18 +71,13 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import MdEditor from 'md-editor-v3'
 import { Edit } from "@element-plus/icons-vue";
 import 'md-editor-v3/lib/style.css'
-import { updateBtName, updateContent, listAll, insert_blog_type, getContent, newBlog } from '../../api/blog'
+import { updateBtName, updateContent, listAll, putBlogType, getContent, putBlog } from '../../api/blog'
 import $moment from "moment";
 
-// const MD_SETTING = () => {
-//   return {
-//     tools: [{ title: 'bold' }]
-//   }
-// }
 type Blog = {
   bid: string,
   btId: string,
@@ -80,10 +95,17 @@ type BlogType = {
 const blogTypes = reactive<Map<string, BlogType>>(new Map())
 const dialogVisible = ref(false)
 const contentDialogVisible = ref(false)
+const btdeleteDialogVisible = ref(false)
 
 let checkedIndex = ref<string>("")
 let checkedBlogIndex = ref<string>("")
 let isReady = ref(false)
+
+// 関数定義
+
+/**
+ * Blog一覧取得
+ */
 const getTestData = async () => {
   await listAll().then(response => {
     response.data.forEach((element: any) => {
@@ -109,12 +131,12 @@ const getTestData = async () => {
   isReady.value = true
   checkedBlogIndex.value = blogTypes.keys().next().value
   checkedIndex.value = blogTypes.values().next().value.blogs.keys().next().value
-  console.log(checkedIndex.value)
 }
-getTestData()
-// watch(blogTypes, (newValue, oldValue) => {
-//   console.log(newValue, '新值', oldValue, '旧值')
-// }, { deep: true })
+
+/**
+ * BlogTypeを選べる
+ * @param key 
+ */
 const onclickTypeTab = (key: string) => {
   const bid = <string>blogTypes.get(key)?.blogs.values().next().value.bid
   getContent(bid).then(response => {
@@ -131,6 +153,9 @@ const handleEditBtName = (bt: BlogType) => {
   dialogVisible.value = true
 }
 
+/**
+ * Blogタイプ名称修正
+ */
 const saveType = () => {
   const query = {
     btId: checkedBlogIndex.value,
@@ -141,15 +166,20 @@ const saveType = () => {
   })
 
 }
+/**
+ * Blogタイトル修正
+ */
 const saveTitle = () => {
   const query = {
     bid: checkedIndex.value,
     title: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).title
   }
   updateContent(query).then(response => {
-    contentDialogVisible.value = false
   })
 }
+/**
+ * Blog内容修正
+ */
 const saveContent = () => {
   const query = {
     bid: checkedIndex.value,
@@ -159,15 +189,15 @@ const saveContent = () => {
 
   })
 }
-const insertBlogType = () => {
-  dialogVisible.value = true
-}
+/**
+ * ブログ新規作成
+ */
 const insertBlog = () => {
   const data = {
     btId: checkedBlogIndex.value,
     title: $moment().format("YYYY-MM-DD")
   }
-  newBlog(data).then(response => {
+  putBlog(data).then(response => {
     const { bid, title, content } = response.data
     const blog = {
       bid: bid,
@@ -181,47 +211,98 @@ const insertBlog = () => {
     checkedIndex.value = bid
   })
 }
-console.log(window.innerWidth)
+// Blogタイプ新規作成用、作成後、リセットする
+let btName = ref("")
+const insertBlogType = () => {
+  const data = {
+    btName: btName.value
+  }
+  putBlogType(data).then(response => {
+    const blog_type: BlogType = {
+      btId: response.data.btId,
+      btName: response.data.btName,
+      blogs: new Map<string, Blog>()
+    }
+    blogTypes.set(response.data.btId, blog_type)
+    response.data.blog_list.forEach((item: any) => {
+      const blog: Blog = {
+        bid: item.bid,
+        btId: item.btId,
+        btName: item.btName,
+        title: item.title,
+        blog_prex: item.blog_prex,
+        content: item.content
+      }
+      blog_type.blogs.set(item.bid, blog)
+    })
+    contentDialogVisible.value = false
+    btName.value = ""
+  })
+}
+
+const deleteBlogType = () => {
+
+}
+
+// Created　段階の関数呼び出す処理
+getTestData()
+
+
+// サイズ調整部分
 type WholeStyle = {
   width: string
+  height: string
 }
+let innerHeight = ref("")
+
 const btWholeStyle = reactive<WholeStyle>({} as WholeStyle)
 let btWidth = 0.10 * window.innerWidth
 btWholeStyle.width = btWidth + 'px'
+btWholeStyle.height = window.innerHeight + 'px'
 const bWholeStyle = reactive<WholeStyle>({} as WholeStyle)
 let bWidth = 0.23 * window.innerWidth
 bWholeStyle.width = bWidth + 'px'
 const cWholeStyle = reactive<WholeStyle>({} as WholeStyle)
 let contentWidth = 0.67 * window.innerWidth
 cWholeStyle.width = contentWidth + 'px'
+innerHeight.value = (window.innerHeight - 50) + 'px'
+onMounted(() => {
+
+})
 </script>
 
 <style scoped>
-.b_section {
+.b_section,
+.bt_section,
+.c_section {
   display: flex;
   flex-direction: column;
-  width: 100px;
+  align-items: stretch;
+  border-right: 1px solid royalblue;
 }
 
-.bts {
+
+
+.bt-input {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
   margin-left: 0px;
-  padding-left: 0px;
-
+  padding-left: 10px;
+  font-size: 15px;
+  overflow: hidden;
+  height: 50px;
+  border-radius: 0px;
+  border-right: 0px;
 }
 
-.el-button {
-  font-size: 15px;
+.title_style :deep() .el-input__inner {
+  height: 50px;
+  font-size: 20px;
 }
 
 .el-dropdown {
   margin-right: 5px;
-}
-
-.bt_section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100px;
 }
 
 .blog_editer {
