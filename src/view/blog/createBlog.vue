@@ -1,7 +1,7 @@
 <template>
   <div class="blog_editer" v-if="isReady">
     <div class="bt_section" :style="btWholeStyle">
-      <el-button class="bt-input" @click="contentDialogVisible = true">增加</el-button>
+      <el-button class="bt-input" @click="contentDialogVisible = true">增加一个分类</el-button>
       <el-button class="bt-input" v-for="(value, key) of blogTypes" :key="key" @click="onclickTypeTab(value[0])">
         <el-dropdown trigger="click">
           <el-icon v-show="checkedBlogIndex == value[0]">
@@ -19,9 +19,21 @@
       </el-button>
     </div>
     <div class="b_section" :style="bWholeStyle">
-      <el-button class="bt-input" @click="insertBlog">增加</el-button>
+      <el-button class="bt-input" :disabled="isclicked" @click="insertBlog">增加一个博客</el-button>
       <el-button class="bt-input" v-for="(blog, index) of blogTypes.get(checkedBlogIndex)?.blogs"
         @click="onclickBlogTab(blog[0])">
+        <el-dropdown trigger="click">
+          <el-icon v-show="checkedIndex == blog[0]">
+            <edit />
+          </el-icon>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="deleteDialogVisible = true">删除</el-dropdown-item>
+              <el-dropdown-item>顶置</el-dropdown-item>
+              <el-dropdown-item @click="true">退出</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
         {{ blog[1].title }}
       </el-button>
     </div>
@@ -30,6 +42,10 @@
         <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title"
           @keyup.enter.native="saveTitle" @blur="saveTitle">
         </el-input>
+        <div style="width: 60px;">
+          <span v-if="!updated">已保存</span>
+          <span v-if="updated">更新中</span>
+        </div>
       </div>
       <div :style="cWholeStyle">
         <md-editor theme="light"
@@ -63,7 +79,18 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="btdeleteDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="insertBlogType">确认</el-button>
+          <el-button type="primary" @click="deleteBlogType">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="deleteDialogVisible" title="删除博客" width="30%">
+      你正在对 {{ ((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title }}
+      <el-input v-model="btName" :placeholder="'请输入<删除>'">
+      </el-input>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="deleteBlog">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -75,7 +102,7 @@ import { onMounted, reactive, ref } from 'vue'
 import MdEditor from 'md-editor-v3'
 import { Edit } from "@element-plus/icons-vue";
 import 'md-editor-v3/lib/style.css'
-import { updateBtName, updateContent, listAll, putBlogType, getContent, putBlog } from '../../api/blog'
+import { updateBtName, updateContent, listAll, putBlogType, removeBlogType, getContent, putBlog, deleteContent } from '../../api/blog'
 import $moment from "moment";
 
 type Blog = {
@@ -96,10 +123,13 @@ const blogTypes = reactive<Map<string, BlogType>>(new Map())
 const dialogVisible = ref(false)
 const contentDialogVisible = ref(false)
 const btdeleteDialogVisible = ref(false)
+const deleteDialogVisible = ref(false)
 
 let checkedIndex = ref<string>("")
 let checkedBlogIndex = ref<string>("")
+let isclicked = ref(false)
 let isReady = ref(false)
+let updated = ref(false)
 
 // 関数定義
 
@@ -114,7 +144,6 @@ const getTestData = async () => {
         btName: element.btName,
         blogs: new Map<string, Blog>()
       }
-      blogTypes.set(element.btId, blog_type)
       element.blog_list.forEach((item: any) => {
         const blog: Blog = {
           bid: item.bid,
@@ -126,6 +155,7 @@ const getTestData = async () => {
         }
         blog_type.blogs.set(item.bid, blog)
       })
+      blogTypes.set(element.btId, blog_type)
     })
   })
   isReady.value = true
@@ -148,6 +178,12 @@ const onclickTypeTab = (key: string) => {
 }
 const onclickBlogTab = (key: string) => {
   checkedIndex.value = key
+  getContent(key).then(response => {
+    ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content = response.data.content
+
+  })
+
+
 }
 const handleEditBtName = (bt: BlogType) => {
   dialogVisible.value = true
@@ -186,13 +222,16 @@ const saveContent = () => {
     content: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content
   }
   updateContent(query).then(response => {
-
+    if (response.status == 200) {
+      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content = 
+    }
   })
 }
 /**
  * ブログ新規作成
  */
 const insertBlog = () => {
+  isclicked.value = true
   const data = {
     btId: checkedBlogIndex.value,
     title: $moment().format("YYYY-MM-DD")
@@ -209,8 +248,27 @@ const insertBlog = () => {
     } as Blog
     (blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.set(bid, blog)
     checkedIndex.value = bid
+    isclicked.value = false
   })
 }
+/**
+ * ブログ削除 
+ */
+const deleteBlog = () => {
+  if (btName.value == "删除") {
+    deleteContent(checkedIndex.value).then(response => {
+      if (response.status == 200) {
+        const deleteKey = checkedIndex.value
+        checkedIndex.value = blogTypes.get(checkedBlogIndex.value)?.blogs.keys().next().value
+        blogTypes.get(checkedBlogIndex.value)?.blogs.delete(deleteKey)
+        deleteDialogVisible.value = false
+      }
+    })
+    btName.value = ""
+  }
+
+}
+
 // Blogタイプ新規作成用、作成後、リセットする
 let btName = ref("")
 const insertBlogType = () => {
@@ -223,7 +281,6 @@ const insertBlogType = () => {
       btName: response.data.btName,
       blogs: new Map<string, Blog>()
     }
-    blogTypes.set(response.data.btId, blog_type)
     response.data.blog_list.forEach((item: any) => {
       const blog: Blog = {
         bid: item.bid,
@@ -235,12 +292,34 @@ const insertBlogType = () => {
       }
       blog_type.blogs.set(item.bid, blog)
     })
+    blogTypes.set(response.data.btId, blog_type)
+    checkedBlogIndex.value = response.data.btId
+    checkedIndex.value = blog_type.blogs.keys().next().value
     contentDialogVisible.value = false
     btName.value = ""
   })
 }
 
 const deleteBlogType = () => {
+  if (btName.value == (blogTypes.get(checkedBlogIndex.value) as BlogType).btName) {
+    const data = {
+      btId: checkedBlogIndex.value
+    }
+    removeBlogType(data).then((response) => {
+      if (response.status == 200) {
+        blogTypes.delete(checkedBlogIndex.value)
+        checkedBlogIndex.value = blogTypes.keys().next().value
+        checkedIndex.value = blogTypes.values().next().value.blogs.keys().next().value
+      } else {
+
+      }
+      btdeleteDialogVisible.value = false
+    })
+    btName.value = ""
+  } else {
+
+  }
+
 
 }
 
@@ -281,8 +360,6 @@ onMounted(() => {
   border-right: 1px solid royalblue;
 }
 
-
-
 .bt-input {
   display: flex;
   flex-direction: row;
@@ -294,11 +371,24 @@ onMounted(() => {
   height: 50px;
   border-radius: 0px;
   border-right: 0px;
+  border-left: 0px;
+  border-top: 1px solid royalblue;
+  border-bottom: 1px solid royalblue;
+}
+
+.title_style {
+  display: flex;
 }
 
 .title_style :deep() .el-input__inner {
+  flex-direction: row;
   height: 50px;
   font-size: 20px;
+  border-right: 0px;
+  border-left: 0px;
+  border-radius: 0px;
+  border-top: 1px solid royalblue;
+  border-bottom: 1px solid royalblue;
 }
 
 .el-dropdown {

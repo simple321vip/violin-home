@@ -7,13 +7,17 @@ import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router'
-// import { get_blog } from '../../api/blog'
+import { getBlog } from '../../api/blogView'
 let text = ref<string>('')
 const route = useRoute()
-// get_blog(route.query).then(response => {
-//   text.value = response.data.blog_text
-// })
+const params = route.query
 
+const init = () => {
+  getBlog(params.bid as string).then(response => {
+    text.value = response.data.content
+  })
+}
+init()
 </script>
 
 <style>

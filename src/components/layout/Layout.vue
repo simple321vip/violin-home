@@ -29,8 +29,6 @@
 import MainApp from '../layout/MainApp.vue';
 import NavBar from "../layout/NavBar.vue";
 import SideBar from "../layout/SideBar.vue";
-
-console.log(window.innerHeight)
 </script>
 
 <style scoped>

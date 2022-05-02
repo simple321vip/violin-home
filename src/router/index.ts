@@ -72,6 +72,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../view/blog/createBlog.vue')
   },
   {
+    path: "/BlogViewer",
+    component: () => import('../view/blog/mdview.vue')
+  },
+  {
     path: "/login",
     component: () => import('../components/login/login.vue')
   },

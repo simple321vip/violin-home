@@ -14,6 +14,7 @@ app.use(ElementPlus)
 app.use(store)
 import { getToken, getUser } from './utils/auth'
 import { User } from './entity/index'
+import Cookies from 'js-cookie';
 const whiteList = ['/login']
 let url = window.location.href
 
@@ -40,6 +41,14 @@ router.beforeEach((to, from, next) => {
         const user = <User>(JSON.parse(getUser() as string))
         if (url.search("write") != -1) {
           next('/BlogEditer')
+        } else if (url.search("view") != -1) {
+          let bid = Cookies.get('bid')
+          router.push({
+            path: '/BlogViewer',
+            query: { bid: bid }
+          })
+          // next('/BlogViewer')
+          console.log(1)
         } else {
           router.push({
             path: '/home',
