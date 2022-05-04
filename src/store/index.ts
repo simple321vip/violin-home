@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 import { Tables } from './table'
 
-export const store = defineStore(Tables.AccessRoutes, {
+export const cloudStore = defineStore({
+  id: 'cloudStore',
   state: () => {
-    return [
-      {
-        current: 1,
-        name: 'xiaoman'
-      }
-    ]
+    return {
+      tableData: 1,
+      showDocument: false,
+      tableSize: 12
+    }
   },
   getters: {
 

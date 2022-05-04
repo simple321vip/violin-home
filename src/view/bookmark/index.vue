@@ -22,9 +22,10 @@
 
     <el-table ref="multipleTableRef" :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
       <el-table-column type="selection" width="55" />
-      <el-table-column type="index" label="index" width="180" />
-      <el-table-column prop="bk_type_name" label="分类" width="180" />
+      <el-table-column type="index" label="index" width="80" />
+      <el-table-column prop="bk_type_name" label="分类" width="100" />
       <el-table-column prop="comment" label="名称" width="180" />
+      <el-table-column prop="facvion" label="图标" width="60" />
       <el-table-column class="click-icon" prop="url" label="url">
         <template #default="scope">
           <span style="cursor: pointer" @click="openUrl(scope.row.url)">{{ scope.row.url }}</span>
@@ -206,8 +207,9 @@ const doDelete = (delete_id: any) => {
   let query = delete_id
   delete_bookmark(query).then(response => {
     dialogVisible.value = false
+    doSearch()
   })
-  dialogVisible.value = false
+
 }
 
 const closeDialog = () => {
@@ -215,6 +217,7 @@ const closeDialog = () => {
 }
 const doSubmit = () => {
   dialogFormVisible.value = false
+  doSearch()
 }
 // 复制转换成功的数值，并提示 复制成功 信息
 const copyNumber = (record: Bookmark) => {
@@ -224,6 +227,7 @@ const copyNumber = (record: Bookmark) => {
     message: h('i', { style: 'color: teal' }, '复制成功'),
   })
 }
+doSearch()
 </script>
 
 <style scoped>

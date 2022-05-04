@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-menu router>
+    <el-menu router class="side_Style" :style="{ height: sideHeight }">
       <el-menu-item v-for="(route, index) in current_routes" v-bind:key="index" v-bind:index="route.path"
         v-bind:title="route.meta?.name">{{ route.meta?.name }}</el-menu-item>
     </el-menu>
@@ -11,11 +11,18 @@
 import { RouteRecordRaw } from "vue-router";
 import { store } from "../../store/index";
 import router from "../../router/index";
+import { onBeforeMount, ref } from 'vue';
 let current_routes = router.options.routes[0].children;
+
+
+let sideHeight = ref("")
+onBeforeMount(() => {
+  sideHeight.value = window.innerHeight + 'px'
+})
 </script>
 
 <style>
-closeStyle {
+.side_Style {
   width: 100px;
 }
 
