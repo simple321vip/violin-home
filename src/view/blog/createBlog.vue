@@ -98,12 +98,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
+import $moment from "moment";
 import MdEditor from 'md-editor-v3'
 import { Edit } from "@element-plus/icons-vue";
 import 'md-editor-v3/lib/style.css'
 import { updateBtName, updateContent, listAll, putBlogType, removeBlogType, getContent, putBlog, deleteContent } from '../../api/blog'
-import $moment from "moment";
 
 type Blog = {
   bid: string,
@@ -111,6 +111,7 @@ type Blog = {
   btName: string,
   title: string,
   blog_prex: string,
+  autosave_control: string,
   content: string
 }
 
@@ -130,6 +131,8 @@ let checkedBlogIndex = ref<string>("")
 let isclicked = ref(false)
 let isReady = ref(false)
 let updated = ref(false)
+let startTime = reactive($moment());
+
 
 // 関数定義
 
@@ -151,6 +154,7 @@ const getTestData = async () => {
           btName: item.btName,
           title: item.title,
           blog_prex: item.blog_prex,
+          autosave_control: item.autosave_control,
           content: item.content
         }
         blog_type.blogs.set(item.bid, blog)
@@ -161,6 +165,26 @@ const getTestData = async () => {
   isReady.value = true
   checkedBlogIndex.value = blogTypes.keys().next().value
   checkedIndex.value = blogTypes.values().next().value.blogs.keys().next().value
+  // TODO 需要优化部分
+  /**
+   * 延迟执行一秒
+   * 获取当前时间，current
+   * 获取上一次修改时间，startTime
+   * 
+   */
+  watch(blogTypes, (newVal, oldVal) => {
+    let current = $moment() // 获取当前时间，current 09:00:00 09:00:00.500
+    const tmp = startTime // 获取开始时间，将值赋给tmp 8:30:00 09:00:00
+    startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
+    setTimeout(() => {
+      if ($moment(current).diff($moment(tmp), 'seconds') >= 1) {
+        console.log(current)
+        console.log(startTime)
+        saveContent()
+      }
+    }, 1000)
+
+  })
 }
 
 /**
@@ -182,13 +206,30 @@ const onclickBlogTab = (key: string) => {
     ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content = response.data.content
 
   })
-
-
 }
 const handleEditBtName = (bt: BlogType) => {
   dialogVisible.value = true
 }
 
+/**
+ * Blog内容修正
+ */
+const saveContent = () => {
+  if (updated.value) {
+    return
+  }
+  updated.value = true
+  const query = {
+    bid: checkedIndex.value,
+    content: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content
+  }
+  updateContent(query).then(response => {
+    if (response.status == 200) {
+      updated.value = false
+      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content = 
+    }
+  })
+}
 /**
  * Blogタイプ名称修正
  */
@@ -206,25 +247,16 @@ const saveType = () => {
  * Blogタイトル修正
  */
 const saveTitle = () => {
+  if (updated.value) {
+    return
+  }
+  updated.value = true
   const query = {
     bid: checkedIndex.value,
     title: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).title
   }
   updateContent(query).then(response => {
-  })
-}
-/**
- * Blog内容修正
- */
-const saveContent = () => {
-  const query = {
-    bid: checkedIndex.value,
-    content: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content
-  }
-  updateContent(query).then(response => {
-    if (response.status == 200) {
-      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content = 
-    }
+    updated.value = false
   })
 }
 /**
@@ -288,6 +320,7 @@ const insertBlogType = () => {
         btName: item.btName,
         title: item.title,
         blog_prex: item.blog_prex,
+        autosave_control: item.autosave_control,
         content: item.content
       }
       blog_type.blogs.set(item.bid, blog)

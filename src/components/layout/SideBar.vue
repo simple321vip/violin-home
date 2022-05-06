@@ -9,7 +9,7 @@
 
 <script setup lang='ts'>
 import { RouteRecordRaw } from "vue-router";
-import { store } from "../../store/index";
+// import { store } from "../../store/index";
 import router from "../../router/index";
 import { onBeforeMount, ref } from 'vue';
 let current_routes = router.options.routes[0].children;
