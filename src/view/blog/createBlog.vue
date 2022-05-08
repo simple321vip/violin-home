@@ -39,8 +39,7 @@
     </div>
     <div class="c_section">
       <div class="title_style">
-        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title"
-          @keyup.enter.native="saveTitle" @blur="saveTitle">
+        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title">
         </el-input>
         <div style="width: 60px;">
           <span v-if="!updated">已保存</span>
