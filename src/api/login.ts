@@ -4,12 +4,12 @@ const headers = {
   'Content-Type': 'application/json;charsetset=UTF-8'
 }
 
-const getAudioInfo = (url: string) => {
+const getQrCode = () => {
   return request({
-    url: '/api/v1/common/audio-info',
+    url: '/authorize/baidu',
     method: 'GET',
-    params: { url: url },
+    headers: headers,
   })
 }
 
-export { getAudioInfo }
+export { getQrCode }

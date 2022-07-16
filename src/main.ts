@@ -12,11 +12,22 @@ let app = createApp(App)
 app.use(router)
 app.use(ElementPlus)
 app.use(store)
-import { getToken, getUser } from './utils/auth'
+import { getToken, getUser, setToken, setUser } from './utils/auth'
 import { User } from './entity/index'
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'
+import { obtainUserInfo } from './api/user'
 const whiteList = ['/login']
 let url = window.location.href
+if (url.search("token") != -1) {
+  let authorizeToken = url.split("token=")[1]
+  setToken(authorizeToken)
+  await obtainUserInfo(authorizeToken).then(response => {
+    setUser(response.data)
+  })
+  router.push({
+    path: '/home',
+  })
+}
 
 /**
  * ルーター監視

@@ -1,10 +1,18 @@
 import request from '../utils/request'
 const authorize = (params: any) => {
   return request({
-    url: '/authorize',
+    url: '/auth/v1/authorize',
     method: 'post',
     data: params
   })
 }
 
-export { authorize }
+const obtainUserInfo = (token: string) => {
+  return request({
+    url: '/auth/v1/user_info',
+    method: 'GET',
+    params: { token: token }
+  })
+}
+
+export { authorize, obtainUserInfo }

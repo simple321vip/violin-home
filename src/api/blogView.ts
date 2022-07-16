@@ -7,7 +7,7 @@ const headers = {
 
 const getBlogs = (params: Object) => {
   return request({
-    url: '/reader/blogs',
+    url: '/api/v1/reader/blogs',
     method: 'GET',
     params: params,
     paramsSerializer: (params) => {
@@ -18,7 +18,7 @@ const getBlogs = (params: Object) => {
 
 const getBtName = () => {
   return request({
-    url: '/reader/blog_type',
+    url: '/api/v1/reader/blog_type',
     method: 'GET',
     headers: headers
   })
@@ -26,7 +26,7 @@ const getBtName = () => {
 
 const getBlog = (bid: string) => {
   return request({
-    url: '/reader/blog/' + bid,
+    url: '/api/v1/reader/blog/' + bid,
     method: 'GET',
     headers: headers
   })

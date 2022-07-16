@@ -1,19 +1,26 @@
 <template>
   <div class="yuliu"></div>
   <el-card class="box-card">
+
     <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
       class="demo-ruleForm">
       <div class="title-container">
         <h3>私人空间</h3>
       </div>
-      <el-form-item label="用户名" prop="pass">
+      <!-- <el-form-item label="用户名" prop="pass">
         <el-input v-model="loginForm.user_id" type="password" autocomplete="off" />
       </el-form-item>
       <el-form-item label="用户凭证" prop="checkPass">
         <el-input v-model="loginForm.password" type="password" autocomplete="off" />
-      </el-form-item>
+      </el-form-item> -->
+      <p class="tang-pass-qrcode-title">请使用<a class="pass-link" href="http://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=WksD0FOVAp8zSRV62qNKxtnCexArVPOf&
+redirect_uri=https://www.violin-home.cn/auth/v1/authorize/baidu&scope=basic,netdisk&device_id=26202308&qrcode=1"
+          target="new">百度App</a>扫码登录</p>
+      <el-button @click="loginWithBaiDu">
+        百度App
+      </el-button>
       <el-form-item>
-        <el-button type="primary" @click="dologin(ruleFormRef)">login</el-button>
+        <!-- <el-button type="primary" @click="dologin(ruleFormRef)">login</el-button> -->
       </el-form-item>
     </el-form>
     ------------------------------------------------------------
@@ -29,6 +36,9 @@ import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { useUserStore } from '../../store/user'
 import router from '../../router'
+import { getQrCode } from '../../api/login'
+
+
 const user = useUserStore()
 
 const ruleFormRef = ref<FormInstance>()
@@ -36,6 +46,13 @@ const loginForm = reactive({
   user_id: '',
   password: ''
 })
+
+const loginWithBaiDu = () => {
+  window.open("", "11");
+  // getQrCode().then((response) => {
+
+  // })
+}
 
 const validateUserName = (rule: any, value: string, callback: Function) => {
   if (!value) {
@@ -75,6 +92,8 @@ const dologin = (form: any) => {
     }
   })
 }
+
+
 
 </script>
 <style scoped>
