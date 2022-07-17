@@ -6,7 +6,7 @@ const headers = {
 
 const getQrCode = () => {
   return request({
-    url: '/authorize/baidu',
+    url: '/auth/authorize/baidu',
     method: 'GET',
     headers: headers,
   })

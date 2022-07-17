@@ -18,16 +18,20 @@ import Cookies from 'js-cookie'
 import { obtainUserInfo } from './api/user'
 const whiteList = ['/login']
 let url = window.location.href
-if (url.search("token") != -1) {
-  let authorizeToken = url.split("token=")[1]
-  setToken(authorizeToken)
-  await obtainUserInfo(authorizeToken).then(response => {
-    setUser(response.data)
-  })
-  router.push({
-    path: '/home',
-  })
+
+async function checktoken(url: string) {
+  if (url.search("token") != -1) {
+    let authorizeToken = url.split("token=")[1]
+    setToken(authorizeToken)
+    await obtainUserInfo(authorizeToken).then(response => {
+      setUser(response.data)
+    })
+    router.push({
+      path: '/home',
+    })
+  }
 }
+checktoken(url)
 
 /**
  * ルーター監視

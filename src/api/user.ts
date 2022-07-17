@@ -1,7 +1,7 @@
 import request from '../utils/request'
 const authorize = (params: any) => {
   return request({
-    url: '/auth/v1/authorize',
+    url: '/auth/api/v1/authorize',
     method: 'post',
     data: params
   })
@@ -9,7 +9,7 @@ const authorize = (params: any) => {
 
 const obtainUserInfo = (token: string) => {
   return request({
-    url: '/auth/v1/user_info',
+    url: '/auth/api/v1/user_info',
     method: 'GET',
     params: { token: token }
   })

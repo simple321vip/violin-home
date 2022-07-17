@@ -14,7 +14,7 @@
         <el-input v-model="loginForm.password" type="password" autocomplete="off" />
       </el-form-item> -->
       <p class="tang-pass-qrcode-title">请使用<a class="pass-link" href="http://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=WksD0FOVAp8zSRV62qNKxtnCexArVPOf&
-redirect_uri=https://www.violin-home.cn/auth/v1/authorize/baidu&scope=basic,netdisk&device_id=26202308&qrcode=1"
+redirect_uri=https://www.violin-home.cn/auth/api/v1/authorize/baidu&scope=basic,netdisk&device_id=26202308&qrcode=1"
           target="new">百度App</a>扫码登录</p>
       <el-button @click="loginWithBaiDu">
         百度App

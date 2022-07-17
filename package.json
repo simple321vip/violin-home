@@ -1,7 +1,7 @@
 {
-  "name": "g-home",
+  "name": "violin-home",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.5",
   "scripts": {
     "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",

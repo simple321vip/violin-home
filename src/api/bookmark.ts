@@ -2,7 +2,7 @@ import request from '../utils/request'
 import Qs from 'qs'
 const search_bookmark = (params: Object) => {
   return request({
-    url: '/api/v1/bookmark',
+    url: '/auth/api/v1/bookmark',
     method: 'get',
     params: params,
     paramsSerializer: (params) => {
@@ -13,7 +13,7 @@ const search_bookmark = (params: Object) => {
 
 const put_bookmark = (params: Object) => {
   return request({
-    url: '/api/v1/bookmark/insert',
+    url: '/auth/api/v1/bookmark/insert',
     method: 'put',
     data: params
   })
@@ -21,7 +21,7 @@ const put_bookmark = (params: Object) => {
 
 const update_bookmark = (params: Object) => {
   return request({
-    url: '/api/v1/bookmark/update',
+    url: '/auth/api/v1/bookmark/update',
     method: 'post',
     data: params
   })
@@ -29,14 +29,14 @@ const update_bookmark = (params: Object) => {
 
 const delete_bookmark = (query: number) => {
   return request({
-    url: '/api/v1/bookmark/delete/' + query,
+    url: '/auth/api/v1/bookmark/delete/' + query,
     method: 'delete',
   })
 }
 
 const delete_bookmarks = (params: Object) => {
   return request({
-    url: '/api/v1/bookmark',
+    url: '/auth/api/v1/bookmark',
     method: 'delete',
     headers: {},
     data: params

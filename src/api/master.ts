@@ -1,7 +1,7 @@
 import request from '../utils/request'
 const bookmark_type = () => {
   return request({
-    url: '/api/v1/master/bookmark/type',
+    url: '/auth/api/v1/master/bookmark/type',
     method: 'get',
     data: {}
   })

@@ -6,7 +6,7 @@ const headers = {
 
 const getAudioInfo = (url: string) => {
   return request({
-    url: '/api/v1/common/audio-info',
+    url: '/auth/api/v1/common/audio-info',
     method: 'GET',
     params: { url: url },
   })
