@@ -115,7 +115,7 @@ const openBlog = (bid: string) => {
 
 const openBlogEditer = () => {
   const { href } = router.resolve({
-    path: '/write'
+    path: '/write/'
   });
   window.open(href, '_blank');
 }
