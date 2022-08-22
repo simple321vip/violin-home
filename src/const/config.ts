@@ -20,7 +20,7 @@ const configObj: any = {
     CLIENT_ID: '&client_id=' + 'BIukdHDXeNPmIXe96GA6OOXGgnP5GEhM',
     REDIRECT_URI: '&redirect_uri=' + 'http://localhost:8080/auth/api/v1/authorize/baidu',
     SCOPE: '&scope=basic,netdisk',
-    DEVICE_ID: '&device_id=26202308',
+    DEVICE_ID: '&device_id=27103657',
     QR_CODE: '&qrcode=' + '1',
     DISPLAY: '&display=popup'
   }

@@ -28,20 +28,26 @@
     </el-form-item>
   </el-form>
   <el-button @click="openBlogEditer">创作</el-button>
+  <el-button @click="publishbyBids">全部重新发布</el-button>
 
   <div class="blog_list" v-for="item in data_list">
     <h3 style="cursor: pointer; width: min-content;white-space:nowrap" @click="openBlog(item.bid)">{{ item.title }}</h3>
-    <span style="font-size: 12px;">{{ item.bid }}</span>
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <p style="font-size: 12px; height: 16px;line-height: 16px;overflow: hidden;text-overflow: ellipsis;">{{
+          item.content
+      }}</p>
+      <el-button size="small" type="success" @click="publishbyBid(item.bid)">重新发布
+      </el-button>
+    </div>
     <!-- <span style="font-size: 12px;">{{ item.blog_prex }}</span> -->
   </div>
-
 
 </template>
 
 <script setup lang="ts">
 import Cookies from 'js-cookie';
 import { reactive } from 'vue';
-import { getBlogs, getBtName } from '../../api/blogView'
+import { getBlogs, getBtName, publish, publishAll } from '../../api/blogView'
 import router from '../../router/index'
 type Blog = {
   bid: string,
@@ -114,6 +120,13 @@ const openBlogEditer = () => {
   window.open(href, '_blank');
 }
 
+const publishbyBids = () => {
+  publishAll()
+}
+
+const publishbyBid = (bid: string) => {
+  publish(bid)
+}
 
 // 初期化処理
 init()

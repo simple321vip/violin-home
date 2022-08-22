@@ -32,4 +32,19 @@ const getBlog = (bid: string) => {
   })
 }
 
-export { getBlogs, getBlog, getBtName }
+const publishAll = () => {
+  return request({
+    url: '/auth/api/v1/reader/blogs/publish/all',
+    method: 'GET'
+  })
+}
+
+const publish = (bid: string) => {
+  return request({
+    url: '/auth/api/v1/reader/blogs/publish/' + bid,
+    method: 'GET'
+  })
+}
+
+
+export { getBlogs, getBlog, getBtName, publish, publishAll }
