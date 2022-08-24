@@ -13,17 +13,6 @@ spec:
     runAsUser: 0
     privileged: true
   containers:
-  - name: nodejs
-    image: vite:latest
-    imagePullPolicy: "IfNotPresent"
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-    - name: "workspace-volume"
-      mountPath: "/home/jenkins/agent"
-      readOnly: false
-
   - name: "docker"
     image: "docker:20.10.17-git"
     imagePullPolicy: "IfNotPresent"
@@ -95,14 +84,6 @@ spec:
     stage('单元测试') {
       echo "测试阶段"
     }
-    stage('npm打包') {
-      container('nodejs') {
-        sh '''
-            npm install
-            npm run build
-            '''
-      }
-    }
     stage('镜像构建') {
       withCredentials([[$class: 'UsernamePasswordMultiBinding',
         credentialsId: '8eb5126b-6a2f-4644-add0-bc2a669e663d',
@@ -125,7 +106,9 @@ spec:
         ]) {
             container('kubectl') {
                 echo "查看 K8S 集群 Pod 列表"
-                sh 'kubectl get pods -A'
+                sh 'kubectl delete deployment violin-home-deployment -n dev'
+                sh 'kubectl apply -f violin-home-dev.yaml'
+                sh 'kubectl get pod -n dev -owide | grep violin-home-deployment'
             }
         }
     }
