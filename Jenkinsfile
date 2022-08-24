@@ -14,7 +14,7 @@ spec:
     privileged: true
   containers:
   - name: nodejs
-    image: node:16.16-alpine3.15
+    image: vite:latest
     imagePullPolicy: "IfNotPresent"
     command:
     - cat
@@ -23,6 +23,7 @@ spec:
     - name: "workspace-volume"
       mountPath: "/home/jenkins/agent"
       readOnly: false
+
   - name: "docker"
     image: "docker:20.10.17-git"
     imagePullPolicy: "IfNotPresent"
