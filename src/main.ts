@@ -26,9 +26,8 @@ async function checktoken(url: string) {
     await obtainUserInfo(authorizeToken).then(response => {
       setUser(response.data)
     })
-    router.push({
-      path: '/home',
-    })
+    let base_url = url.split("?token=")[0]
+    window.open(base_url, "_self")
   }
 }
 checktoken(url)
