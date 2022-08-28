@@ -17,7 +17,7 @@
       </div>
     </el-form>
     <div class="create_dialog">
-      <el-button type="primary" @click="handleInsert" v-show="user.owner">新建</el-button>
+      <el-button type="primary" @click="handleInsert" v-show="Tenant.account">新建</el-button>
     </div>
 
     <el-table ref="multipleTableRef" :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
@@ -36,9 +36,11 @@
           <el-icon :size="20" @click="copyNumber(scope.row)" class="click-icon">
             <CopyDocument />
           </el-icon>
-          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)" v-show="user.owner">编辑
+          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)"
+            v-show="Tenant.account">编辑
           </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-show="user.owner">删除
+          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-show="Tenant.account">
+            删除
           </el-button>
         </template>
       </el-table-column>
@@ -70,9 +72,9 @@ import { CopyDocument } from "@element-plus/icons-vue";
 import { ElNotification } from 'element-plus'
 import copy from 'copy-to-clipboard';
 import { h } from 'vue'
-import { useUserStore } from '../../store/user'
+import { useTenantStore } from '../../store/tenant'
 // obtain user infomation 
-const user = useUserStore()
+const Tenant = useTenantStore()
 
 const bookmark_types = reactive<any[]>([])
 bookmark_type().then(response => {

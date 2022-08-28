@@ -7,7 +7,8 @@ const headers = {
 const listAll = () => {
   return request({
     url: '/auth/api/v1/author/blog/list',
-    method: 'GET'
+    method: 'GET',
+    headers: headers
   })
 }
 

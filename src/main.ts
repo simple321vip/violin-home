@@ -12,8 +12,8 @@ let app = createApp(App)
 app.use(router)
 app.use(ElementPlus)
 app.use(store)
-import { getToken, getUser, setToken, setUser } from './utils/auth'
-import { User } from './entity/index'
+import { getToken, getTenant, setToken, setTenant } from './utils/auth'
+import { Tenant } from './entity/index'
 import Cookies from 'js-cookie'
 import { obtainUserInfo } from './api/user'
 const whiteList = ['/login']
@@ -21,13 +21,29 @@ let url = window.location.href
 
 async function checktoken(url: string) {
   if (url.search("token") != -1) {
-    let authorizeToken = url.split("token=")[1]
-    setToken(authorizeToken)
+
+    const list = url.split("?token=")
+
+    let base_url = list[0]
+    let authorizeToken = list[1]
+    if (list.length < 2 || authorizeToken.length == 0) {
+      router.push({
+        path: '/illustration',
+      })
+      return
+    }
     await obtainUserInfo(authorizeToken).then(response => {
-      setUser(response.data)
+
+      if (response.status == 200) {
+        const tenant = {
+          id: response.data.id,
+          account: response.data.account
+        }
+        setToken(authorizeToken)
+        setTenant(tenant)
+        window.open(base_url, "_self")
+      }
     })
-    let base_url = url.split("?token=")[0]
-    window.open(base_url, "_self")
   }
 }
 checktoken(url)
@@ -52,7 +68,7 @@ router.beforeEach((to, from, next) => {
         next('/')
         break;
       case '/':
-        const user = <User>(JSON.parse(getUser() as string))
+        const tenant = <Tenant>(JSON.parse(getTenant() as string))
         if (url.search("write") != -1) {
           next('/BlogEditer')
         } else if (url.search("view") != -1) {
@@ -61,12 +77,10 @@ router.beforeEach((to, from, next) => {
             path: '/BlogViewer',
             query: { bid: bid }
           })
-          // next('/BlogViewer')
-          console.log(1)
         } else {
           router.push({
             path: '/home',
-            query: user
+            query: tenant
           })
         }
         break;

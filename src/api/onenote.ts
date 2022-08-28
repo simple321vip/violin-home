@@ -3,7 +3,7 @@ import request from '../utils/request'
 const get_notes = (params: Object) => {
   return request({
     url: '/auth/api/v1/one_note',
-    method: 'get',
+    method: 'GET',
     params: params
   })
 }
@@ -11,7 +11,7 @@ const get_notes = (params: Object) => {
 const update_page = (params: Object) => {
   return request({
     url: '/auth/api/v1/one_note/update_page',
-    method: 'post',
+    method: 'POST',
     data: params
   })
 }
@@ -19,7 +19,7 @@ const update_page = (params: Object) => {
 const update_section = (params: Object) => {
   return request({
     url: '/auth/api/v1/one_note/update_section',
-    method: 'post',
+    method: 'POST',
     data: params
   })
 }
@@ -27,14 +27,14 @@ const update_section = (params: Object) => {
 const insert_section = () => {
   return request({
     url: '/auth/api/v1/one_note/insert_section',
-    method: 'put'
+    method: 'PUT'
   })
 }
 
 const insert_page = (params: Object) => {
   return request({
     url: '/auth/one_note/insert_page',
-    method: 'put',
+    method: 'PUT',
     data: params
   })
 }

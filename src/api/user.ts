@@ -15,4 +15,12 @@ const obtainUserInfo = (token: string) => {
   })
 }
 
-export { authorize, obtainUserInfo }
+const logout = (id: string) => {
+  return request({
+    url: '/auth/api/v1/logout/' + id,
+    method: 'GET'
+  })
+}
+
+
+export { authorize, obtainUserInfo, logout }
