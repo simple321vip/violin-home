@@ -14,6 +14,7 @@
       <div class="tag_list">
         <el-tag class="ml-2 click-icon" :type="item.clicked ? 'danger' : 'info'" v-for="(item) in bookmark_types"
           @click="handleTags(item)">{{ item.bk_type_name }}</el-tag>
+        <el-button type="primary" @click="handleAddType" v-show="Tenant.account">增加</el-button>
         <el-button type="primary" @click="handleManageType" v-show="Tenant.account">自定义</el-button>
       </div>
     </el-form>
@@ -60,7 +61,11 @@
       <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
     </el-dialog>
 
-    <!-- <el-dialog v-model="TypeDialogVisible">
+    <el-dialog v-model="createTypeDialogVisible">
+      <createType_dialog @on-update="doUpdate"></createType_dialog>
+    </el-dialog>
+
+    <!-- <el-dialog v-model="typeDialogVisible">
       <bookmarkType_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></bookmarkType_dialog>
     </el-dialog> -->
   </div>
@@ -69,9 +74,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { search_bookmark, delete_bookmark } from '../../api/bookmark'
-import { bookmark_type } from '../../api/master'
+import { get_bookmark_type } from '../../api/bookmark_type'
 import bookmark_dialog from './dialog.vue'
 import bookmarkType_dialog from './Typedialog.vue'
+import createType_dialog from './createTypedialog.vue'
 import delete_dialog from '../../components/operate/deleteDialog.vue'
 import type { ElTable } from 'element-plus'
 import { CopyDocument } from "@element-plus/icons-vue";
@@ -81,19 +87,6 @@ import { h } from 'vue'
 import { useTenantStore } from '../../store/tenant'
 // obtain user infomation 
 const Tenant = useTenantStore()
-
-const bookmark_types = reactive<any[]>([])
-bookmark_type().then(response => {
-  response.data.forEach((element: String) => {
-    const item = element.split("|")
-    const row = {
-      bk_type_id: Number(item[0]),
-      bk_type_name: item[1],
-      clicked: false
-    }
-    bookmark_types.push(row)
-  })
-})
 
 // 定义书签格式
 type Bookmark = {
@@ -140,16 +133,45 @@ const toggleSelection = (rows?: Bookmark[]) => {
   }
 }
 
-
-const handleManageType = () => {
-
-}
-
-
 // dialog表示flag
 let dialogFormVisible = ref(false)
 let dialogVisible = ref(false)
-let TypeDialogVisible = ref(false)
+let typeDialogVisible = ref(false)
+let createTypeDialogVisible = ref(false)
+
+/* click 自定义 */
+const handleManageType = () => {
+  typeDialogVisible.value = true
+}
+
+/* click 增加 */
+const handleAddType = () => {
+  createTypeDialogVisible.value = true
+}
+
+/* callback after we add bookmark_type */
+const doUpdate = () => {
+  createTypeDialogVisible.value = false
+  doSearch()
+  dearchBookmarkType()
+}
+
+const bookmark_types = reactive<any[]>([])
+const dearchBookmarkType = () => {
+  get_bookmark_type().then(response => {
+    bookmark_types.splice(0, bookmark_types.length)
+    response.data.forEach((element: String) => {
+      const item = element.split("|")
+      const row = {
+        bk_type_id: Number(item[0]),
+        bk_type_name: item[1],
+        clicked: false
+      }
+      bookmark_types.push(row)
+    })
+  })
+}
+
 
 // 操作-》添加
 const handleInsert = () => {
@@ -223,7 +245,6 @@ const doDelete = (delete_id: any) => {
     dialogVisible.value = false
     doSearch()
   })
-
 }
 
 const closeDialog = () => {
@@ -242,6 +263,7 @@ const copyNumber = (record: Bookmark) => {
   })
 }
 doSearch()
+dearchBookmarkType()
 </script>
 
 <style scoped>

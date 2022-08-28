@@ -39,7 +39,8 @@
     </div>
     <div class="c_section">
       <div class="title_style">
-        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title">
+        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title"
+          @keyup.enter.native="saveTitle" @blur="saveTitle">
         </el-input>
         <div style="width: 60px;">
           <span v-if="!updated">已保存</span>
@@ -98,9 +99,9 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
-import $moment from "moment";
+import $moment from "moment"
 import MdEditor from 'md-editor-v3'
-import { Edit } from "@element-plus/icons-vue";
+import { Edit } from "@element-plus/icons-vue"
 import 'md-editor-v3/lib/style.css'
 import { updateBtName, updateContent, listAll, putBlogType, removeBlogType, getContent, putBlog, deleteContent } from '../../api/blog'
 
@@ -177,8 +178,6 @@ const getTestData = async () => {
     startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
     setTimeout(() => {
       if ($moment(current).diff($moment(tmp), 'seconds') >= 1) {
-        console.log(current)
-        console.log(startTime)
         saveContent()
       }
     }, 1000)
@@ -188,17 +187,17 @@ const getTestData = async () => {
 
 /**
  * BlogTypeを選べる
- * @param key 
+ * @param key
  */
 const onclickTypeTab = (key: string) => {
-  const bid = <string>blogTypes.get(key)?.blogs.values().next().value.bid
+  const bid = blogTypes.get(key)?.blogs.values().next().value.bid
   getContent(bid).then(response => {
     ((blogTypes.get(key) as BlogType).blogs.get(bid) as Blog).content = response.data.content
     checkedBlogIndex.value = key
     checkedIndex.value = bid
   })
-
 }
+
 const onclickBlogTab = (key: string) => {
   checkedIndex.value = key
   getContent(key).then(response => {
@@ -206,6 +205,7 @@ const onclickBlogTab = (key: string) => {
 
   })
 }
+
 const handleEditBtName = (bt: BlogType) => {
   dialogVisible.value = true
 }
@@ -225,10 +225,11 @@ const saveContent = () => {
   updateContent(query).then(response => {
     if (response.status == 200) {
       updated.value = false
-      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content = 
+      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content =
     }
   })
 }
+
 /**
  * Blogタイプ名称修正
  */
@@ -242,6 +243,7 @@ const saveType = () => {
   })
 
 }
+
 /**
  * Blogタイトル修正
  */
@@ -258,6 +260,7 @@ const saveTitle = () => {
     updated.value = false
   })
 }
+
 /**
  * ブログ新規作成
  */
@@ -282,8 +285,9 @@ const insertBlog = () => {
     isclicked.value = false
   })
 }
+
 /**
- * ブログ削除 
+ * ブログ削除
  */
 const deleteBlog = () => {
   if (btName.value == "删除") {
@@ -297,7 +301,6 @@ const deleteBlog = () => {
     })
     btName.value = ""
   }
-
 }
 
 // Blogタイプ新規作成用、作成後、リセットする
@@ -351,8 +354,6 @@ const deleteBlogType = () => {
   } else {
 
   }
-
-
 }
 
 // Created　段階の関数呼び出す処理
@@ -361,7 +362,7 @@ getTestData()
 
 // サイズ調整部分
 type WholeStyle = {
-  width: string
+  width: string,
   height: string
 }
 let innerHeight = ref("")
@@ -377,9 +378,9 @@ const cWholeStyle = reactive<WholeStyle>({} as WholeStyle)
 let contentWidth = 0.67 * window.innerWidth
 cWholeStyle.width = contentWidth + 'px'
 innerHeight.value = (window.innerHeight - 50) + 'px'
-onMounted(() => {
+// onMounted(() => {
 
-})
+// })
 </script>
 
 <style scoped>
