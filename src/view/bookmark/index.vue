@@ -14,6 +14,7 @@
       <div class="tag_list">
         <el-tag class="ml-2 click-icon" :type="item.clicked ? 'danger' : 'info'" v-for="(item) in bookmark_types"
           @click="handleTags(item)">{{ item.bk_type_name }}</el-tag>
+        <el-button type="primary" @click="handleManageType" v-show="Tenant.account">自定义</el-button>
       </div>
     </el-form>
     <div class="create_dialog">
@@ -58,6 +59,10 @@
     <el-dialog v-model="dialogVisible">
       <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
     </el-dialog>
+
+    <!-- <el-dialog v-model="TypeDialogVisible">
+      <bookmarkType_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></bookmarkType_dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -66,6 +71,7 @@ import { reactive, ref } from 'vue'
 import { search_bookmark, delete_bookmark } from '../../api/bookmark'
 import { bookmark_type } from '../../api/master'
 import bookmark_dialog from './dialog.vue'
+import bookmarkType_dialog from './Typedialog.vue'
 import delete_dialog from '../../components/operate/deleteDialog.vue'
 import type { ElTable } from 'element-plus'
 import { CopyDocument } from "@element-plus/icons-vue";
@@ -135,9 +141,15 @@ const toggleSelection = (rows?: Bookmark[]) => {
 }
 
 
+const handleManageType = () => {
+
+}
+
+
 // dialog表示flag
 let dialogFormVisible = ref(false)
 let dialogVisible = ref(false)
+let TypeDialogVisible = ref(false)
 
 // 操作-》添加
 const handleInsert = () => {

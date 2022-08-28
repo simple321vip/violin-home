@@ -41,27 +41,27 @@ export const useTenantStore = defineStore({
      * @param {string} user_id
      * @param {string} user_password
      */
-    // async login(user_id: string, user_password: string) {
-    //   const userData = await authorize({ user_id, user_password })
-    //   if (userData.data.token) {
-    //     this.$patch({
-    //       account: user_id,
+    async login(user_id: string, user_password: string) {
+      const userData = await authorize({ user_id, user_password })
+      if (userData.data.token) {
+        this.$patch({
+          account: user_id,
 
-    //       ...userData.data,
-    //       id: 'true'
-    //     })
-    //     setToken(userData.data.token)
-    //     setTenant(userData)
-    //     console.log('authorize success!')
-    //   }
-    //   return new Promise((resolve, reject) => {
-    //     if (userData.data.message) {
-    //       reject(userData.data.message)
-    //     } else {
-    //       resolve(userData.data)
-    //     }
-    //   })
-    // },
+          ...userData.data,
+          id: 'true'
+        })
+        setToken(userData.data.token)
+        setTenant(userData)
+        console.log('authorize success!')
+      }
+      return new Promise((resolve, reject) => {
+        if (userData.data.message) {
+          reject(userData.data.message)
+        } else {
+          resolve(userData.data)
+        }
+      })
+    },
     async reflush() {
       if (getToken()) {
         const tenant = <Tenant>(JSON.parse(getTenant() as string))
