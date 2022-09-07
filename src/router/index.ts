@@ -61,6 +61,13 @@ const routes: Array<RouteRecordRaw> = [
           name: '一键打包'
         }
       },
+      {
+        path: '/trader',
+        component: () => import('../view/trader/index.vue'),
+        meta: {
+          name: 'trader'
+        }
+      },
     ]
   },
   {

@@ -49,7 +49,7 @@ const doLogin = () => {
 }
 const doLogout = () => {
   dialogVisible.value = false
-  logout(tenant.id).then(() => {
+  logout(tenant.id).catch(() => { console.log(1) }).finally(() => {
     tenant.logout()
     router.push({
       path: '/login'

@@ -1,7 +1,7 @@
 <template>
   <div class="about" ref="bookmarks" id="bookmarks" :style="{
     width: '600px',
-    height: '300px'
+    height: '400px'
   }"></div>
 </template>
 
