@@ -1,11 +1,11 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 
 const headers = {
   'Content-Type': 'application/json;charsetset=UTF-8'
 }
 
 const listAll = () => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog/list',
     method: 'GET',
     headers: headers
@@ -13,7 +13,7 @@ const listAll = () => {
 }
 
 const updateBtName = (data: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog_type',
     method: 'POST',
     headers: headers,
@@ -22,7 +22,7 @@ const updateBtName = (data: Object) => {
 }
 
 const putBlogType = (data: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog_type',
     method: 'PUT',
     headers: headers,
@@ -31,7 +31,7 @@ const putBlogType = (data: Object) => {
 }
 
 const removeBlogType = (data: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog_type',
     method: 'DELETE',
     headers: headers,
@@ -40,7 +40,7 @@ const removeBlogType = (data: Object) => {
 }
 
 const getContent = (id: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog/content/' + id,
     method: 'GET',
     headers: headers,
@@ -48,7 +48,7 @@ const getContent = (id: string) => {
 }
 
 const putBlog = (postData: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog/content',
     method: 'PUT',
     headers: headers,
@@ -57,7 +57,7 @@ const putBlog = (postData: Object) => {
 }
 
 const updateContent = (postData: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog/content',
     method: 'POST',
     headers: headers,
@@ -66,7 +66,7 @@ const updateContent = (postData: Object) => {
 }
 
 const deleteContent = (bid: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/author/blog/' + bid,
     method: 'DELETE',
     headers: headers,

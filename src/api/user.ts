@@ -1,6 +1,6 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 const authorize = (params: any) => {
-  return request({
+  return service({
     url: '/auth/api/v1/authorize',
     method: 'post',
     data: params
@@ -8,7 +8,7 @@ const authorize = (params: any) => {
 }
 
 const obtainUserInfo = (token: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/user_info',
     method: 'GET',
     params: { token: token }
@@ -16,7 +16,7 @@ const obtainUserInfo = (token: string) => {
 }
 
 const logout = (id: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/logout/' + id,
     method: 'GET'
   })

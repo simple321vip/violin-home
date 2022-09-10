@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 import Qs from 'qs'
 
 const headers = {
@@ -6,7 +6,7 @@ const headers = {
 }
 
 const getBlogs = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/reader/blogs',
     method: 'GET',
     params: params,
@@ -17,7 +17,7 @@ const getBlogs = (params: Object) => {
 }
 
 const getBtName = () => {
-  return request({
+  return service({
     url: '/auth/api/v1/reader/blog_type',
     method: 'GET',
     headers: headers
@@ -25,7 +25,7 @@ const getBtName = () => {
 }
 
 const getBlog = (bid: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/reader/blog/' + bid,
     method: 'GET',
     headers: headers
@@ -33,14 +33,14 @@ const getBlog = (bid: string) => {
 }
 
 const publishAll = () => {
-  return request({
+  return service({
     url: '/auth/api/v1/reader/blogs/publish/all',
     method: 'GET'
   })
 }
 
 const publish = (bid: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/reader/blogs/publish/' + bid,
     method: 'GET'
   })

@@ -1,10 +1,10 @@
-import request from '../utils/request'
+import { service2 } from '../utils/request'
 
 "CTA strategy"
 
 "strategy list"
 const get_strategy_list = () => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -12,7 +12,7 @@ const get_strategy_list = () => {
 
 "upload a strategy"
 const upload_strategy = () => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -20,7 +20,7 @@ const upload_strategy = () => {
 
 "load a strategy"
 const load_strategy = (strategy_id: string) => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -28,7 +28,7 @@ const load_strategy = (strategy_id: string) => {
 
 "unload a strategy"
 const unload_strategy = (strategy_id: string) => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -36,7 +36,7 @@ const unload_strategy = (strategy_id: string) => {
 
 "start a strategy"
 const start_strategy = (strategy_id: string) => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -44,7 +44,7 @@ const start_strategy = (strategy_id: string) => {
 
 "stop a strategy"
 const stop_strategy = (strategy_id: string) => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })
@@ -52,7 +52,7 @@ const stop_strategy = (strategy_id: string) => {
 
 "remove a strategy"
 const remove_strategy = (strategy_id: string) => {
-  return request({
+  return service2({
     url: '/auth/api/v1/trader',
     method: 'PUT',
   })

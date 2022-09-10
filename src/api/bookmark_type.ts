@@ -1,7 +1,7 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 
 const put_bookmark_type = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/bookmark_type/insert',
     method: 'PUT',
     data: params
@@ -9,7 +9,7 @@ const put_bookmark_type = (params: Object) => {
 }
 
 const get_bookmark_type = () => {
-  return request({
+  return service({
     url: '/auth/api/v1/bookmark_type',
     method: 'GET',
     data: {}
@@ -17,14 +17,14 @@ const get_bookmark_type = () => {
 }
 
 const delete_bookmark_type = (type_id: string) => {
-  return request({
+  return service({
     url: '/auth/api/v1/bookmark_type/' + type_id,
     method: 'DELETE'
   })
 }
 
 const post_bookmark_type = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/bookmark_type',
     method: 'POST',
     data: params

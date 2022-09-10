@@ -1,9 +1,18 @@
 import axios from 'axios'
 import { getToken, getTenant } from '../utils/auth'
 
+// violin-book
 const service = axios.create(
   {
     baseURL: import.meta.env.VITE_APP_URL as string,
+    timeout: 5000
+  }
+)
+
+// violin-trader
+const service2 = axios.create(
+  {
+    baseURL: import.meta.env.VITE_APP_URL2 as string,
     timeout: 5000
   }
 )
@@ -25,6 +34,25 @@ service.interceptors.request.use(
     return Promise.reject(error)
   }
 )
+
+service2.interceptors.request.use(
+  config => {
+    if (typeof getToken() === 'string') {
+      (config as any).headers['Authorization'] = 'Bearer' + getToken()
+    }
+    const tenant = getTenant()
+    if (typeof tenant === 'string') {
+      (config as any).headers['id'] = JSON.parse(tenant).id
+    }
+
+    return config
+  },
+  error => {
+    console.log(error)
+    return Promise.reject(error)
+  }
+)
+
 
 // service.interceptors.response.use(
 //   response => {
@@ -54,4 +82,4 @@ service.interceptors.request.use(
 //   }
 // )
 
-export default service
+export { service, service2 }

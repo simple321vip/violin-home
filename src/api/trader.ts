@@ -1,7 +1,7 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 
 const get_stock_data = (data: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/trader',
     method: 'PUT',
     data: data

@@ -1,7 +1,7 @@
-import request from '../utils/request'
+import { service } from '../utils/request'
 
 const get_notes = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/one_note',
     method: 'GET',
     params: params
@@ -9,7 +9,7 @@ const get_notes = (params: Object) => {
 }
 
 const update_page = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/one_note/update_page',
     method: 'POST',
     data: params
@@ -17,7 +17,7 @@ const update_page = (params: Object) => {
 }
 
 const update_section = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/api/v1/one_note/update_section',
     method: 'POST',
     data: params
@@ -25,14 +25,14 @@ const update_section = (params: Object) => {
 }
 
 const insert_section = () => {
-  return request({
+  return service({
     url: '/auth/api/v1/one_note/insert_section',
     method: 'PUT'
   })
 }
 
 const insert_page = (params: Object) => {
-  return request({
+  return service({
     url: '/auth/one_note/insert_page',
     method: 'PUT',
     data: params
