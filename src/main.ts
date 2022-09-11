@@ -7,7 +7,15 @@ import router from './router'
 import { createPinia } from 'pinia'
 const store = createPinia()
 
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 let app = createApp(App)
+
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
 
 app.use(router)
 app.use(ElementPlus)

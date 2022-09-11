@@ -11,132 +11,141 @@
           <el-button type="primary" @click="doSearch">检索</el-button>
         </el-col>
       </el-row>
-      <div class="tag_list">
-        <el-tag class="ml-2 click-icon" :type="item.clicked ? 'danger' : 'info'" v-for="(item) in bookmark_types"
-          @click="handleTags(item)">{{ item.bk_type_name }}</el-tag>
-        <el-button type="primary" @click="handleAddType" v-show="Tenant.account">增加</el-button>
-        <el-button type="primary" @click="handleManageType" v-show="Tenant.account">自定义</el-button>
-      </div>
-    </el-form>
+    </el-form> -->
     <div class="create_dialog">
-      <el-button type="primary" @click="handleInsert" v-show="Tenant.account">新建</el-button>
+      <el-button type="primary" @click="on_create">新建</el-button>
     </div>
 
-    <el-table ref="multipleTableRef" :data="strategy_list" @selection-change="handleSelectionChange" style="width: 100%">
+    <el-table ref="multipleTableRef" :data="strategy_list" style="width: 100%">
       <el-table-column type="selection" width="55" />
       <el-table-column type="index" label="index" width="80" />
-      <el-table-column prop="bk_type_name" label="分类" width="100" />
-      <el-table-column prop="comment" label="名称" width="180" />
-      <el-table-column prop="facvion" label="图标" width="60" />
-      <el-table-column class="click-icon" prop="url" label="url">
+      <el-table-column prop="strategy_name" label="策略名" width="200" />
+      <el-table-column prop="class_name" label="策略类名" width="200" />
+      <el-table-column prop="vt_symbol" label="合约" width="100" />
+      <el-table-column prop="status" label="状态" width="60">
         <template #default="scope">
-          <span style="cursor: pointer" @click="openUrl(scope.row.url)">{{ scope.row.url }}</span>
+          <el-icon v-if="scope.row.status == 0" :size="20">
+            <Cloudy />
+          </el-icon>
+          <el-icon v-if="scope.row.status == 1" :size="20" color="yellow">
+            <Sunrise />
+          </el-icon>
+          <el-icon v-if="scope.row.status == 2" :size="20" color="gold">
+            <Sunny />
+          </el-icon>
+          <el-icon v-if="scope.row.status == 3" :size="20" color="blue">
+            <Moon />
+          </el-icon>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="url" label="开始" width="60">
         <template #default="scope">
-          <el-icon :size="20" @click="copyNumber(scope.row)" class="click-icon">
-            <CopyDocument />
-          </el-icon>
-          <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)"
-            v-show="Tenant.account">编辑
-          </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-show="Tenant.account">
-            删除
-          </el-button>
+          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_remove(scope.row)">
+            <el-icon :size="20" @click="on_start(scope.row)">
+              <VideoPlay />
+            </el-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="url" label="停止" width="60">
+        <template #default="scope">
+          <span v-if="scope.row.status == 2" style="cursor: pointer" @click="on_remove(scope.row)">
+            <el-icon :size="20" @click="on_stop(scope.row)">
+              <VideoPause />
+            </el-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="url" label="删除" width="60">
+        <template #default="scope">
+          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_remove(scope.row)">
+            <el-icon :size="20" @click="on_remove(scope.row)">
+              <Delete />
+            </el-icon>
+          </span>
         </template>
       </el-table-column>
     </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="toggleSelection([tableData[1], tableData[2]])">反选</el-button>
-      <el-button @click="toggleSelection()">清除</el-button>
-    </div> -->
-
-    <!-- <el-dialog v-model="dialogFormVisible" title="添加书签">
-      <bookmark_dialog :dialog_form="currentDialogData" :operate_code="operate" :types="bookmark_types"
-        @on-concel="closeDialog" @on-submit="doSubmit"></bookmark_dialog>
-    </el-dialog>
-
-    <el-dialog v-model="dialogVisible">
-      <delete_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></delete_dialog>
-    </el-dialog>
-
-    <el-dialog v-model="createTypeDialogVisible">
-      <createType_dialog @on-update="doUpdate"></createType_dialog>
-    </el-dialog> -->
-
-    <!-- <el-dialog v-model="typeDialogVisible">
-      <bookmarkType_dialog :delete_id="currentDialogData.bk_id" @on-submit="doDelete"></bookmarkType_dialog>
-    </el-dialog> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import {
-  get_strategy_list,
-  upload_strategy,
-  load_strategy,
-  unload_strategy,
+  get_strategies,
+  create_strategy,
   start_strategy,
   stop_strategy,
-  remove_strategy
+  get_strategy_status,
 } from '../../api/cta_strategy'
+import { genFileId } from 'element-plus'
+import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
+import { h } from 'vue'
+import { ElMessage } from 'element-plus'
+
+const upload = ref<UploadInstance>()
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  upload.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload.value!.handleStart(file)
+}
 
 
 type Strategy = {
-  strategy_id: string,
   strategy_name: string,
+  class_name: string,
+  vt_symbol: string,
+  setting: Object,
+  status: number,
 }
 
 const strategy_list = reactive<Strategy[]>([])
 
 const on_list = () => {
-  get_strategy_list().then(res => {
+  get_strategies().then(res => {
+    strategy_list.length = 0
     res.data.forEach((item: Strategy, index: number) => {
       strategy_list.push(item)
     })
   })
 }
 
-const on_upload = () => {
-  upload_strategy().then(res => {
+const on_create = () => {
+
+
+}
+
+const on_start = (row: any) => {
+  start_strategy(row.strategy_name).then(res => {
 
   })
 }
 
-const on_load = (strategy_id: string) => {
-  load_strategy(strategy_id).then(res => {
+const on_stop = (row: any) => {
+  stop_strategy(row.strategy_name).then(res => {
 
   })
 }
 
-const on_unload = (strategy_id: string) => {
-  unload_strategy(strategy_id).then(res => {
-
+const on_remove = (row: any) => {
+  stop_strategy(row.strategy_name).then(res => {
+    on_list()
   })
 }
 
-const on_start = (strategy_id: string) => {
-  start_strategy(strategy_id).then(res => {
-
+const on_status = (row: any) => {
+  get_strategy_status(row.strategy_name).then(res => {
+    row.status = res.data.status
   })
 }
 
-const on_stop = (strategy_id: string) => {
-  stop_strategy(strategy_id).then(res => {
-
-  })
-}
-
-const on_remove = (strategy_id: string) => {
-  remove_strategy(strategy_id).then(res => {
-
-  })
-}
+// init process
+on_list()
 
 
 </script>
 
 <style scoped>
+
 </style>

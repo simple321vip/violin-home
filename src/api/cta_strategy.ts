@@ -1,69 +1,113 @@
-import { service2 } from '../utils/request'
+import { trader_service } from '../utils/request'
 
 "CTA strategy"
 
-"strategy list"
-const get_strategy_list = () => {
-  return service2({
-    url: '/auth/api/v1/trader',
+"strategy file list"
+const get_strategy_files = () => {
+  return trader_service({
+    url: '/trader/api/v1/strategy_file',
+    method: 'GET',
+  })
+}
+
+"upload a strategy file"
+const upload_strategy_file = (file: any) => {
+  const formData = new FormData();
+  formData.append("file", file)
+  return trader_service({
+    url: '/trader/api/v1/strategy_file',
+    method: 'POST',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  })
+}
+
+"load a strategy file"
+const load_strategy_file = (file_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy_file/' + file_name,
     method: 'PUT',
   })
 }
 
-"upload a strategy"
-const upload_strategy = () => {
-  return service2({
-    url: '/auth/api/v1/trader',
-    method: 'PUT',
+"unload a strategy file"
+const unload_strategy_file = (class_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy_file/' + class_name,
+    method: 'PATCH',
   })
 }
 
-"load a strategy"
-const load_strategy = (strategy_id: string) => {
-  return service2({
-    url: '/auth/api/v1/trader',
-    method: 'PUT',
+"remove a strategy file"
+const remove_strategy_file = (file_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy_file/' + file_name,
+    method: 'DELETE',
   })
 }
 
-"unload a strategy"
-const unload_strategy = (strategy_id: string) => {
-  return service2({
-    url: '/auth/api/v1/trader',
-    method: 'PUT',
+
+"get strategy list"
+const get_strategies = () => {
+  return trader_service({
+    url: '/trader/api/v1/strategies',
+    method: 'GET',
+  })
+}
+
+"create a strategy"
+const create_strategy = () => {
+  return trader_service({
+    url: '/trader/api/v1/strategy',
+    method: 'POST',
+    data: {}
   })
 }
 
 "start a strategy"
-const start_strategy = (strategy_id: string) => {
-  return service2({
-    url: '/auth/api/v1/trader',
+const start_strategy = (strategy_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/' + strategy_name,
     method: 'PUT',
   })
 }
 
 "stop a strategy"
-const stop_strategy = (strategy_id: string) => {
-  return service2({
-    url: '/auth/api/v1/trader',
-    method: 'PUT',
+const stop_strategy = (strategy_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/' + strategy_name,
+    method: 'PATCH',
   })
 }
 
 "remove a strategy"
-const remove_strategy = (strategy_id: string) => {
-  return service2({
-    url: '/auth/api/v1/trader',
-    method: 'PUT',
+const remove_strategy = (strategy_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/' + strategy_name,
+    method: 'DELETE',
+  })
+}
+
+"get a strategy status"
+const get_strategy_status = (strategy_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/status/' + strategy_name,
+    method: 'GET',
   })
 }
 
 export {
-  get_strategy_list,
-  upload_strategy,
-  load_strategy,
-  unload_strategy,
+  get_strategy_files,
+  upload_strategy_file,
+  load_strategy_file,
+  unload_strategy_file,
+  remove_strategy_file,
+  get_strategies,
+  create_strategy,
   start_strategy,
   stop_strategy,
-  remove_strategy
+  remove_strategy,
+  get_strategy_status
 }

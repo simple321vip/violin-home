@@ -10,7 +10,7 @@ const service = axios.create(
 )
 
 // violin-trader
-const service2 = axios.create(
+const trader_service = axios.create(
   {
     baseURL: import.meta.env.VITE_APP_URL2 as string,
     timeout: 5000
@@ -35,7 +35,7 @@ service.interceptors.request.use(
   }
 )
 
-service2.interceptors.request.use(
+trader_service.interceptors.request.use(
   config => {
     if (typeof getToken() === 'string') {
       (config as any).headers['Authorization'] = 'Bearer' + getToken()
@@ -82,4 +82,4 @@ service2.interceptors.request.use(
 //   }
 // )
 
-export { service, service2 }
+export { service, trader_service }

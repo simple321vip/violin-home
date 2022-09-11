@@ -68,6 +68,20 @@ const routes: Array<RouteRecordRaw> = [
           name: 'trader'
         }
       },
+      {
+        path: '/strategy',
+        component: () => import('../view/trader/cta_strategy_file.vue'),
+        meta: {
+          name: '策略文件管理'
+        }
+      },
+      {
+        path: '/strategy_instance',
+        component: () => import('../view/trader/cta_strategy.vue'),
+        meta: {
+          name: '策略管理'
+        }
+      },
     ]
   },
   {
