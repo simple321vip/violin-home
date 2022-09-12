@@ -66,11 +66,19 @@ const get_strategies = () => {
 }
 
 "create a strategy"
-const create_strategy = (ruleForm: object) => {
+const create_strategy = (ruleForm: any) => {
   return trader_service({
-    url: '/trader/api/v1/strategy',
+    url: '/trader/api/v1/strategy/' + ruleForm.strategy_name,
     method: 'POST',
     data: ruleForm
+  })
+}
+
+"init a strategy"
+const init_strategy = (strategy_name: string) => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/init/' + strategy_name,
+    method: 'PUT',
   })
 }
 
@@ -123,6 +131,7 @@ export {
   remove_strategy_file,
   get_strategies,
   create_strategy,
+  init_strategy,
   start_strategy,
   stop_strategy,
   remove_strategy,

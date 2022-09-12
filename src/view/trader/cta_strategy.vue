@@ -9,7 +9,7 @@
       <el-table-column type="index" label="index" width="80" />
       <el-table-column prop="strategy_name" label="策略名" width="200" />
       <el-table-column prop="class_name" label="策略类名" width="200" />
-      <el-table-column prop="vt_symbol" label="合约" width="100" />
+      <el-table-column prop="vt_symbol" label="合约" width="140" />
       <el-table-column prop="status" label="状态" width="60">
         <template #default="scope">
           <el-icon v-if="scope.row.status == 0" :size="20">
@@ -28,7 +28,7 @@
       </el-table-column>
       <el-table-column prop="url" label="开始" width="60">
         <template #default="scope">
-          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_remove(scope.row)">
+          <span v-if="scope.row.status == 0 || scope.row.status == 3" style="cursor: pointer">
             <el-icon :size="20" @click="on_start(scope.row)">
               <VideoPlay />
             </el-icon>
@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column prop="url" label="停止" width="60">
         <template #default="scope">
-          <span v-if="scope.row.status == 2" style="cursor: pointer" @click="on_remove(scope.row)">
+          <span v-if="scope.row.status == 2" style="cursor: pointer">
             <el-icon :size="20" @click="on_stop(scope.row)">
               <VideoPause />
             </el-icon>
@@ -46,7 +46,7 @@
       </el-table-column>
       <el-table-column prop="url" label="删除" width="60">
         <template #default="scope">
-          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_remove(scope.row)">
+          <span v-if="scope.row.status == 0 || scope.row.status == 3" style="cursor: pointer">
             <el-icon :size="20" @click="on_remove(scope.row)">
               <Delete />
             </el-icon>
@@ -65,8 +65,10 @@ import { reactive, ref } from 'vue'
 import create_strategy_dialog from './dialog.vue'
 import {
   get_strategies,
+  init_strategy,
   start_strategy,
   stop_strategy,
+  remove_strategy,
   get_strategy_status,
   get_strategy_load_files,
   get_vt_symbols
@@ -91,6 +93,7 @@ type Strategy = {
 const strategy_list = reactive<Strategy[]>([])
 
 const on_list = () => {
+  createStrategyDialogVisible.value = false
   get_strategies().then(res => {
     strategy_list.length = 0
     res.data.forEach((item: Strategy, index: number) => {
@@ -104,11 +107,15 @@ const handle_create = () => {
   dialogRef.value.clear_form()
 }
 
-
 const on_start = (row: any) => {
-  start_strategy(row.strategy_name).then(res => {
-    row.status = 2
+  init_strategy(row.strategy_name).then(res => {
+    row.status = 1
+    start_strategy(row.strategy_name).then(res => {
+      row.status = 2
+    })
   })
+
+
 }
 
 const on_stop = (row: any) => {
@@ -118,7 +125,7 @@ const on_stop = (row: any) => {
 }
 
 const on_remove = (row: any) => {
-  stop_strategy(row.strategy_name).then(res => {
+  remove_strategy(row.strategy_name).then(res => {
     on_list()
   })
 }
@@ -142,15 +149,15 @@ const init = () => {
     })
   })
 
-  // get_vt_symbols().then(res => {
-  //   console.log(res)
-  // }).catch(error => {
-  //   ElMessage({
-  //     message: h('p', null, [
-  //       h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
-  //     ]),
-  //   })
-  // })
+  get_vt_symbols().then(res => {
+    store.$patch({ vt_symbols: res.data.vt_symbols })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
+      ]),
+    })
+  })
 }
 // init process
 init()
