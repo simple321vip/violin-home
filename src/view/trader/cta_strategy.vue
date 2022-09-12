@@ -1,19 +1,7 @@
 <template>
-  <div class="bookmark">
-    <!-- <el-form>
-      <el-row>
-        <el-col :span="6">
-          <el-form-item>
-            <el-input v-model="search_form.comment" placeholder="请输入" clearable />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-button type="primary" @click="doSearch">检索</el-button>
-        </el-col>
-      </el-row>
-    </el-form> -->
+  <div class="startegy">
     <div class="create_dialog">
-      <el-button type="primary" @click="on_create">新建</el-button>
+      <el-button type="primary" @click="handle_create">新建策略</el-button>
     </div>
 
     <el-table ref="multipleTableRef" :data="strategy_list" style="width: 100%">
@@ -66,30 +54,30 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog v-model="createStrategyDialogVisible">
+      <create_strategy_dialog ref="dialogRef" @on-create="on_list"></create_strategy_dialog>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref } from 'vue'
+import create_strategy_dialog from './dialog.vue'
 import {
   get_strategies,
-  create_strategy,
   start_strategy,
   stop_strategy,
   get_strategy_status,
+  get_strategy_load_files,
+  get_vt_symbols
 } from '../../api/cta_strategy'
-import { genFileId } from 'element-plus'
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
 import { h } from 'vue'
 import { ElMessage } from 'element-plus'
+import { strategyStore } from '../../store/strategy'
 
-const upload = ref<UploadInstance>()
-const handleExceed: UploadProps['onExceed'] = (files) => {
-  upload.value!.clearFiles()
-  const file = files[0] as UploadRawFile
-  file.uid = genFileId()
-  upload.value!.handleStart(file)
-}
+const store = strategyStore()
+
+let createStrategyDialogVisible = ref(false)
 
 
 type Strategy = {
@@ -110,21 +98,22 @@ const on_list = () => {
     })
   })
 }
-
-const on_create = () => {
-
-
+const dialogRef = ref()
+const handle_create = () => {
+  createStrategyDialogVisible.value = true
+  dialogRef.value.clear_form()
 }
+
 
 const on_start = (row: any) => {
   start_strategy(row.strategy_name).then(res => {
-
+    row.status = 2
   })
 }
 
 const on_stop = (row: any) => {
   stop_strategy(row.strategy_name).then(res => {
-
+    row.status = 3
   })
 }
 
@@ -140,9 +129,31 @@ const on_status = (row: any) => {
   })
 }
 
-// init process
-on_list()
+const init = () => {
+  on_list()
 
+  get_strategy_load_files().then(res => {
+    store.$patch({ class_names: res.data.class_names })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "读取策略文件失败"),
+      ]),
+    })
+  })
+
+  // get_vt_symbols().then(res => {
+  //   console.log(res)
+  // }).catch(error => {
+  //   ElMessage({
+  //     message: h('p', null, [
+  //       h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
+  //     ]),
+  //   })
+  // })
+}
+// init process
+init()
 
 </script>
 

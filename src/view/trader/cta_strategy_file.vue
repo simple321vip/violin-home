@@ -3,14 +3,15 @@
     <el-upload ref="upload" class="upload-demo" action="http://localhost:5000/trader/api/v1/strategy_file" :limit="1"
       :on-exceed="handleExceed" :auto-upload="false">
       <template #trigger>
-        <el-button type="primary">select file</el-button>
+        <el-button type="primary">添加策略文件</el-button>
       </template>
+      ->
       <el-button class="ml-3" type="success" @click="on_upload">
-        upload to server
+        上传策略文件
       </el-button>
       <template #tip>
         <div class="el-upload__tip text-red">
-          limit 1 file, new file will cover the old file
+          一次只能上传一个文件
         </div>
       </template>
     </el-upload>

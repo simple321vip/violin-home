@@ -61,25 +61,25 @@ const routes: Array<RouteRecordRaw> = [
           name: '一键打包'
         }
       },
-      {
-        path: '/trader',
-        component: () => import('../view/trader/index.vue'),
-        meta: {
-          name: 'trader'
-        }
-      },
+      // {
+      //   path: '/trader',
+      //   component: () => import('../view/trader/index.vue'),
+      //   meta: {
+      //     name: 'trader'
+      //   }
+      // },
       {
         path: '/strategy',
         component: () => import('../view/trader/cta_strategy_file.vue'),
         meta: {
-          name: '策略文件管理'
+          name: '策略文件'
         }
       },
       {
         path: '/strategy_instance',
         component: () => import('../view/trader/cta_strategy.vue'),
         meta: {
-          name: '策略管理'
+          name: 'CTA策略'
         }
       },
     ]

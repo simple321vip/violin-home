@@ -10,6 +10,14 @@ const get_strategy_files = () => {
   })
 }
 
+"strategy file list"
+const get_strategy_load_files = () => {
+  return trader_service({
+    url: '/trader/api/v1/strategy_file/load',
+    method: 'GET',
+  })
+}
+
 "upload a strategy file"
 const upload_strategy_file = (file: any) => {
   const formData = new FormData();
@@ -58,11 +66,11 @@ const get_strategies = () => {
 }
 
 "create a strategy"
-const create_strategy = () => {
+const create_strategy = (ruleForm: object) => {
   return trader_service({
     url: '/trader/api/v1/strategy',
     method: 'POST',
-    data: {}
+    data: ruleForm
   })
 }
 
@@ -98,8 +106,17 @@ const get_strategy_status = (strategy_name: string) => {
   })
 }
 
+"get a strategy status"
+const get_vt_symbols = () => {
+  return trader_service({
+    url: '/trader/api/v1/strategy/vt_symbols',
+    method: 'GET',
+  })
+}
+
 export {
   get_strategy_files,
+  get_strategy_load_files,
   upload_strategy_file,
   load_strategy_file,
   unload_strategy_file,
@@ -109,5 +126,6 @@ export {
   start_strategy,
   stop_strategy,
   remove_strategy,
-  get_strategy_status
+  get_strategy_status,
+  get_vt_symbols
 }
