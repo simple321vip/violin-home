@@ -48,17 +48,17 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/recommend',
+        path: '/market',
         component: () => import('../view/recommend/index.vue'),
         meta: {
-          name: '推荐中'
+          name: '市场行情'
         }
       },
       {
-        path: '/download',
-        component: () => import('../view/download/index.vue'),
+        path: '/capital',
+        component: () => import('../view/capital/index.vue'),
         meta: {
-          name: '一键打包'
+          name: '资金管理'
         }
       },
       // {

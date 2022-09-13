@@ -8,56 +8,47 @@
 <script setup lang="ts">
 import * as echarts from 'echarts'
 import { onMounted, ref } from 'vue';
-const bookmarks = ref<HTMLElement>()
+import {
+  get_strategy_load_files,
+  get_vt_symbols
+} from '../../api/cta_strategy'
+import { h } from 'vue'
+import { ElMessage } from 'element-plus'
+import { strategyStore } from '../../store/strategy';
+
+const store = strategyStore()
 onMounted(() => {
-  const myEcharts = echarts.init(bookmarks.value!)
-  const option = {
-    tooltip: {
-      trigger: 'item'
-    },
-    legend: {
-      top: '5%',
-      left: 'center'
-    },
-    series: [
-      {
-        name: 'Access From',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2
-        },
-        label: {
-          show: false,
-          position: 'center'
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: '25',
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-          show: false
-        },
-        data: [
-          { value: 1048, name: 'Java' },
-          { value: 735, name: 'JavaScript' },
-          { value: 580, name: 'Internet' },
-          { value: 484, name: '数据结构' },
-          { value: 300, name: '数据库' }
-        ]
-      }
-    ]
-  }
-  myEcharts.setOption(option)
+
 })
+
+const init = () => {
+
+  get_strategy_load_files().then(res => {
+    store.$patch({ class_names: res.data.class_names })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "读取策略文件失败"),
+      ]),
+    })
+  })
+
+  get_vt_symbols().then(res => {
+    store.$patch({ vt_symbols: res.data.vt_symbols })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
+      ]),
+    })
+  })
+}
+// init process
+init()
+
 
 </script>
 
 <style>
+
 </style>

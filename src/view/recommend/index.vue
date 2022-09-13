@@ -1,5 +1,9 @@
 <template>
-  <div class="dashboard">这里我想分享的一些东西，无论是生活还是工作，还是学科</div>
+  <div class="recommend">
+    - 行情订阅后，将会出现在创建策略的symbol中<br>
+    -
+
+  </div>
 </template>
 
 <script setup lang="ts">

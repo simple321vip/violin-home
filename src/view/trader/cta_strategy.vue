@@ -138,26 +138,6 @@ const on_status = (row: any) => {
 
 const init = () => {
   on_list()
-
-  get_strategy_load_files().then(res => {
-    store.$patch({ class_names: res.data.class_names })
-  }).catch(error => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "读取策略文件失败"),
-      ]),
-    })
-  })
-
-  get_vt_symbols().then(res => {
-    store.$patch({ vt_symbols: res.data.vt_symbols })
-  }).catch(error => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
-      ]),
-    })
-  })
 }
 // init process
 init()

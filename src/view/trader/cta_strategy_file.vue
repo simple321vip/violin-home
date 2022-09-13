@@ -21,15 +21,44 @@
       <el-table-column type="index" label="index" width="80" />
       <el-table-column prop="file_name" label="策略文件名" width="200" />
       <el-table-column prop="class_name" label="策略类名" width="200" />
-      <el-table-column prop="status" label="状态" width="180" />
-      <el-table-column prop="facvion" label="图标" width="60" />
-      <el-table-column class="click-icon" prop="url" label="操作">
+      <el-table-column prop="status" label="状态" width="60">
         <template #default="scope">
-          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_load(scope.row)">{{ "加载图标" }}</span>
-          <span v-if="scope.row.status == 0" style="cursor: pointer" @click="on_remove(scope.row)">{{ "删除" }}</span>
-          <span v-if="scope.row.status == 2" style="cursor: pointer">{{ "加载中图标" }}</span>
-          <span v-if="scope.row.status == 1" style="cursor: pointer" @click="on_unload(scope.row)">{{
-          "卸载图标" }}</span>
+          <el-icon v-if="scope.row.status == 0" :size="20">
+            <InfoFilled />
+          </el-icon>
+          <el-icon v-if="scope.row.status == 1" :size="20" color="green">
+            <SuccessFilled />
+          </el-icon>
+          <el-icon v-if="scope.row.status == 2" :size="20" color="gold">
+            <WarningFilled />
+          </el-icon>
+        </template>
+      </el-table-column>
+      <el-table-column prop="url" label="加载" width="60">
+        <template #default="scope">
+          <span v-if="scope.row.status == 0" style="cursor: pointer">
+            <el-icon :size="20" @click="on_remove(scope.row)" color="blue">
+              <CirclePlusFilled />
+            </el-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="url" label="卸载" width="60">
+        <template #default="scope">
+          <span v-if="scope.row.status == 1" style="cursor: pointer">
+            <el-icon :size="20" @click="on_remove(scope.row)" color="red">
+              <RemoveFilled />
+            </el-icon>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="url" label="删除" width="60">
+        <template #default="scope">
+          <span v-if="scope.row.status == 0" style="cursor: pointer">
+            <el-icon :size="20" @click="on_remove(scope.row)" color="red">
+              <Delete />
+            </el-icon>
+          </span>
         </template>
       </el-table-column>
     </el-table>
