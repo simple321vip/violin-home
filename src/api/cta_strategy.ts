@@ -114,14 +114,6 @@ const get_strategy_status = (strategy_name: string) => {
   })
 }
 
-"get a strategy status"
-const get_vt_symbols = () => {
-  return trader_service({
-    url: '/trader/api/v1/strategy/vt_symbols',
-    method: 'GET',
-  })
-}
-
 export {
   get_strategy_files,
   get_strategy_load_files,
@@ -136,5 +128,4 @@ export {
   stop_strategy,
   remove_strategy,
   get_strategy_status,
-  get_vt_symbols
 }

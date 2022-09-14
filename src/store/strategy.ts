@@ -4,7 +4,9 @@ export const strategyStore = defineStore({
   id: 'strategy',
   state: () => ({
     class_names: [],
-    vt_symbols: []
+    vt_symbols: new Map(),
+    subscribe_vt_symbols: [],
+    exchanges: []
   }),
 })
 

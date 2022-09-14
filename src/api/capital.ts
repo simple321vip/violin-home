@@ -18,7 +18,23 @@ const get_contract = (symbol: string) => {
   })
 }
 
-"unload a strategy file"
+"get tick"
+const get_tick = (symbol: string) => {
+  return trader_service({
+    url: '/trader/api/v1/tick/' + symbol,
+    method: 'GET',
+  })
+}
+
+"get ticks"
+const get_ticks = () => {
+  return trader_service({
+    url: '/trader/api/v1/ticks',
+    method: 'GET',
+  })
+}
+
+"send_order"
 const send_order = (data: any) => {
   return trader_service({
     url: '/trader/api/v1/order',
@@ -27,8 +43,46 @@ const send_order = (data: any) => {
   })
 }
 
+"get tick"
+const subscribe = (symbol: string) => {
+  return trader_service({
+    url: '/trader/api/v1/subscribe/' + symbol,
+    method: 'GET',
+  })
+}
+
+"get subscribe vt_symbols"
+const get_subscribe_vt_symbols = () => {
+  return trader_service({
+    url: '/trader/api/v1/subscribe/vt_symbols',
+    method: 'GET',
+  })
+}
+
+"get all vt_symbols"
+const get_vt_symbols = () => {
+  return trader_service({
+    url: '/trader/api/v1/vt_symbols',
+    method: 'GET',
+  })
+}
+
+"get exchanges"
+const get_exchanges = () => {
+  return trader_service({
+    url: '/trader/api/v1/exchanges',
+    method: 'GET',
+  })
+}
+
 export {
   get_accounts,
   get_contract,
-  send_order
+  get_tick,
+  get_ticks,
+  subscribe,
+  send_order,
+  get_vt_symbols,
+  get_subscribe_vt_symbols,
+  get_exchanges
 }

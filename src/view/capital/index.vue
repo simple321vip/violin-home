@@ -1,20 +1,26 @@
 <template>
   <div class="capital">
     <el-descriptions title="Account Info">
-      <el-descriptions-item>
+      <el-descriptions-item class="descriptionsclass">
         <template #label>
           <div class="cell-item">
             <el-icon style="iconStyle">
               <user />
             </el-icon>
-            Account
           </div>
         </template>
-        {{account_data.account_id}}
+        <el-tag size="small"> {{account_data.account_id}}</el-tag>
       </el-descriptions-item>
       <el-descriptions-item label="gateway_name">{{account_data.geteway_name}}</el-descriptions-item>
       <el-descriptions-item label="frozen">{{account_data.frozen}}</el-descriptions-item>
-      <el-descriptions-item label="balance">
+      <el-descriptions-item>
+        <template #label>
+          <div class="cell-item">
+            <el-icon style="iconStyle">
+              <Coin />
+            </el-icon>
+          </div>
+        </template>
         <el-tag size="small"> {{account_data.balance}}</el-tag>
       </el-descriptions-item>
       <el-descriptions-item label="Address">No.1188, Gaoxinyuan Avenue, Dalian District, Liaoning, Jiangsu
@@ -23,8 +29,8 @@
 
     <div class="operate">
       <div width="180px">
-        <el-select v-model="vt_symbol" placeholder="select a vt_symbol" @change="query_contract">
-          <el-option v-for="symbol in store.vt_symbols" :value="symbol" />
+        <el-select v-model="vt_symbol" placeholder="select a vt_symbol" @change="select_contract">
+          <el-option v-for="symbol in store.subscribe_vt_symbols" :value="symbol" />
         </el-select>
         <el-input-number v-model="volume" :min="1" :max="10" @change="handleChange" />
         <el-input-number v-model="price" :min="1" :max="10000" @change="handleChange" />
@@ -80,8 +86,8 @@
 <script setup lang="ts">
 
 import { ElMessage, TabsPaneContext } from 'element-plus'
-import { reactive, ref, h } from 'vue'
-import { get_accounts, send_order, get_contract } from '../../api/capital'
+import { reactive, ref, h, onMounted, onUnmounted } from 'vue'
+import { get_accounts, send_order, get_contract, subscribe } from '../../api/capital'
 import { strategyStore } from '../../store/strategy';
 type AccountData = {
   geteway_name: string
@@ -107,6 +113,9 @@ const contracts = reactive<string[]>([])
 const direction = ref('多')
 const offset = ref('开')
 const activeName = ref(1)
+const volume = ref(1)
+const price = ref(3000)
+const timer = ref(0)
 const account_data = reactive<AccountData>({
   geteway_name: '',
   account_id: '',
@@ -125,9 +134,9 @@ const on_query_accounts = () => {
     account_data.frozen = res.data.frozen
   })
 }
-const query_contract = () => {
-  get_contract(vt_symbol.value).then(res => {
-
+const select_contract = () => {
+  subscribe(vt_symbol.value).then(res => {
+    price.value = res.data.tick.last_price
   })
 }
 
@@ -135,8 +144,7 @@ const query_contract = () => {
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
 }
-const volume = ref(1)
-const price = ref(3000)
+
 const handleChange = (value: number) => {
   console.log(value)
 }
@@ -164,10 +172,13 @@ const on_order = () => {
   })
 }
 
-const init = () => {
-  on_query_accounts()
-}
-init()
+onMounted(() => {
+  clearInterval(timer.value)
+  timer.value = window.setInterval(on_query_accounts, 3000);
+})
+onUnmounted(() => {
+  window.clearInterval(timer.value);
+})
 
 </script>
 
@@ -184,5 +195,10 @@ init()
   display: flex;
   align-items: center
     /* justify-content: center */
+}
+
+.descriptionsclass {
+  display: flex;
+  align-items: center
 }
 </style>
