@@ -57,28 +57,45 @@
       <el-tab-pane label="委托" name=3></el-tab-pane>
       <el-tab-pane label="成交" name=4></el-tab-pane>
     </el-tabs>
-    <el-table v-if="activeName == 1" :data="position_data" stripe style="width: 100%">
-      <el-table-column prop="symbol" label="合约名称" width="180" />
-      <el-table-column prop="direction" label="多空" width="180" />
-      <el-table-column prop="open_price" label="开仓价格" width="180" />
-      <el-table-column prop="gain_loss" label="盈亏" />
+    <el-table v-if="activeName == 1" :data="positions_data" stripe style="width: 100%">
+      <el-table-column prop="symbol" label="合约名称" width="100" />
+      <el-table-column prop="exchange" label="交易所" width="100" />
+      <el-table-column prop="direction" label="多空" width="100" />
+      <el-table-column prop="volume" label="成交量" width="100" />
+      <el-table-column prop="price" label="开仓价格" width="100" />
+      <el-table-column prop="frozen" label="frozen" width="100" />
+      <el-table-column prop="pnl" label="pnl" width="100" />
+      <el-table-column prop="yd_volume" label="yd_volume" width="120" />
     </el-table>
-    <el-table v-if="activeName == 2" :data="position_data" stripe style="width: 100%">
-      <el-table-column prop="symbol" label="合约名称" width="180" />
-      <el-table-column prop="direction" label="多空" width="180" />
-      <el-table-column prop="balance" label="盈亏" />
+    <el-table v-if="activeName == 2" :data="orders_data" stripe style="width: 100%">
+      <el-table-column prop="symbol" label="合约名称" width="100" />
+      <el-table-column prop="exchange" label="交易所" width="100" />
+      <el-table-column prop="direction" label="多空" width="100" />
+      <el-table-column prop="volume" label="成交量" width="100" />
+      <el-table-column prop="price" label="开仓价格" width="100" />
     </el-table>
-    <el-table v-if="activeName == 3" :data="position_data" stripe style="width: 100%">
-      <el-table-column prop="symbol" label="合约名称" width="180" />
-      <el-table-column prop="direction" label="多空" width="180" />
-      <el-table-column prop="balance" label="盈亏" />
+    <el-table v-if="activeName == 3" :data="orders_data" stripe style="width: 100%">
+      <el-table-column prop="symbol" label="合约名称" width="80" />
+      <el-table-column prop="exchange" label="交易所" width="80" />
+      <el-table-column prop="direction" label="多空" width="80" />
+      <el-table-column prop="volume" label="成交量" width="80" />
+      <el-table-column prop="price" label="委托价格" width="100" />
+      <el-table-column prop="orderid" label="orderid" width="160" />
+      <el-table-column prop="type" label="type" width="80" />
+      <el-table-column prop="offset" label="开平" width="80" />
+      <el-table-column prop="traded" label="traded" width="80" />
+      <el-table-column prop="status" label="status" width="80" />
+      <el-table-column prop="reference" label="reference" width="100" />
     </el-table>
-    <el-table v-if="activeName == 4" :data="deal_data" stripe style="width: 100%">
-      <el-table-column prop="symbol" label="合约名称" width="180" />
-      <el-table-column prop="direction" label="开平" width="180" />
-      <el-table-column prop="price" label="成交价" width="180" />
-      <el-table-column prop="volume" label="成交量" width="180" />
-      <el-table-column prop="balance" label="成交时间" width="180" />
+    <el-table v-if="activeName == 4" :data="trades_data" stripe style="width: 100%">
+      <el-table-column prop="symbol" label="合约名称" width="100" />
+      <el-table-column prop="exchange" label="交易所" width="100" />
+      <el-table-column prop="direction" label="多空" width="100" />
+      <el-table-column prop="volume" label="成交量" width="100" />
+      <el-table-column prop="price" label="开仓价格" width="100" />
+      <el-table-column prop="orderid" label="orderid" width="100" />
+      <el-table-column prop="orderid" label="orderid" width="100" />
+      <el-table-column prop="offset" label="offset" width="100" />
     </el-table>
   </div>
 </template>
@@ -87,7 +104,7 @@
 
 import { ElMessage, TabsPaneContext } from 'element-plus'
 import { reactive, ref, h, onMounted, onUnmounted } from 'vue'
-import { get_accounts, send_order, get_contract, subscribe } from '../../api/capital'
+import { get_accounts, send_order, get_tick } from '../../api/capital'
 import { strategyStore } from '../../store/strategy';
 type AccountData = {
   geteway_name: string
@@ -97,19 +114,41 @@ type AccountData = {
 }
 type PositionData = {
   symbol: string
+  exchange: string
   direction: string
-  open_price: number
-  gain_loss: number
-}
-type DealData = {
-  symbol: string
-  direction: string
-  price: number
   volume: number
+  price: number
+  frozen: number
+  pnl: number
+  yd_volume: number
+}
+type OrderData = {
+  symbol: string
+  exchange: string
+  direction: string
+  volume: number
+  price: number
+  orderid: string
+  type: string
+  offset: string
+  traded: number
+  status: string
+  // datetime :datetime
+  reference: string
+}
+type TradeData = {
+  symbol: string
+  exchange: string
+  direction: string
+  volume: number
+  price: number
+  orderid: string
+  tradeid: string
+  offset: string
+  // datetime: datetime
 }
 const store = strategyStore()
 const vt_symbol = ref<string>("")
-const contracts = reactive<string[]>([])
 const direction = ref('多')
 const offset = ref('开')
 const activeName = ref(1)
@@ -122,20 +161,39 @@ const account_data = reactive<AccountData>({
   balance: 0.0,
   frozen: 0.0
 })
-const position_data = reactive<PositionData[]>([])
-const deal_data = reactive<DealData[]>([])
+const positions_data = reactive<PositionData[]>([])
+const trades_data = reactive<TradeData[]>([])
+const orders_data = reactive<OrderData[]>([])
 
 
 const on_query_accounts = () => {
   get_accounts().then(res => {
-    account_data.account_id = res.data.account_id
-    account_data.balance = res.data.balance
-    account_data.geteway_name = res.data.geteway_name
-    account_data.frozen = res.data.frozen
+    let accounts: [] = res.data.accounts
+    let account: any = accounts.pop()
+    account_data.account_id = account.account_id
+    account_data.balance = account.balance
+    account_data.geteway_name = account.geteway_name
+    account_data.frozen = account.frozen
+
+    positions_data.length = 0
+    res.data.positions.forEach((element: PositionData) => {
+      positions_data.push(element)
+    })
+
+    trades_data.length = 0
+    res.data.trades.forEach((element: TradeData) => {
+      trades_data.push(element)
+    })
+
+    orders_data.length = 0
+    res.data.orders.forEach((element: OrderData) => {
+      orders_data.push(element)
+    })
+
   })
 }
 const select_contract = () => {
-  subscribe(vt_symbol.value).then(res => {
+  get_tick(vt_symbol.value).then(res => {
     price.value = res.data.tick.last_price
   })
 }

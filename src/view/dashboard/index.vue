@@ -48,7 +48,7 @@ const init = () => {
   })
 
   get_subscribe_vt_symbols().then(res => {
-    store.$patch({ vt_symbols: res.data.vt_symbols })
+    store.$patch({ subscribe_vt_symbols: res.data.vt_symbols })
   }).catch(error => {
     ElMessage({
       message: h('p', null, [

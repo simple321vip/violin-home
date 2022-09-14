@@ -1,22 +1,22 @@
 <template>
   <el-row>
     <el-col :span="4">
-      <el-select v-model="exchange" placeholder="select a exchange" @change="filter_vt_symbols">
-        <el-option v-for="ex in store.exchanges" :value="ex" />
+      <el-select v-model="exchange" placeholder="select a exchange">
+        <el-option v-for="ex in exchanges" :value="ex" />
       </el-select>
     </el-col>
     <el-col :span="1">
     </el-col>
     <el-col :span="4">
       <el-select v-model="vt_symbol" placeholder="select a vt_symbol">
-        <el-option v-for="symbol in store.vt_symbols.get(exchange)" :value="symbol" />
+        <el-option v-for="symbol in vt_symbols" :value="symbol" />
       </el-select>
     </el-col>
     <el-col :span="1">
     </el-col>
     <el-col :span="4">
       <span style="cursor: pointer">
-        <el-icon :size="25" @click="on_subscribe(vt_symbol)">
+        <el-icon :size="25" @click="on_subscribe()">
           <ZoomIn />
         </el-icon>
       </span>
@@ -36,14 +36,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted, onUnmounted, reactive } from 'vue'
+import { ref, h, onMounted, onUnmounted, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { get_ticks, subscribe } from '../../api/capital'
 import { strategyStore } from '../../store/strategy'
 
 const store = strategyStore()
-const vt_symbol = ref<string>("")
+const vt_symbol = ref<string>()
+const vt_symbols = reactive<string[]>([])
 const exchange = ref<string>()
+const exchanges = reactive<string[]>([])
+store.exchanges.forEach(exchange => {
+  exchanges.push(exchange)
+})
 const timer = ref(0)
 
 type TickData = {
@@ -58,8 +63,11 @@ type TickData = {
 }
 const ticks_data = reactive<TickData[]>([])
 
-const on_subscribe = (vt_symbol: string) => {
-  subscribe(vt_symbol).then(res => {
+const on_subscribe = () => {
+  if (!vt_symbol.value) {
+    return
+  }
+  subscribe(vt_symbol.value).then(res => {
     ElMessage({
       message: h('p', null, [
         h('i', { style: 'color: green' }, "行情订阅成功"),
@@ -83,9 +91,13 @@ const on_ticks = () => {
   })
 }
 
-const filter_vt_symbols = () => {
-
-}
+watch(exchange, (newVal, oldVal) => {
+  vt_symbols.length = 0
+  // let sp_vt_symbol: [] = store.vt_symbols.get(vt_symbol.value)
+  // sp_vt_symbol.forEach((record: string) => {
+  //   vt_symbols.push(record)
+  // })
+})
 
 onMounted(() => {
   clearInterval(timer.value)
