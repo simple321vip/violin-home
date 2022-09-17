@@ -11,7 +11,7 @@
         </el-icon>&nbsp 9:00-11:30 &nbsp
         <el-icon color="gold">
           <Sunny />
-        </el-icon>&nbsp 13:00-15:00 &nbsp
+        </el-icon>&nbsp 13:30-15:00 &nbsp
         <el-icon color="blue">
           <Moon />
         </el-icon>&nbsp 21:00-23:00
