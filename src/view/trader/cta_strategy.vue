@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import create_strategy_dialog from './dialog.vue'
 import {
   get_strategies,
@@ -71,16 +71,10 @@ import {
   remove_strategy,
   get_strategy_status,
   get_strategy_load_files,
-  get_vt_symbols
 } from '../../api/cta_strategy'
 import { h } from 'vue'
 import { ElMessage } from 'element-plus'
 import { strategyStore } from '../../store/strategy'
-
-const store = strategyStore()
-
-let createStrategyDialogVisible = ref(false)
-
 
 type Strategy = {
   strategy_name: string,
@@ -90,7 +84,10 @@ type Strategy = {
   status: number,
 }
 
+const store = strategyStore()
+let createStrategyDialogVisible = ref(false)
 const strategy_list = reactive<Strategy[]>([])
+const dialogRef = ref()
 
 const on_list = () => {
   createStrategyDialogVisible.value = false
@@ -101,7 +98,7 @@ const on_list = () => {
     })
   })
 }
-const dialogRef = ref()
+
 const handle_create = () => {
   createStrategyDialogVisible.value = true
   dialogRef.value.clear_form()
@@ -114,8 +111,6 @@ const on_start = (row: any) => {
       row.status = 2
     })
   })
-
-
 }
 
 const on_stop = (row: any) => {
@@ -135,12 +130,18 @@ const on_status = (row: any) => {
     row.status = res.data.status
   })
 }
-
-const init = () => {
+onMounted(() => {
   on_list()
-}
-// init process
-init()
+  get_strategy_load_files().then(res => {
+    store.$patch({ class_names: res.data.class_names })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "读取策略文件失败"),
+      ]),
+    })
+  })
+})
 
 </script>
 

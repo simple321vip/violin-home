@@ -21,16 +21,6 @@ onMounted(() => {
 
 const init = () => {
 
-  get_strategy_load_files().then(res => {
-    store.$patch({ class_names: res.data.class_names })
-  }).catch(error => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "读取策略文件失败"),
-      ]),
-    })
-  })
-
   get_vt_symbols().then(res => {
     console.log(res)
     let map = new Map()

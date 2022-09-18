@@ -1,8 +1,8 @@
 <template>
   <div class="demo-collapse">
     <el-collapse v-model="activeNames">
-      <el-collapse-item title="Account Info" name="1">
-        <el-row>
+      <el-collapse-item title="Accounts list" name="1">
+        <el-row v-for="account_data in account_datas">
           <el-col :span="1">
             <div class="cell-item">
               <el-icon style="iconStyle">
@@ -184,12 +184,7 @@ const activeName = ref(1)
 const volume = ref(1)
 const price = ref(3000)
 const timer = ref(0)
-const account_data = reactive<AccountData>({
-  gateway_name: '',
-  account_id: '',
-  balance: 0.0,
-  frozen: 0.0
-})
+const account_datas = reactive<AccountData[]>([])
 const positions_data = reactive<PositionData[]>([])
 const trades_data = reactive<TradeData[]>([])
 const orders_data = reactive<OrderData[]>([])
@@ -197,13 +192,10 @@ const activeNames = ref(['1'])
 
 const on_query_accounts = () => {
   get_accounts().then(res => {
-    let accounts: [] = res.data.accounts
-    let account: any = accounts.pop()
-    account_data.account_id = account.account_id
-    account_data.balance = account.balance
-    account_data.gateway_name = account.gateway_name
-    account_data.frozen = account.frozen
-
+    account_datas.length = 0
+    res.data.accounts.forEach((account: AccountData) => {
+      account_datas.push(account)
+    })
     positions_data.length = 0
     res.data.positions.forEach((element: PositionData) => {
       positions_data.push(element)

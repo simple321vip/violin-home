@@ -37,7 +37,7 @@
       <el-table-column prop="url" label="加载" width="60">
         <template #default="scope">
           <span v-if="scope.row.status == 0" style="cursor: pointer">
-            <el-icon :size="20" @click="on_remove(scope.row)" color="blue">
+            <el-icon :size="20" @click="on_load(scope.row)" color="blue">
               <CirclePlusFilled />
             </el-icon>
           </span>
@@ -46,7 +46,7 @@
       <el-table-column prop="url" label="卸载" width="60">
         <template #default="scope">
           <span v-if="scope.row.status == 1" style="cursor: pointer">
-            <el-icon :size="20" @click="on_remove(scope.row)" color="red">
+            <el-icon :size="20" @click="on_unload(scope.row)" color="red">
               <RemoveFilled />
             </el-icon>
           </span>
