@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item label="" prop="setting">
         <el-select v-model="ruleForm.setting.interval" placeholder="select a interval">
-          <el-option label="interval:1DAILY" value=24 />
+          <el-option label="interval:1DAILY" value=1440 />
           <el-option label="interval:4HOUR" value=240 />
           <el-option label="interval:1HOUR" value=60 />
           <el-option label="interval:30MIN" value=30 />
