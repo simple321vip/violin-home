@@ -27,7 +27,8 @@
     "save": "^2.4.0",
     "type-fest": "^2.12.2",
     "vue": "^3.2.25",
-    "vue-router": "^4.0.14"
+    "vue-router": "^4.0.14",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.1",

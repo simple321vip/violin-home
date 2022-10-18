@@ -14,7 +14,7 @@
         </el-main>
         <el-footer>
           <span>
-            管祥玮的个人网站 ©Copyright 2019-2021
+            管祥玮的个人网站 ©Copyright 2022-2022
           </span>
           <span @click="openSiteQuery">辽ICP备2022003637号-2</span>
           <div>

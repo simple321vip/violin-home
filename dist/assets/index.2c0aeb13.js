@@ -1,1 +1,0 @@
-import{_ as e,o as _,c as a}from"./index.4a6e9266.js";const c={},n={class:"dashboard"};function r(s,t){return _(),a("div",n,"\u8FD9\u91CC\u6211\u60F3\u5206\u4EAB\u7684\u4E00\u4E9B\u4E1C\u897F\uFF0C\u65E0\u8BBA\u662F\u751F\u6D3B\u8FD8\u662F\u5DE5\u4F5C\uFF0C\u8FD8\u662F\u5B66\u79D1")}var d=e(c,[["render",r]]);export{d as default};
