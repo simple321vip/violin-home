@@ -13,7 +13,7 @@
       <el-form-item label="用户凭证" prop="checkPass">
         <el-input v-model="loginForm.password" type="password" autocomplete="off" />
       </el-form-item> -->
-      <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="new">请使用微信扫一扫登录</a></p>
+      <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="_self">请使用微信扫一扫登录</a></p>
       <!-- <el-button @click="loginWithBaiDu">
         百度App
       </el-button> -->

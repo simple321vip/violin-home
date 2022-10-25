@@ -39,6 +39,15 @@ const removeBlogType = (data: Object) => {
   })
 }
 
+const sortBlogTypes = (data: Object) => {
+  return service({
+    url: '/auth/api/v1/author/blog_types',
+    method: 'POST',
+    headers: headers,
+    data: data
+  })
+}
+
 const getContent = (id: string) => {
   return service({
     url: '/auth/api/v1/author/blog/content/' + id,
@@ -74,4 +83,4 @@ const deleteContent = (bid: string) => {
 }
 
 
-export { listAll, updateBtName, putBlogType, removeBlogType, getContent, putBlog, updateContent, deleteContent }
+export { listAll, updateBtName, putBlogType, removeBlogType, sortBlogTypes, getContent, putBlog, updateContent, deleteContent }

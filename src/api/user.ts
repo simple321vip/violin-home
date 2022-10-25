@@ -22,5 +22,13 @@ const logout = (id: string) => {
   })
 }
 
+const register_user = (postData: Object) => {
+  return service({
+    url: '/auth/api/v1/register',
+    method: 'POST',
+    data: postData
+  })
+}
 
-export { authorize, obtainUserInfo, logout }
+
+export { authorize, obtainUserInfo, logout, register_user }

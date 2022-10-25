@@ -23,35 +23,52 @@ app.use(store)
 import { getToken, getTenant, setToken, setTenant } from './utils/auth'
 import { Tenant } from './entity/index'
 import Cookies from 'js-cookie'
-import { obtainUserInfo } from './api/user'
-const whiteList = ['/login']
+const whiteList = ['/login', '/register', '/sorryPage']
 let url = window.location.href
 
 async function checktoken(url: string) {
-  if (url.search("token") != -1) {
 
-    const list = url.split("?token=")
-
-    let base_url = list[0]
-    let authorizeToken = list[1]
-    if (list.length < 2 || authorizeToken.length == 0) {
-      router.push({
-        path: '/illustration',
-      })
-      return
-    }
-    await obtainUserInfo(authorizeToken).then(response => {
-
-      if (response.status == 200) {
-        const tenant = {
-          id: response.data.id,
-          account: response.data.account
-        }
-        setToken(authorizeToken)
-        setTenant(tenant)
-        window.open(base_url, "_self")
-      }
+  if (url.search("register") != -1) {
+    let arr = url.split('?')
+    let parameters = arr[1].split('&')
+    let query_data: { [key: string]: any } = {}
+    parameters.forEach(parameter => {
+      let parameter_list = parameter.split("=")
+      query_data[parameter_list[0]] = parameter_list[1]
     })
+    router.push({
+      path: '/register',
+      query: query_data
+    })
+    return
+  }
+  if (url.search("home") != -1) {
+    let arr = url.split('?')
+    let parameters = arr[1].split('&')
+    let query_data: { [key: string]: any } = {}
+    parameters.forEach(parameter => {
+      let parameter_list = parameter.split("=")
+      query_data[parameter_list[0]] = parameter_list[1]
+    })
+    const tenant = {
+      id: query_data.tenantId,
+      account: query_data.account
+    }
+
+    setToken(query_data.token as string)
+    setTenant(tenant)
+
+    const { href } = router.resolve({
+      path: '/'
+    });
+    window.open(href, '_self');
+    return
+  }
+  if (url.search("sorryPage") != -1) {
+    router.push({
+      path: '/sorryPage',
+    })
+    return
   }
 }
 checktoken(url)
@@ -96,7 +113,7 @@ router.beforeEach((to, from, next) => {
         next()
     }
   } else {
-    if (whiteList.includes(to.path)) {
+    if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
       next('/login')
