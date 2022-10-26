@@ -65,22 +65,32 @@ const putBlog = (postData: Object) => {
   })
 }
 
-const updateContent = (postData: Object) => {
+const updateContent = (post_data: Object) => {
   return service({
     url: '/auth/api/v1/author/blog/content',
     method: 'POST',
     headers: headers,
-    data: postData
+    data: post_data
   })
 }
 
-const deleteContent = (bid: string) => {
+const deleteContent = (bid: string, delete_data: Object) => {
   return service({
     url: '/auth/api/v1/author/blog/' + bid,
     method: 'DELETE',
     headers: headers,
+    data: delete_data
+  })
+}
+
+const sortBlogs = (data: Object, btId: string) => {
+  return service({
+    url: '/auth/api/v1/author/blogs/' + btId,
+    method: 'POST',
+    headers: headers,
+    data: data
   })
 }
 
 
-export { listAll, updateBtName, putBlogType, removeBlogType, sortBlogTypes, getContent, putBlog, updateContent, deleteContent }
+export { listAll, updateBtName, putBlogType, removeBlogType, sortBlogTypes, getContent, putBlog, updateContent, deleteContent, sortBlogs }

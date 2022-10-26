@@ -1,47 +1,16 @@
 <template>
   <div class="blog_editer" v-if="isReady">
     <div class="bt_section" :style="btWholeStyle">
-      <table class="tb">
-        <thead>
-          <draggable v-model="state.headers" animation="200" tag="tr" :item-key="(key: string) => key">
-            <template #item="{ element: header }">
-              <th class="move">
-                增加分类
-              </th>
-            </template>
-          </draggable>
-        </thead>
-        <!-- <draggable :list="blogTypes" handle=".move" animation="300" @start="onStart" @end="onEnd" tag="tbody" -->
-        <draggable :list="blogTypes" handle=".move" animation="300" @start="onStart" @end="onEnd" tag="tbody"
-          item-key="name">
-          <template #item="{ element }">
-            <tr>
-              <td class="move" v-for="(header, index) in state.headers" :key="header">
-                <el-icon v-show="checkedBlogIndex == element.order">
-                  <edit />
-                </el-icon>
-                {{ element.btName }}
-              </td>
-            </tr>
-          </template>
-        </draggable>
-      </table>
-      <!-- <el-button class="bt-input" @click="contentDialogVisible = true">增加一个分类</el-button>
-      <el-button class="bt-input" v-for="(value, key) of blogTypes" :key="key" @click="onclickTypeTab(value.order)">
-        <el-dropdown trigger="click">
-          <el-icon v-show="checkedBlogIndex == value.order">
-            <edit />
-          </el-icon>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="dialogVisible = true">修改</el-dropdown-item>
-              <el-dropdown-item @click="btdeleteDialogVisible = true">删除</el-dropdown-item>
-              <el-dropdown-item @click="true">退出</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        {{ value.btName }}
-      </el-button> -->
+      <el-button class="bt-input" @click="contentDialogVisible = true">增加一个分类</el-button>
+      <draggable :list="blogTypes" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true"
+        filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="onEnd" group="group1">
+        <template #item="{ element }">
+          <div :class="element.disabledMove ? 'forbid item' : 'item'">
+            <label class="move">{{ element.btName }}</label>
+          </div>
+        </template>
+      </draggable>
     </div>
     <div class="b_section" :style="bWholeStyle">
 
@@ -138,7 +107,8 @@ import {
   getContent,
   putBlog,
   deleteContent,
-  sortBlogTypes
+  sortBlogTypes,
+  sortBlogs
 } from '../../api/blog'
 import draggable from "vuedraggable"
 
@@ -180,9 +150,11 @@ animation="300"            //动画效果
 @end="onEnd"               //拖拽结束的事件
 */
 const state = reactive({
-  //列的名称
-  headers: ["blogType"],
-  //需要拖拽的数据，拖拽后数据的顺序也会变化
+  modules: {
+    group1: [
+
+    ]
+  },
 })
 
 // 関数定義
@@ -296,7 +268,7 @@ const saveContent = () => {
 }
 
 /**
- * Blogタイプ名称修正
+ * btName modify
  */
 const saveType = () => {
   const query = {
@@ -306,7 +278,6 @@ const saveType = () => {
   updateBtName(query).then(response => {
     dialogVisible.value = false
   })
-
 }
 
 /**
@@ -360,8 +331,11 @@ const insertBlog = () => {
  */
 const deleteBlog = () => {
   if (btName.value == "删除") {
-    deleteContent(checkedIndex.value).then(response => {
-      if (response.status == 200) {
+    let delete_data = {
+      btId: blogTypes[checkedBlogIndex.value].btId
+    }
+    deleteContent(checkedIndex.value, delete_data).then(response => {
+      if (response.data.process_status) {
         const deleteKey = checkedIndex.value
         checkedIndex.value = blogTypes[checkedBlogIndex.value].blogs.keys().next().value
         blogTypes[checkedBlogIndex.value].blogs.delete(deleteKey)
@@ -441,6 +415,21 @@ const sortBlogType = () => {
   })
 
   sortBlogTypes(sortData).then(response => {
+
+  }).catch()
+}
+
+const sortBlog = () => {
+
+  const sortData: any[] = []
+  blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog) => {
+    sortData.push({
+      bid: blog.btId,
+      order: blog.order
+    })
+  })
+
+  sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(response => {
 
   }).catch()
 }
@@ -569,5 +558,41 @@ table.tb td {
 
 table.tb td:nth-of-type(1) {
   text-align: center;
+}
+
+.item {
+  border: solid 1px #ddd;
+  padding: 0px;
+  text-align: left;
+  background-color: #fff;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  user-select: none;
+}
+
+.item>label {
+  border-bottom: solid 1px #ddd;
+  padding: 6px 10px;
+  color: #333;
+}
+
+.item>label:hover {
+  cursor: move;
+}
+
+.item>p {
+  padding: 6px 10px;
+  color: #666;
+}
+
+.chosenClass {
+  opacity: 1;
+  border: solid 1px red;
+}
+
+.ghost {
+  border: solid 1px rgb(19, 41, 239) !important;
 }
 </style>
