@@ -3,7 +3,6 @@ import App from './App.vue'
 import ElementPlus from "element-plus";
 import 'element-plus/dist/index.css'
 import router from './router'
-// vue store
 import { createPinia } from 'pinia'
 const store = createPinia()
 
@@ -16,6 +15,11 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
+import { setupMock } from '../mock'
+
+if (process.env.NODE_ENV === 'development') {
+  setupMock()
+}
 
 app.use(router)
 app.use(ElementPlus)
@@ -23,6 +27,7 @@ app.use(store)
 import { getToken, getTenant, setToken, setTenant } from './utils/auth'
 import { Tenant } from './entity/index'
 import Cookies from 'js-cookie'
+import { tenantStore } from './store/tenant'
 const whiteList = ['/login', '/register', '/sorryPage']
 let url = window.location.href
 
@@ -51,12 +56,11 @@ async function checktoken(url: string) {
       query_data[parameter_list[0]] = parameter_list[1]
     })
     const tenant = {
-      id: query_data.tenantId,
+      tenant_id: query_data.tenantId,
       account: query_data.account
     }
-
-    setToken(query_data.token as string)
-    setTenant(tenant)
+    const tenant_store = tenantStore()
+    await tenant_store.login(tenant, query_data.token)
 
     const { href } = router.resolve({
       path: '/'

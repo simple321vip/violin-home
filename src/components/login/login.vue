@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { useTenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/tenant'
 import router from '../../router'
 import baiduCloudImage from "../../assets/baiducloud.png"
 import config from '../../const/config'
@@ -42,7 +42,7 @@ import config from '../../const/config'
 
 let qrcode = config.BAIDU_CLOUD_URL + config.RESPONSE_TYPE + config.CLIENT_ID + config.REDIRECT_URI + config.SCOPE + config.DEVICE_ID + config.QR_CODE + config.DISPLAY
 
-const tenant = useTenantStore()
+const tenant = tenantStore()
 
 const ruleFormRef = ref<FormInstance>()
 const loginForm = reactive({

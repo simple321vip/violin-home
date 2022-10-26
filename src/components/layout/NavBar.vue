@@ -43,10 +43,10 @@
 import $moment from "moment";
 import { reactive, ref } from "vue";
 import router from '../../router'
-import { useTenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/tenant'
 import { logout } from '../../api/user'
 // obtain user infomation 
-const tenant = useTenantStore()
+const tenant = tenantStore()
 tenant.reflush()
 const dialogVisible = ref(false)
 

@@ -14,7 +14,7 @@ import { Tenant } from '../entity/index'
 //   return Promise.reject(new Error('invalid credentials'))
 // }
 
-export const useTenantStore = defineStore({
+export const tenantStore = defineStore({
   id: 'tenant',
   state: () => ({
     account: '',
@@ -41,11 +41,13 @@ export const useTenantStore = defineStore({
      * @param {string} user_id
      * @param {string} user_password
      */
-    async login(user_id: string, user_password: string) {
-      const userData = await authorize({ user_id, user_password })
+    async login(tenant: any, token: string) {
+      const userData = await authorize({
+        tenant_id: tenant.tenant_id, token: token
+      })
       if (userData.data.token) {
         this.$patch({
-          account: user_id,
+          account: tenant.tenant_id,
 
           ...userData.data,
           id: 'true'
@@ -54,6 +56,7 @@ export const useTenantStore = defineStore({
         setTenant(userData)
         console.log('authorize success!')
       }
+
       return new Promise((resolve, reject) => {
         if (userData.data.message) {
           reject(userData.data.message)
@@ -77,5 +80,5 @@ export const useTenantStore = defineStore({
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useTenantStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(tenantStore, import.meta.hot))
 }

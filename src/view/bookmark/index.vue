@@ -84,9 +84,9 @@ import { CopyDocument } from "@element-plus/icons-vue";
 import { ElNotification } from 'element-plus'
 import copy from 'copy-to-clipboard';
 import { h } from 'vue'
-import { useTenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/tenant'
 // obtain user infomation 
-const Tenant = useTenantStore()
+const Tenant = tenantStore()
 
 // 定义书签格式
 type Bookmark = {
