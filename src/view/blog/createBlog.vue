@@ -15,7 +15,7 @@
 
       <draggable :list="blogTypes" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true" itemKey=""
         filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
-        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="sortBlogType" group="group1"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlogType" @end="sortBlogType" group="group1"
         :move="onMove">
         <template #item="{ element }">
           <div class="item">
@@ -43,8 +43,8 @@
       </div>
       <draggable :list="blogTypes[checkedBlogIndex].blogs" ghost-class="ghost" handle=".move" animation="300"
         :force-fallback="true" itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true"
-        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="sortBlog"
-        group="group2" :move="onMove">
+        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog"
+        @end="sortBlog" group="group2" :move="onMove">
         <template #item="{ element }">
           <div class="item">
             <label class="move"></label>
@@ -226,7 +226,7 @@ const getTestData = async () => {
    * 获取上一次修改时间，startTime
    * 
    */
-  watch(blogTypes, (newVal, oldVal) => {
+  watch(blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value], (newVal, oldVal) => {
     let current = $moment() // 获取当前时间，current 09:00:00 09:00:00.500
     const tmp = startTime // 获取开始时间，将值赋给tmp 8:30:00 09:00:00
     startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
@@ -477,12 +477,13 @@ const deleteBlogType = () => {
 }
 
 const sortBlogType = () => {
-  blogTypes.forEach((blogType, index) => {
-    blogType.order = index
-  })
 
   const sortData: BlogType[] = []
-  blogTypes.forEach((blogType: BlogType) => {
+  blogTypes.forEach((blogType: BlogType, index) => {
+    blogType.order = index
+    if (blogType.btId == id.value) {
+      checkedBlogIndex.value = index
+    }
     sortData.push({
       btId: blogType.btId,
       btName: blogType.btName,
@@ -504,16 +505,13 @@ const sortBlogType = () => {
 
 const sortBlog = () => {
 
-  blogTypes[checkedBlogIndex.value].blogs.forEach((blog, index) => {
-    if (checkedIndex.value == blog.order) {
-      checkedIndex.value = index
-    }
-  })
-
   const sortData: any[] = []
 
   blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog, index) => {
     blog.order = index
+    if (blog.bid == id.value) {
+      checkedIndex.value = index
+    }
     sortData.push({
       bid: blog.btId,
       order: blog.order
@@ -537,8 +535,15 @@ getTestData()
 
 // サイズ調整部分
 //拖拽开始的事件
-const onStart = () => {
+const id = ref("")
+const onStartBlogType = () => {
   console.log("开始拖拽");
+  id.value = blogTypes[checkedBlogIndex.value].btId
+};
+
+const onStartBlog = () => {
+  console.log("开始拖拽");
+  id.value = blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid
 };
 
 //拖拽结束的事件
