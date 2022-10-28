@@ -28,18 +28,25 @@
 ## js-cookie
     npm install js-cookie -S
 
+## vite-plugin-mock
+
+    // to enter the home page:
+    localhost:3000/home?tenantId=XXX&account=YYY&token=ABCDEFG
+
 ## 环境配置
-  前后端分离，所以前端单独服务器，所以生产环境需要装node.js
-  添加了.env.production .env.development 文件
-  对vite.config.ts做了修改。
+  添加了.env.development ebv.test .env.production  文件
+  development: 
+    开发环境，使用mock，不需要后台联动
+  test:
+    测试环境需要 后台java程序支持，同时需要百度第三方认证。
+  prod:
+    生产环境通过 jenkins cicd进行发布配置。
 
 # 云服务器
   nginx as a veb server, i use the official image to build this app image.
 
 ## 发布
  - npm run build 生成dist 文件夹
-    把这个文件夹放到nginx的html文件夹下改名ghome
-    nginx那个 location /ghome 也要有。
 
 ## 百度网盘开放平台
 https://pan.baidu.com/union/home?menuKey=union-home

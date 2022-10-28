@@ -15,7 +15,7 @@
 
       <draggable :list="blogTypes" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true" itemKey=""
         filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
-        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="onEnd" group="group1"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="sortBlogType" group="group1"
         :move="onMove">
         <template #item="{ element }">
           <div class="item">
@@ -43,14 +43,14 @@
       </div>
       <draggable :list="blogTypes[checkedBlogIndex].blogs" ghost-class="ghost" handle=".move" animation="300"
         :force-fallback="true" itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true"
-        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="onEnd"
+        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStart" @end="sortBlog"
         group="group2" :move="onMove">
         <template #item="{ element }">
           <div class="item">
             <label class="move"></label>
             <p class="bt-input" @click="onclickBlogTab(element)">{{ element.title }}</p>
             <div>
-              <el-button class="operate_button" v-show="checkedIndex == element.order" :icon="Edit" size="small"
+              <el-button class="operate_button" v-show="checkedIndex == element.order" :icon="Delete" size="small"
                 @click="deleteDialogVisible = true" />
             </div>
           </div>
@@ -121,8 +121,10 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import $moment from "moment"
 import MdEditor from 'md-editor-v3'
-import { Edit, CaretRight, CaretLeft, Setting } from "@element-plus/icons-vue"
+import { Edit, CaretRight, CaretLeft, Setting, Delete } from "@element-plus/icons-vue"
 import 'md-editor-v3/lib/style.css'
+import { h } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
   updateBtName,
   updateContent,
@@ -276,8 +278,13 @@ const saveContent = () => {
   updateContent(query).then(response => {
     if (response.status == 200) {
       updated.value = false
-      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content =
     }
+  }).then(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章保存失败"),
+      ]),
+    })
   })
 }
 
@@ -295,7 +302,7 @@ const saveTitle = () => {
     bid: checkedIndex.value,
     title: blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].title
   }
-  updateContent(query).then(response => {
+  updateContent(query).then(() => {
     updated.value = false
   })
 }
@@ -324,7 +331,7 @@ const insertBlog = () => {
     } as Blog
 
     blogTypes[checkedBlogIndex.value].blogs.push(blog)
-    checkedIndex.value = bid
+    checkedIndex.value = order
     isclicked.value = false
   })
 }
@@ -338,19 +345,26 @@ const deleteBlog = () => {
       btId: blogTypes[checkedBlogIndex.value].btId
     }
     deleteContent(blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid, delete_data).then(response => {
-      if (response.data.process_status) {
-        const deleteKey = checkedIndex.value
-        checkedIndex.value = blogTypes[checkedBlogIndex.value].blogs.keys().next().value
-        blogTypes[checkedBlogIndex.value].blogs.splice(checkedIndex.value, 1)
-        deleteDialogVisible.value = false
-      }
+      blogTypes[checkedBlogIndex.value].blogs.length = 0
+      response.data.blog_list.forEach((item: any) => {
+        const blog: Blog = {
+          bid: item.bid,
+          btId: item.btId,
+          btName: item.btName,
+          title: item.title,
+          blog_prex: item.blog_prex,
+          autosave_control: item.autosave_control,
+          content: item.content,
+          order: item.order
+        }
+        blogTypes[checkedBlogIndex.value].blogs.push(blog)
+      })
       deleteDialogVisible.value = false
       btName.value = ""
     }).catch(() => {
       deleteDialogVisible.value = false
       btName.value = ""
     })
-
   }
 }
 
@@ -463,6 +477,9 @@ const deleteBlogType = () => {
 }
 
 const sortBlogType = () => {
+  blogTypes.forEach((blogType, index) => {
+    blogType.order = index
+  })
 
   const sortData: BlogType[] = []
   blogTypes.forEach((blogType: BlogType) => {
@@ -474,24 +491,44 @@ const sortBlogType = () => {
     })
   })
 
-  sortBlogTypes(sortData).then(response => {
+  sortBlogTypes(sortData).then(() => {
 
-  }).catch()
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "分类排序失败"),
+      ]),
+    })
+  })
 }
 
 const sortBlog = () => {
 
+  blogTypes[checkedBlogIndex.value].blogs.forEach((blog, index) => {
+    if (checkedIndex.value == blog.order) {
+      checkedIndex.value = index
+    }
+  })
+
   const sortData: any[] = []
-  blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog) => {
+
+  blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog, index) => {
+    blog.order = index
     sortData.push({
       bid: blog.btId,
       order: blog.order
     })
   })
 
-  sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(response => {
+  sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(() => {
 
-  }).catch()
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "blog排序失败"),
+      ]),
+    })
+  })
 }
 
 // Created　段階の関数呼び出す処理
@@ -506,10 +543,7 @@ const onStart = () => {
 
 //拖拽结束的事件
 const onEnd = () => {
-  blogTypes.forEach((blogType, index) => {
-    blogType.order = index
-  })
-  sortBlogType()
+
 }
 
 const onMove = (e: any) => {
