@@ -60,13 +60,14 @@ async function checktoken(url: string) {
       account: query_data.account
     }
     const tenant_store = tenantStore()
-    await tenant_store.login(tenant, query_data.token)
-
-    const { href } = router.resolve({
-      path: '/'
-    });
-    window.open(href, '_self');
-    return
+    await tenant_store.login(tenant, query_data.token).then(() => {
+      const { href } = router.resolve({
+        path: '/'
+      });
+      window.open(href, '_self');
+    }).catch((error) => {
+      console.log(error)
+    })
   }
   if (url.search("sorryPage") != -1) {
     router.push({
@@ -89,7 +90,6 @@ router.beforeEach((to, from, next) => {
   console.log(from.path, to.path)
 
   const token = getToken()
-
 
   if (typeof token === 'string') {
     switch (to.path) {

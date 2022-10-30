@@ -64,14 +64,14 @@
         <el-input v-model="blogTypes[checkedBlogIndex].blogs[checkedIndex].title" @keyup.enter.native="saveTitle"
           @blur="saveTitle">
         </el-input>
+
         <div style="width: 60px;">
           <span v-if="!updated">已保存</span>
           <span v-if="updated">更新中</span>
         </div>
       </div>
       <div :style="cWholeStyle">
-        <md-editor theme="light" v-model="blogTypes[checkedBlogIndex].blogs[checkedIndex].content" @save="saveContent"
-          :style="{ height: innerHeight }" />
+        <md-editor theme="light" v-model="current_blog.content" @save="saveContent" :style="{ height: innerHeight }" />
       </div>
     </div>
 
@@ -118,10 +118,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import $moment from "moment"
 import MdEditor from 'md-editor-v3'
-import { Edit, CaretRight, CaretLeft, Setting, Delete } from "@element-plus/icons-vue"
+import { CaretRight, CaretLeft, Setting, Delete } from "@element-plus/icons-vue"
 import 'md-editor-v3/lib/style.css'
 import { h } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -137,12 +137,12 @@ import {
   sortBlogTypes,
   sortBlogs
 } from '../../api/blog'
+import { copy } from '../../utils/copyutil'
 import draggable from "vuedraggable"
 
 type Blog = {
   bid: string,
   btId: string,
-  btName: string,
   title: string,
   blog_prex: string,
   autosave_control: string,
@@ -170,6 +170,10 @@ let startTime = reactive($moment());
 // tmp btName for create, edit, delete
 let btName = ref("")
 let deleteBtName = ref("")
+let current_blog = reactive({
+  bid: "",
+  content: "",
+})
 
 /*
 draggable 对CSS样式没有什么要求万物皆可拖拽
@@ -204,7 +208,6 @@ const getTestData = async () => {
         const blog: Blog = {
           bid: item.bid,
           btId: item.btId,
-          btName: item.btName,
           title: item.title,
           blog_prex: item.blog_prex,
           autosave_control: item.autosave_control,
@@ -215,10 +218,13 @@ const getTestData = async () => {
       })
       blogTypes.push(blog_type)
     })
+    isReady.value = true
+    checkedBlogIndex.value = blogTypes[0].order
+    checkedIndex.value = 0
+    console.log(blogTypes[0].blogs[0])
+    copy(current_blog, blogTypes[0].blogs[0])
   })
-  isReady.value = true
-  checkedBlogIndex.value = blogTypes[0].order
-  checkedIndex.value = 0
+
   // TODO 需要优化部分
   /**
    * 延迟执行一秒
@@ -226,7 +232,8 @@ const getTestData = async () => {
    * 获取上一次修改时间，startTime
    * 
    */
-  watch(blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value], (newVal, oldVal) => {
+  watch(current_blog, (newVal, oldVal) => {
+
     let current = $moment() // 获取当前时间，current 09:00:00 09:00:00.500
     const tmp = startTime // 获取开始时间，将值赋给tmp 8:30:00 09:00:00
     startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
@@ -235,7 +242,7 @@ const getTestData = async () => {
         saveContent()
       }
     }, 1000)
-
+    updated.value = false
   })
 }
 
@@ -244,20 +251,24 @@ const getTestData = async () => {
  * @param order
  */
 const onclickTypeTab = (order: number) => {
-  checkedBlogIndex.value = order
   const bid = blogTypes[order].blogs[0].bid
+  deleteBtName.value = ""
   getContent(bid).then(response => {
     blogTypes[order].blogs[0].content = response.data.content
     checkedBlogIndex.value = order
     checkedIndex.value = 0
+    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
+    updated.value = true
   })
 }
 
 const onclickBlogTab = (blog: Blog) => {
-  checkedIndex.value = blog.order
+  deleteBtName.value = ""
   getContent(blog.bid).then(response => {
     blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
     checkedIndex.value = blog.order
+    copy(current_blog, blog)
+    updated.value = true
   }).catch(() => {
     checkedIndex.value = blog.order
   })
@@ -272,14 +283,14 @@ const saveContent = () => {
   }
   updated.value = true
   const query = {
-    bid: checkedIndex.value,
-    content: blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content
+    bid: current_blog.bid,
+    content: current_blog.content
   }
   updateContent(query).then(response => {
     if (response.status == 200) {
       updated.value = false
     }
-  }).then(() => {
+  }).catch(() => {
     ElMessage({
       message: h('p', null, [
         h('i', { style: 'color: teal' }, "文章保存失败"),
@@ -289,21 +300,21 @@ const saveContent = () => {
 }
 
 
-
 /**
  * Blogタイトル修正
  */
 const saveTitle = () => {
-  if (updated.value) {
-    return
-  }
-  updated.value = true
   const query = {
-    bid: checkedIndex.value,
+    bid: current_blog.bid,
     title: blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].title
   }
   updateContent(query).then(() => {
-    updated.value = false
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章标题保存失败"),
+      ]),
+    })
   })
 }
 
@@ -313,7 +324,7 @@ const saveTitle = () => {
 const insertBlog = () => {
   isclicked.value = true
   const data = {
-    btId: checkedBlogIndex.value,
+    btId: blogTypes[checkedBlogIndex.value].btId,
     title: $moment().format("YYYY-MM-DD"),
     order: blogTypes[checkedBlogIndex.value].blogs.length
   }
@@ -322,7 +333,6 @@ const insertBlog = () => {
     const blog = {
       bid: bid,
       btId: btid,
-      btName: "",
       title: title,
       blog_prex: "",
       content: content,
@@ -333,6 +343,7 @@ const insertBlog = () => {
     blogTypes[checkedBlogIndex.value].blogs.push(blog)
     checkedIndex.value = order
     isclicked.value = false
+    copy(current_blog, blog)
   })
 }
 
@@ -350,7 +361,6 @@ const deleteBlog = () => {
         const blog: Blog = {
           bid: item.bid,
           btId: item.btId,
-          btName: item.btName,
           title: item.title,
           blog_prex: item.blog_prex,
           autosave_control: item.autosave_control,
@@ -359,6 +369,8 @@ const deleteBlog = () => {
         }
         blogTypes[checkedBlogIndex.value].blogs.push(blog)
       })
+      checkedIndex.value = 0
+      copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
       deleteDialogVisible.value = false
       btName.value = ""
     }).catch(() => {
@@ -371,6 +383,7 @@ const deleteBlog = () => {
 const handleCreateBlogType = () => {
   btName.value = blogTypes[checkedBlogIndex.value].btName
   blogTypeEditDialogVisible.value = true
+  deleteBtName.value = ""
 }
 
 /**
@@ -396,7 +409,6 @@ const insertBlogType = () => {
       const blog: Blog = {
         bid: item.bid,
         btId: item.btId,
-        btName: item.btName,
         title: item.title,
         blog_prex: item.blog_prex,
         autosave_control: item.autosave_control,
@@ -408,6 +420,7 @@ const insertBlogType = () => {
     blogTypes.push(blog_type)
     checkedBlogIndex.value = response.data.order
     checkedIndex.value = blog_type.blogs[0].order
+    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
     blogTypeCreateDialogVisible.value = false
     btName.value = ""
   })
@@ -426,7 +439,6 @@ const saveBlogType = () => {
     btName: btName.value,
   }
   updateBtName(query).then(() => {
-    console.log(blogTypes)
     blogTypes[checkedBlogIndex.value].btName = btName.value
     blogTypeEditDialogVisible.value = false
     btName.value = ""
@@ -439,11 +451,10 @@ const saveBlogType = () => {
 const deleteBlogType = () => {
   if (deleteBtName.value == blogTypes[checkedBlogIndex.value].btName) {
     const data = {
-      btId: checkedBlogIndex.value
+      btId: blogTypes[checkedBlogIndex.value].btId
     }
     removeBlogType(data).then((response) => {
       blogTypes.length = 0
-      response.data.sort((x: any, y: any) => { x.order - y.order })
       response.data.forEach((element: any) => {
         const blog_type: BlogType = {
           btId: element.btId,
@@ -455,7 +466,6 @@ const deleteBlogType = () => {
           const blog: Blog = {
             bid: item.bid,
             btId: item.btId,
-            btName: item.btName,
             title: item.title,
             blog_prex: item.blog_prex,
             autosave_control: item.autosave_control,
@@ -468,12 +478,12 @@ const deleteBlogType = () => {
       })
       checkedBlogIndex.value = 0
       checkedIndex.value = 0
+      copy(current_blog, blogTypes[0].blogs[0])
       blogTypeEditDialogVisible.value = false
     })
   } else {
     blogTypeEditDialogVisible.value = false
   }
-  deleteBtName.value = ""
 }
 
 const sortBlogType = () => {
@@ -513,7 +523,7 @@ const sortBlog = () => {
       checkedIndex.value = index
     }
     sortData.push({
-      bid: blog.btId,
+      bid: blog.bid,
       order: blog.order
     })
   })
@@ -564,13 +574,6 @@ const cWholeStyle = reactive<WholeStyle>({} as WholeStyle)
 const collapsible = reactive([0, 0])
 const whole_width = reactive([0.15, 0.15])
 let innerHeight = ref("")
-const selected_style = {
-  "background-color": "#EBEBEB"
-}
-
-const unselected_style = {
-  "background-color": "#FFFFFF"
-}
 
 const setup_size = () => {
   btWholeStyle.width = whole_width[0] * window.innerWidth + 'px'

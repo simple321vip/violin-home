@@ -20,18 +20,30 @@ const trader_service = axios.create(
 service.interceptors.request.use(
   config => {
     if (typeof getToken() === 'string') {
-      (config as any).headers['Authorization'] = 'Bearer' + getToken()
+      (config as any).headers['Authorization'] = 'Bearer:' + getToken()
     }
     const tenant = getTenant()
     if (typeof tenant === 'string') {
-      (config as any).headers['id'] = JSON.parse(tenant).id
+      (config as any).headers['tenantId'] = JSON.parse(tenant).tenant_id
     }
 
     return config
   },
-  error => {
-    console.log(error)
-    return Promise.reject(error)
+  async error => {
+    console.log("-----------------")
+    const err = {} as any
+    if (error.code === "ECONNABORTED") {
+      err.message = "time out"
+      return Promise.reject(error)
+    }
+    if (!error.response) {
+      err.message = "server error"
+      return Promise.reject(error)
+    }
+    if (error.response) {
+      return Promise.reject(error.response.data)
+    }
+    return Promise.reject(error.response.data)
   }
 )
 
