@@ -265,8 +265,8 @@ const onclickTypeTab = (order: number) => {
 const onclickBlogTab = (blog: Blog) => {
   deleteBtName.value = ""
   getContent(blog.bid).then(response => {
-    blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
     checkedIndex.value = blog.order
+    blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
     copy(current_blog, blog)
     updated.value = true
   }).catch(() => {

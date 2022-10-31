@@ -47,7 +47,7 @@ async function checktoken(url: string) {
     })
     return
   }
-  if (url.search("home") != -1) {
+  if (url.search("/home/") != -1) {
     let arr = url.split('?')
     let parameters = arr[1].split('&')
     let query_data: { [key: string]: any } = {}
@@ -66,7 +66,10 @@ async function checktoken(url: string) {
       });
       window.open(href, '_self');
     }).catch((error) => {
-      console.log(error)
+      const { href } = router.resolve({
+        path: '/login'
+      });
+      window.open(href, '_self');
     })
   }
   if (url.search("sorryPage") != -1) {
