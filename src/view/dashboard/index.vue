@@ -22,7 +22,6 @@ onMounted(() => {
 const init = () => {
 
   get_vt_symbols().then(res => {
-    console.log(res)
     let map = new Map()
     let keys = Object.keys(res.data.vt_symbols)
     keys.forEach(key => {

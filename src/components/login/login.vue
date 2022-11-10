@@ -1,5 +1,6 @@
 <template>
-  <div class="yuliu"></div>
+  <div class="yuliu" :style="style">
+  </div>
   <el-card class="box-card">
 
     <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
@@ -14,6 +15,7 @@
         <el-input v-model="loginForm.password" type="password" autocomplete="off" />
       </el-form-item> -->
       <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="_self">请使用微信扫一扫登录</a></p>
+      <!-- <el-link :icon="Edit">Edit</el-link> -->
       <!-- <el-button @click="loginWithBaiDu">
         百度App
       </el-button> -->
@@ -89,7 +91,8 @@ const dologin = (form: any) => {
   })
 }
 
-
+const style = reactive({} as any)
+style.width = window.innerWidth * 0.7 + 'px'
 
 </script>
 <style scoped>
@@ -102,15 +105,17 @@ const dologin = (form: any) => {
 }
 
 .box-card {
-  width: 480px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
+
+  /* top: 50%;
+  left: 50%; */
 }
 
 .yuliu {
-  width: 600px;
+  /* width: 600px; */
   height: 600px;
-  background-color: antiquewhite;
+  float: left;
+  /* background-color: antiquewhite; */
+  background: url('../../assets/have_a_nice_day.jpeg') center top no-repeat;
+  background-size: cover;
 }
 </style>

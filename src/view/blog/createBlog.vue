@@ -254,11 +254,11 @@ const onclickTypeTab = (order: number) => {
   const bid = blogTypes[order].blogs[0].bid
   deleteBtName.value = ""
   getContent(bid).then(response => {
+    updated.value = true
     blogTypes[order].blogs[0].content = response.data.content
     checkedBlogIndex.value = order
     checkedIndex.value = 0
     copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
-    updated.value = true
   })
 }
 
@@ -278,18 +278,17 @@ const onclickBlogTab = (blog: Blog) => {
  * Blog内容修正
  */
 const saveContent = () => {
-  if (updated.value) {
-    return
-  }
   updated.value = true
   const query = {
     bid: current_blog.bid,
     content: current_blog.content
   }
-  updateContent(query).then(response => {
-    if (response.status == 200) {
-      updated.value = false
-    }
+  updateContent(query).then(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章保存成功"),
+      ]),
+    })
   }).catch(() => {
     ElMessage({
       message: h('p', null, [
@@ -541,7 +540,13 @@ const sortBlog = () => {
 
 // Created　段階の関数呼び出す処理
 getTestData()
-
+//js监听键盘ctrl+s快捷键保存
+window.addEventListener('keydown', async function (event) {
+  if (event.ctrlKey && event.key == "s") {
+    event.preventDefault();
+    saveContent()
+  }
+})
 
 // サイズ調整部分
 //拖拽开始的事件

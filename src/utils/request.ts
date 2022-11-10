@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { getToken, getTenant } from '../utils/auth'
+import router from '../router'
+import { getToken, getTenant, resetToken } from '../utils/auth'
 
 // violin-book
 const service = axios.create(
@@ -28,24 +29,24 @@ service.interceptors.request.use(
     }
 
     return config
-  },
-  async error => {
-    console.log("-----------------")
-    const err = {} as any
-    if (error.code === "ECONNABORTED") {
-      err.message = "time out"
-      return Promise.reject(error)
-    }
-    if (!error.response) {
-      err.message = "server error"
-      return Promise.reject(error)
-    }
-    if (error.response) {
-      return Promise.reject(error.response.data)
-    }
-    return Promise.reject(error.response.data)
   }
 )
+
+service.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error && error.response) {
+      if (error.response.status == 401) {
+        resetToken()
+        router.resolve({ path: '/' });
+        return
+      }
+    }
+  }
+)
+
 
 trader_service.interceptors.request.use(
   config => {
