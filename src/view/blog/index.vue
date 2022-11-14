@@ -41,7 +41,10 @@
     </div>
     <!-- <span style="font-size: 12px;">{{ item.blog_prex }}</span> -->
   </div>
-
+  <div class="page_style">
+    <!-- <el-pagination small layout="prev, pager, next" :total="50" /> -->
+    <el-pagination small background layout="prev, pager, next" :total="50" class="mt-4" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +70,10 @@ const form = reactive({
   key_word: '',
   btId: '',
   start_day: '',
-  end_day: ''
+  end_day: '',
+  page_number: 1,
+  page_size: 20,
+  total: 1
 })
 const data_list = reactive<Blog[]>([])
 const btNameList = reactive<Blog_Type[]>([])
@@ -140,5 +146,12 @@ init()
   border-bottom: 1px solid rgba(151, 151, 151, 0.3);
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.page_style {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

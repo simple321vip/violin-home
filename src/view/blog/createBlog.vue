@@ -1,89 +1,110 @@
 <template>
   <div class="blog_editer" v-if="isReady">
-    <div class="bt_section" :style="btWholeStyle">
-      <el-button class="bt-input" @click="contentDialogVisible = true">增加一个分类</el-button>
-      <el-button class="bt-input" v-for="(value, key) of blogTypes" :key="key" @click="onclickTypeTab(value[0])">
-        <el-dropdown trigger="click">
-          <el-icon v-show="checkedBlogIndex == value[0]">
-            <edit />
-          </el-icon>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="dialogVisible = true">修改</el-dropdown-item>
-              <el-dropdown-item @click="btdeleteDialogVisible = true">删除</el-dropdown-item>
-              <el-dropdown-item @click="true">退出</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        {{ value[1].btName }}
-      </el-button>
+
+
+    <div class="side_bar">
+      <el-button class="operate_button" v-if="collapsible[0] == 1" :icon="CaretRight" @click="collapsible[0] = 0"
+        size="small" />
+      <el-button class="operate_button" v-if="collapsible[0] == 0" :icon="CaretLeft" @click="collapsible[0] = 1"
+        size="small" />
     </div>
-    <div class="b_section" :style="bWholeStyle">
-      <el-button class="bt-input" :disabled="isclicked" @click="insertBlog">增加一个博客</el-button>
-      <el-button class="bt-input" v-for="(blog, index) of blogTypes.get(checkedBlogIndex)?.blogs"
-        @click="onclickBlogTab(blog[0])">
-        <el-dropdown trigger="click">
-          <el-icon v-show="checkedIndex == blog[0]">
-            <edit />
-          </el-icon>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="deleteDialogVisible = true">删除</el-dropdown-item>
-              <el-dropdown-item>顶置</el-dropdown-item>
-              <el-dropdown-item @click="true">退出</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-        {{ blog[1].title }}
-      </el-button>
+    <div class="bt_section" :style="btWholeStyle" v-show="collapsible[0] == 0">
+      <div class="item_header">
+        <el-button class="item_header_button" @click="blogTypeCreateDialogVisible = true">增加一个分类</el-button>
+      </div>
+
+      <draggable :list="blogTypes" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true" itemKey=""
+        filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlogType" @end="sortBlogType" group="group1"
+        :move="onMove">
+        <template #item="{ element }">
+          <div class="item">
+            <label class="move"></label>
+            <p class="bt-input" @click="onclickTypeTab(element.order)">{{ element.btName }}</p>
+            <div>
+              <el-button class="operate_button" :icon="Setting" size="small" v-show="checkedBlogIndex == element.order"
+                @click="handleCreateBlogType()" />
+            </div>
+          </div>
+        </template>
+      </draggable>
     </div>
+
+
+    <div class="side_bar">
+      <el-button class="operate_button" v-if="collapsible[1] == 1" :icon="CaretRight" @click="collapsible[1] = 0"
+        size="small" />
+      <el-button class="operate_button" v-if="collapsible[1] == 0" :icon="CaretLeft" @click="collapsible[1] = 1"
+        size="small" />
+    </div>
+    <div class="b_section" :style="bWholeStyle" v-show="collapsible[1] == 0">
+      <div class="item_header">
+        <el-button class="item_header_button" :disabled="isclicked" @click="insertBlog">增加一个博客</el-button>
+      </div>
+      <draggable :list="blogTypes[checkedBlogIndex].blogs" ghost-class="ghost" handle=".move" animation="300"
+        :force-fallback="true" itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true"
+        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog"
+        @end="sortBlog" group="group2" :move="onMove">
+        <template #item="{ element }">
+          <div class="item">
+            <label class="move"></label>
+            <p class="bt-input" @click="onclickBlogTab(element)">{{ element.title }}</p>
+            <div>
+              <el-button class="operate_button" v-show="checkedIndex == element.order" :icon="Delete" size="small"
+                @click="deleteDialogVisible = true" />
+            </div>
+          </div>
+        </template>
+      </draggable>
+    </div>
+
+
     <div class="c_section">
       <div class="title_style">
-        <el-input v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title">
+        <el-input v-model="blogTypes[checkedBlogIndex].blogs[checkedIndex].title" @keyup.enter.native="saveTitle"
+          @blur="saveTitle">
         </el-input>
+
         <div style="width: 60px;">
           <span v-if="!updated">已保存</span>
           <span v-if="updated">更新中</span>
         </div>
       </div>
       <div :style="cWholeStyle">
-        <md-editor theme="light"
-          v-model="((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).content"
-          @save="saveContent" :style="{ height: innerHeight }" />
+        <md-editor theme="light" v-model="current_blog.content" @save="saveContent" :style="{ height: innerHeight }" />
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="修改博客分类名称" width="30%">
-      <el-input v-model="(blogTypes.get(checkedBlogIndex) as BlogType).btName"></el-input>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveType">确认</el-button>
-        </span>
-      </template>
-    </el-dialog>
-    <el-dialog v-model="contentDialogVisible" title="新的博客分类" width="30%">
+
+    <!-- create blogtype dialog -->
+    <el-dialog v-model="blogTypeCreateDialogVisible" title="新的博客分类" width="30%">
       <el-input v-model="btName">
       </el-input>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="contentDialogVisible = false">取消</el-button>
+          <el-button @click="blogTypeCreateDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="insertBlogType">确认</el-button>
         </span>
       </template>
     </el-dialog>
-    <el-dialog v-model="btdeleteDialogVisible" title="删除博客分类" width="30%">
-      你正在对 {{ (blogTypes.get(checkedBlogIndex) as BlogType).btName }}
-      <el-input v-model="btName" :placeholder="'请输入<' + (blogTypes.get(checkedBlogIndex) as BlogType).btName + '>'">
-      </el-input>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="btdeleteDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="deleteBlogType">确认</el-button>
-        </span>
-      </template>
+
+    <!-- edit and delete blogtype dialog -->
+    <el-dialog v-model="blogTypeEditDialogVisible" title="博客分类 Setting" width="30%">
+      你正在对「 {{ blogTypes[checkedBlogIndex].btName }}」进行操作
+      <div style="display: flex; margin: 10px">
+        <el-button type="primary" @click="saveBlogType()">修改</el-button>
+        <el-input v-model="btName">
+        </el-input>
+      </div>
+      <div style="display: flex; margin: 10px">
+        <el-button type="danger" @click="deleteBlogType()">删除</el-button>
+        <el-input v-model="deleteBtName" :placeholder="'请输入 ' + blogTypes[checkedBlogIndex].btName + ' 进行删除'">
+        </el-input>
+      </div>
     </el-dialog>
+
+    <!-- delete blog dialog -->
     <el-dialog v-model="deleteDialogVisible" title="删除博客" width="30%">
-      你正在对 {{ ((blogTypes.get(checkedBlogIndex) as BlogType).blogs.get(checkedIndex) as Blog).title }}
+      你正在对 {{ blogTypes[checkedBlogIndex].blogs[checkedIndex].title }}
       <el-input v-model="btName" :placeholder="'请输入<删除>'">
       </el-input>
       <template #footer>
@@ -97,73 +118,113 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
-import $moment from "moment";
+import { reactive, ref, watch } from 'vue'
+import $moment from "moment"
 import MdEditor from 'md-editor-v3'
-import { Edit } from "@element-plus/icons-vue";
+import { CaretRight, CaretLeft, Setting, Delete } from "@element-plus/icons-vue"
 import 'md-editor-v3/lib/style.css'
-import { updateBtName, updateContent, listAll, putBlogType, removeBlogType, getContent, putBlog, deleteContent } from '../../api/blog'
+import { h } from 'vue'
+import { ElMessage } from 'element-plus'
+import {
+  updateBtName,
+  updateContent,
+  listAll,
+  putBlogType,
+  removeBlogType,
+  getContent,
+  putBlog,
+  deleteContent,
+  sortBlogTypes,
+  sortBlogs
+} from '../../api/blog'
+import { copy } from '../../utils/copyutil'
+import draggable from "vuedraggable"
 
 type Blog = {
   bid: string,
   btId: string,
-  btName: string,
   title: string,
   blog_prex: string,
   autosave_control: string,
-  content: string
+  content: string,
+  order: number
 }
 
 type BlogType = {
   btId: string,
   btName: string,
-  blogs: Map<string, Blog>
+  blogs: Blog[],
+  order: number
 }
-const blogTypes = reactive<Map<string, BlogType>>(new Map())
-const dialogVisible = ref(false)
-const contentDialogVisible = ref(false)
-const btdeleteDialogVisible = ref(false)
+const blogTypes = reactive<BlogType[]>([])
+const blogTypeCreateDialogVisible = ref(false)
+const blogTypeEditDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
 
-let checkedIndex = ref<string>("")
-let checkedBlogIndex = ref<string>("")
+let checkedIndex = ref<number>(0)
+let checkedBlogIndex = ref<number>(0)
 let isclicked = ref(false)
 let isReady = ref(false)
 let updated = ref(false)
 let startTime = reactive($moment());
+// tmp btName for create, edit, delete
+let btName = ref("")
+let deleteBtName = ref("")
+let current_blog = reactive({
+  bid: "",
+  content: "",
+})
 
+/*
+draggable 对CSS样式没有什么要求万物皆可拖拽
+:list="state.list"         //需要绑定的数组 
+animation="300"            //动画效果
+@start="onStart"           //拖拽开始的事件
+@end="onEnd"               //拖拽结束的事件
+*/
+const state = reactive({
+  modules: {
+    group1: [
+
+    ]
+  },
+})
 
 // 関数定義
-
 /**
  * Blog一覧取得
  */
 const getTestData = async () => {
   await listAll().then(response => {
+    response.data.sort((x: any, y: any) => { x.order - y.order })
     response.data.forEach((element: any) => {
       const blog_type: BlogType = {
         btId: element.btId,
         btName: element.btName,
-        blogs: new Map<string, Blog>()
+        blogs: [],
+        order: element.order
       }
       element.blog_list.forEach((item: any) => {
         const blog: Blog = {
           bid: item.bid,
           btId: item.btId,
-          btName: item.btName,
           title: item.title,
           blog_prex: item.blog_prex,
           autosave_control: item.autosave_control,
-          content: item.content
+          content: item.content,
+          order: item.order
         }
-        blog_type.blogs.set(item.bid, blog)
+        blog_type.blogs.push(blog)
       })
-      blogTypes.set(element.btId, blog_type)
+      blogTypes.push(blog_type)
     })
+    isReady.value = true
+    checkedBlogIndex.value = blogTypes[0].order
+    checkedIndex.value = 0
+    console.log(blogTypes[0].blogs[0])
+    copy(current_blog, blogTypes[0].blogs[0])
   })
-  isReady.value = true
-  checkedBlogIndex.value = blogTypes.keys().next().value
-  checkedIndex.value = blogTypes.values().next().value.blogs.keys().next().value
+
   // TODO 需要优化部分
   /**
    * 延迟执行一秒
@@ -171,215 +232,379 @@ const getTestData = async () => {
    * 获取上一次修改时间，startTime
    * 
    */
-  watch(blogTypes, (newVal, oldVal) => {
+  watch(current_blog, (newVal, oldVal) => {
+
     let current = $moment() // 获取当前时间，current 09:00:00 09:00:00.500
     const tmp = startTime // 获取开始时间，将值赋给tmp 8:30:00 09:00:00
     startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
     setTimeout(() => {
       if ($moment(current).diff($moment(tmp), 'seconds') >= 1) {
-        console.log(current)
-        console.log(startTime)
         saveContent()
       }
     }, 1000)
-
+    updated.value = false
   })
 }
 
 /**
  * BlogTypeを選べる
- * @param key 
+ * @param order
  */
-const onclickTypeTab = (key: string) => {
-  const bid = <string>blogTypes.get(key)?.blogs.values().next().value.bid
+const onclickTypeTab = (order: number) => {
+  const bid = blogTypes[order].blogs[0].bid
+  deleteBtName.value = ""
   getContent(bid).then(response => {
-    ((blogTypes.get(key) as BlogType).blogs.get(bid) as Blog).content = response.data.content
-    checkedBlogIndex.value = key
-    checkedIndex.value = bid
-  })
-
-}
-const onclickBlogTab = (key: string) => {
-  checkedIndex.value = key
-  getContent(key).then(response => {
-    ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content = response.data.content
-
+    updated.value = true
+    blogTypes[order].blogs[0].content = response.data.content
+    checkedBlogIndex.value = order
+    checkedIndex.value = 0
+    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
   })
 }
-const handleEditBtName = (bt: BlogType) => {
-  dialogVisible.value = true
+
+const onclickBlogTab = (blog: Blog) => {
+  deleteBtName.value = ""
+  getContent(blog.bid).then(response => {
+    checkedIndex.value = blog.order
+    blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
+    copy(current_blog, blog)
+    updated.value = true
+  }).catch(() => {
+    checkedIndex.value = blog.order
+  })
 }
 
 /**
  * Blog内容修正
  */
 const saveContent = () => {
-  if (updated.value) {
-    return
-  }
   updated.value = true
   const query = {
-    bid: checkedIndex.value,
-    content: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).content
+    bid: current_blog.bid,
+    content: current_blog.content
   }
-  updateContent(query).then(response => {
-    if (response.status == 200) {
-      updated.value = false
-      // blogTypes.get(checkedBlogIndex.value)?.blogs.get(checkedIndex.value)?.content = 
-    }
+  updateContent(query).then(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章保存成功"),
+      ]),
+    })
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章保存失败"),
+      ]),
+    })
   })
 }
-/**
- * Blogタイプ名称修正
- */
-const saveType = () => {
-  const query = {
-    btId: checkedBlogIndex.value,
-    btName: (blogTypes.get(checkedBlogIndex.value) as BlogType).btName
-  }
-  updateBtName(query).then(response => {
-    dialogVisible.value = false
-  })
 
-}
+
 /**
  * Blogタイトル修正
  */
 const saveTitle = () => {
-  if (updated.value) {
-    return
-  }
-  updated.value = true
   const query = {
-    bid: checkedIndex.value,
-    title: ((blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.get(checkedIndex.value) as Blog).title
+    bid: current_blog.bid,
+    title: blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].title
   }
-  updateContent(query).then(response => {
-    updated.value = false
+  updateContent(query).then(() => {
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "文章标题保存失败"),
+      ]),
+    })
   })
 }
+
 /**
  * ブログ新規作成
  */
 const insertBlog = () => {
   isclicked.value = true
   const data = {
-    btId: checkedBlogIndex.value,
-    title: $moment().format("YYYY-MM-DD")
+    btId: blogTypes[checkedBlogIndex.value].btId,
+    title: $moment().format("YYYY-MM-DD"),
+    order: blogTypes[checkedBlogIndex.value].blogs.length
   }
   putBlog(data).then(response => {
-    const { bid, title, content } = response.data
+    const { bid, btid, title, content, order, autosave_control } = response.data
     const blog = {
       bid: bid,
-      btId: checkedBlogIndex.value,
-      btName: "",
+      btId: btid,
       title: title,
       blog_prex: "",
-      content: content
+      content: content,
+      autosave_control: autosave_control,
+      order: order
     } as Blog
-    (blogTypes.get(checkedBlogIndex.value) as BlogType).blogs.set(bid, blog)
-    checkedIndex.value = bid
+
+    blogTypes[checkedBlogIndex.value].blogs.push(blog)
+    checkedIndex.value = order
     isclicked.value = false
+    copy(current_blog, blog)
   })
 }
+
 /**
- * ブログ削除 
+ * ブログ削除
  */
 const deleteBlog = () => {
   if (btName.value == "删除") {
-    deleteContent(checkedIndex.value).then(response => {
-      if (response.status == 200) {
-        const deleteKey = checkedIndex.value
-        checkedIndex.value = blogTypes.get(checkedBlogIndex.value)?.blogs.keys().next().value
-        blogTypes.get(checkedBlogIndex.value)?.blogs.delete(deleteKey)
-        deleteDialogVisible.value = false
-      }
+    let delete_data = {
+      btId: blogTypes[checkedBlogIndex.value].btId
+    }
+    deleteContent(blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid, delete_data).then(response => {
+      blogTypes[checkedBlogIndex.value].blogs.length = 0
+      response.data.blog_list.forEach((item: any) => {
+        const blog: Blog = {
+          bid: item.bid,
+          btId: item.btId,
+          title: item.title,
+          blog_prex: item.blog_prex,
+          autosave_control: item.autosave_control,
+          content: item.content,
+          order: item.order
+        }
+        blogTypes[checkedBlogIndex.value].blogs.push(blog)
+      })
+      checkedIndex.value = 0
+      copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
+      deleteDialogVisible.value = false
+      btName.value = ""
+    }).catch(() => {
+      deleteDialogVisible.value = false
+      btName.value = ""
     })
-    btName.value = ""
   }
-
 }
 
-// Blogタイプ新規作成用、作成後、リセットする
-let btName = ref("")
+const handleCreateBlogType = () => {
+  btName.value = blogTypes[checkedBlogIndex.value].btName
+  blogTypeEditDialogVisible.value = true
+  deleteBtName.value = ""
+}
+
+/**
+ * create blogType
+ */
 const insertBlogType = () => {
+  if (btName.value == "") {
+    blogTypeCreateDialogVisible.value = false
+    return
+  }
   const data = {
-    btName: btName.value
+    btName: btName.value,
+    order: blogTypes.length
   }
   putBlogType(data).then(response => {
     const blog_type: BlogType = {
       btId: response.data.btId,
       btName: response.data.btName,
-      blogs: new Map<string, Blog>()
+      blogs: [],
+      order: response.data.order
     }
     response.data.blog_list.forEach((item: any) => {
       const blog: Blog = {
         bid: item.bid,
         btId: item.btId,
-        btName: item.btName,
         title: item.title,
         blog_prex: item.blog_prex,
         autosave_control: item.autosave_control,
-        content: item.content
+        content: item.content,
+        order: item.order
       }
-      blog_type.blogs.set(item.bid, blog)
+      blog_type.blogs.push(blog)
     })
-    blogTypes.set(response.data.btId, blog_type)
-    checkedBlogIndex.value = response.data.btId
-    checkedIndex.value = blog_type.blogs.keys().next().value
-    contentDialogVisible.value = false
+    blogTypes.push(blog_type)
+    checkedBlogIndex.value = response.data.order
+    checkedIndex.value = blog_type.blogs[0].order
+    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
+    blogTypeCreateDialogVisible.value = false
     btName.value = ""
   })
 }
 
+/**
+ * edit blogType
+ */
+const saveBlogType = () => {
+  if (btName.value == "") {
+    blogTypeEditDialogVisible.value = false
+    return
+  }
+  const query = {
+    btId: blogTypes[checkedBlogIndex.value].btId,
+    btName: btName.value,
+  }
+  updateBtName(query).then(() => {
+    blogTypes[checkedBlogIndex.value].btName = btName.value
+    blogTypeEditDialogVisible.value = false
+    btName.value = ""
+  }).catch(() => {
+    btName.value = ""
+    blogTypeEditDialogVisible.value = false
+  })
+}
+
 const deleteBlogType = () => {
-  if (btName.value == (blogTypes.get(checkedBlogIndex.value) as BlogType).btName) {
+  if (deleteBtName.value == blogTypes[checkedBlogIndex.value].btName) {
     const data = {
-      btId: checkedBlogIndex.value
+      btId: blogTypes[checkedBlogIndex.value].btId
     }
     removeBlogType(data).then((response) => {
-      if (response.status == 200) {
-        blogTypes.delete(checkedBlogIndex.value)
-        checkedBlogIndex.value = blogTypes.keys().next().value
-        checkedIndex.value = blogTypes.values().next().value.blogs.keys().next().value
-      } else {
-
-      }
-      btdeleteDialogVisible.value = false
+      blogTypes.length = 0
+      response.data.forEach((element: any) => {
+        const blog_type: BlogType = {
+          btId: element.btId,
+          btName: element.btName,
+          blogs: [],
+          order: element.order
+        }
+        element.blog_list.forEach((item: any) => {
+          const blog: Blog = {
+            bid: item.bid,
+            btId: item.btId,
+            title: item.title,
+            blog_prex: item.blog_prex,
+            autosave_control: item.autosave_control,
+            content: item.content,
+            order: item.order
+          }
+          blog_type.blogs.push(blog)
+        })
+        blogTypes.push(blog_type)
+      })
+      checkedBlogIndex.value = 0
+      checkedIndex.value = 0
+      copy(current_blog, blogTypes[0].blogs[0])
+      blogTypeEditDialogVisible.value = false
     })
-    btName.value = ""
   } else {
-
+    blogTypeEditDialogVisible.value = false
   }
+}
 
+const sortBlogType = () => {
 
+  const sortData: BlogType[] = []
+  blogTypes.forEach((blogType: BlogType, index) => {
+    blogType.order = index
+    if (blogType.btId == id.value) {
+      checkedBlogIndex.value = index
+    }
+    sortData.push({
+      btId: blogType.btId,
+      btName: blogType.btName,
+      blogs: [],
+      order: blogType.order
+    })
+  })
+
+  sortBlogTypes(sortData).then(() => {
+
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "分类排序失败"),
+      ]),
+    })
+  })
+}
+
+const sortBlog = () => {
+
+  const sortData: any[] = []
+
+  blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog, index) => {
+    blog.order = index
+    if (blog.bid == id.value) {
+      checkedIndex.value = index
+    }
+    sortData.push({
+      bid: blog.bid,
+      order: blog.order
+    })
+  })
+
+  sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(() => {
+
+  }).catch(() => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: teal' }, "blog排序失败"),
+      ]),
+    })
+  })
 }
 
 // Created　段階の関数呼び出す処理
 getTestData()
-
+//js监听键盘ctrl+s快捷键保存
+window.addEventListener('keydown', async function (event) {
+  if (event.ctrlKey && event.key == "s") {
+    event.preventDefault();
+    saveContent()
+  }
+})
 
 // サイズ調整部分
-type WholeStyle = {
-  width: string
-  height: string
+//拖拽开始的事件
+const id = ref("")
+const onStartBlogType = () => {
+  console.log("开始拖拽");
+  id.value = blogTypes[checkedBlogIndex.value].btId
+};
+
+const onStartBlog = () => {
+  console.log("开始拖拽");
+  id.value = blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid
+};
+
+//拖拽结束的事件
+const onEnd = () => {
+
 }
+
+const onMove = (e: any) => {
+  //不允许停靠
+  if (e.relatedContext.element.disabledPark == true) return false;
+  return true;
+}
+
+type WholeStyle = any
+const btWholeStyle = reactive<WholeStyle>({} as WholeStyle)
+const bWholeStyle = reactive<WholeStyle>({} as WholeStyle)
+const cWholeStyle = reactive<WholeStyle>({} as WholeStyle)
+const collapsible = reactive([0, 0])
+const whole_width = reactive([0.15, 0.15])
 let innerHeight = ref("")
 
-const btWholeStyle = reactive<WholeStyle>({} as WholeStyle)
-let btWidth = 0.10 * window.innerWidth
-btWholeStyle.width = btWidth + 'px'
-btWholeStyle.height = window.innerHeight + 'px'
-const bWholeStyle = reactive<WholeStyle>({} as WholeStyle)
-let bWidth = 0.23 * window.innerWidth
-bWholeStyle.width = bWidth + 'px'
-const cWholeStyle = reactive<WholeStyle>({} as WholeStyle)
-let contentWidth = 0.67 * window.innerWidth
-cWholeStyle.width = contentWidth + 'px'
-innerHeight.value = (window.innerHeight - 50) + 'px'
-onMounted(() => {
+const setup_size = () => {
+  btWholeStyle.width = whole_width[0] * window.innerWidth + 'px'
+  bWholeStyle.width = whole_width[1] * window.innerWidth + 'px'
+  cWholeStyle.width = ((1 - whole_width[0] - whole_width[1]) * window.innerWidth - 44) + 'px'
+  innerHeight.value = (window.innerHeight - 50) + 'px'
+  btWholeStyle.height = window.innerHeight + 'px'
+}
+setup_size()
 
+watch(collapsible, async () => {
+  if (collapsible[0] == 0) {
+    whole_width[0] = 0.15
+  } else {
+    whole_width[0] = 0
+  }
+  if (collapsible[1] == 0) {
+    whole_width[1] = 0.15
+  } else {
+    whole_width[1] = 0
+  }
+  btWholeStyle.width = whole_width[0] * window.innerWidth + 'px'
+  bWholeStyle.width = whole_width[1] * window.innerWidth + 'px'
+  cWholeStyle.width = ((1 - whole_width[0] - whole_width[1]) * window.innerWidth - 44) + 'px'
 })
+
 </script>
 
 <style scoped>
@@ -390,22 +615,6 @@ onMounted(() => {
   flex-direction: column;
   align-items: stretch;
   border-right: 1px solid royalblue;
-}
-
-.bt-input {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  margin-left: 0px;
-  padding-left: 10px;
-  font-size: 15px;
-  overflow: hidden;
-  height: 50px;
-  border-radius: 0px;
-  border-right: 0px;
-  border-left: 0px;
-  border-top: 1px solid royalblue;
-  border-bottom: 1px solid royalblue;
 }
 
 .title_style {
@@ -423,16 +632,97 @@ onMounted(() => {
   border-bottom: 1px solid royalblue;
 }
 
-.el-dropdown {
-  margin-right: 5px;
-}
-
 .blog_editer {
   display: flex;
 }
 
-.tab_list {
+.item_header {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid royalblue;
+  border-bottom: 1px solid royalblue;
+}
+
+.item_header_button {
+  border: 0px;
+  height: 50px;
+}
+
+.side_bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 20px;
+}
+
+.item {
+  padding: 0px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  display: flex;
+  height: 50px;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  user-select: none;
+  border: 0px;
+  border-bottom: 1px;
+}
+
+.item>label {
+  color: #333;
+  height: 50px;
+  width: 15px;
+}
+
+.item>label:hover {
+  cursor: move;
+}
+
+.item>div {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+  border: 0px;
+}
+
+.operate_button {
+  border-color: #FFFFFF;
+  width: 20px;
+  border: 0px;
+}
+
+.bt-input {
+  margin: 0px;
+  border: 0px;
+  padding-left: 0px;
+  padding-right: 5px;
+  font-size: 15px;
+  overflow: hidden;
+  line-height: 50px;
+  height: 50px;
+  width: 100px;
+  flex-grow: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bt-input:hover {
+  background-color: #EBEBEB;
+}
+
+.item>p {
+  padding: 6px 10px;
+  color: rgb(142, 51, 51);
+}
+
+.chosenClass {
+  opacity: 1;
+  border: solid 1px red;
+}
+
+.ghost {
+  border: solid 1px rgb(19, 41, 239) !important;
 }
 </style>

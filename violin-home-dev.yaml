@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: violin-home
-        image: ccr.ccs.tencentyun.com/violin/violin-home:latest
+        image: ccr.ccs.tencentyun.com/violin/violin-home:v1.00
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

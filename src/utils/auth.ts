@@ -8,17 +8,17 @@ const setToken = (token: String) => {
   Cookies.set('token', token)
 }
 
-const setUser = (user: object) => {
-  Cookies.set('user', JSON.stringify(user))
+const setTenant = (tenant: object) => {
+  Cookies.set('tenant', JSON.stringify(tenant))
 }
 
-const getUser = () => {
-  return Cookies.get('user')
+const getTenant = () => {
+  return Cookies.get('tenant')
 }
 
 const resetToken = () => {
   Cookies.remove('token')
-  Cookies.remove('user')
+  Cookies.remove('tenant')
 }
 
-export { getToken, setToken, resetToken, setUser, getUser }
+export { getToken, setToken, resetToken, setTenant, getTenant }

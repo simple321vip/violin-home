@@ -3,32 +3,80 @@ import App from './App.vue'
 import ElementPlus from "element-plus";
 import 'element-plus/dist/index.css'
 import router from './router'
-// vue store
 import { createPinia } from 'pinia'
 const store = createPinia()
 
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 let app = createApp(App)
+
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+import { setupMock } from '../mock'
+
+if (process.env.NODE_ENV === 'development') {
+  setupMock()
+}
 
 app.use(router)
 app.use(ElementPlus)
 app.use(store)
-import { getToken, getUser, setToken, setUser } from './utils/auth'
-import { User } from './entity/index'
+import { getToken, getTenant, setToken, setTenant } from './utils/auth'
+import { Tenant } from './entity/index'
 import Cookies from 'js-cookie'
-import { obtainUserInfo } from './api/user'
-const whiteList = ['/login']
+import { tenantStore } from './store/tenant'
+const whiteList = ['/login', '/register', '/sorryPage']
 let url = window.location.href
 
 async function checktoken(url: string) {
-  if (url.search("token") != -1) {
-    let authorizeToken = url.split("token=")[1]
-    setToken(authorizeToken)
-    await obtainUserInfo(authorizeToken).then(response => {
-      setUser(response.data)
+
+  if (url.search("register") != -1) {
+    let arr = url.split('?')
+    let parameters = arr[1].split('&')
+    let query_data: { [key: string]: any } = {}
+    parameters.forEach(parameter => {
+      let parameter_list = parameter.split("=")
+      query_data[parameter_list[0]] = parameter_list[1]
     })
     router.push({
-      path: '/home',
+      path: '/register',
+      query: query_data
     })
+    return
+  }
+  if (url.search("/home/") != -1) {
+    let arr = url.split('?')
+    let parameters = arr[1].split('&')
+    let query_data: { [key: string]: any } = {}
+    parameters.forEach(parameter => {
+      let parameter_list = parameter.split("=")
+      query_data[parameter_list[0]] = parameter_list[1]
+    })
+    const tenant = {
+      tenant_id: query_data.tenantId,
+      account: query_data.account
+    }
+    const tenant_store = tenantStore()
+    await tenant_store.login(tenant, query_data.token).then(() => {
+      const { href } = router.resolve({
+        path: '/'
+      });
+      window.open(href, '_self');
+    }).catch((error) => {
+      const { href } = router.resolve({
+        path: '/login'
+      });
+      window.open(href, '_self');
+    })
+  }
+  if (url.search("sorryPage") != -1) {
+    router.push({
+      path: '/sorryPage',
+    })
+    return
   }
 }
 checktoken(url)
@@ -46,14 +94,13 @@ router.beforeEach((to, from, next) => {
 
   const token = getToken()
 
-
   if (typeof token === 'string') {
     switch (to.path) {
       case '/login':
         next('/')
         break;
       case '/':
-        const user = <User>(JSON.parse(getUser() as string))
+        const tenant = <Tenant>(JSON.parse(getTenant() as string))
         if (url.search("write") != -1) {
           next('/BlogEditer')
         } else if (url.search("view") != -1) {
@@ -62,12 +109,10 @@ router.beforeEach((to, from, next) => {
             path: '/BlogViewer',
             query: { bid: bid }
           })
-          // next('/BlogViewer')
-          console.log(1)
         } else {
           router.push({
             path: '/home',
-            query: user
+            query: tenant
           })
         }
         break;
@@ -75,7 +120,7 @@ router.beforeEach((to, from, next) => {
         next()
     }
   } else {
-    if (whiteList.includes(to.path)) {
+    if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
       next('/login')

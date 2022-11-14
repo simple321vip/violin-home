@@ -1,6 +1,6 @@
-type User = {
+type Tenant = {
   id: string,
-  username: string
+  account: string
 }
 
-export { User }
+export { Tenant }

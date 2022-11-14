@@ -48,17 +48,38 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/recommend',
+        path: '/market',
         component: () => import('../view/recommend/index.vue'),
         meta: {
-          name: '推荐中'
+          name: '市场行情'
         }
       },
       {
-        path: '/download',
-        component: () => import('../view/download/index.vue'),
+        path: '/capital',
+        component: () => import('../view/capital/index.vue'),
         meta: {
-          name: '一键打包'
+          name: '资金管理'
+        }
+      },
+      // {
+      //   path: '/trader',
+      //   component: () => import('../view/trader/index.vue'),
+      //   meta: {
+      //     name: 'trader'
+      //   }
+      // },
+      {
+        path: '/strategy',
+        component: () => import('../view/trader/cta_strategy_file.vue'),
+        meta: {
+          name: '策略文件'
+        }
+      },
+      {
+        path: '/strategy_instance',
+        component: () => import('../view/trader/cta_strategy.vue'),
+        meta: {
+          name: 'CTA策略'
         }
       },
     ]
@@ -78,6 +99,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     component: () => import('../components/login/login.vue')
+  },
+  {
+    path: "/illustration",
+    component: () => import('../components/illustration/index.vue')
+  },
+  {
+    path: "/register",
+    component: () => import('../components/login/register.vue')
+  },
+  {
+    path: "/sorryPage",
+    component: () => import('../components/login/sorry.vue')
   },
 ]
 

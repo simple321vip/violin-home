@@ -14,11 +14,13 @@
         </el-main>
         <el-footer>
           <span>
-            本网站不涉及色情，赌博，毒品和政治宗教等内容，暂时为个人学习用途。
-            考虑到法律风险，针对有敏感词汇还设有过滤功能，所以暂时不对外提供一切功能。
-            <br />
-            再次重申，本网站只作为学习网站。。。。。。
+            管祥玮的个人网站 ©Copyright 2022-2022
           </span>
+          <span @click="openSiteQuery">辽ICP备2022003637号-2</span>
+          <div>
+            <el-avatar @click="openGithub" src="https://github.githubassets.com/favicons/favicon.svg" />
+          </div>
+
         </el-footer>
       </el-container>
     </el-container>
@@ -26,9 +28,21 @@
 </template>
 
 <script setup lang='ts'>
-import MainApp from '../layout/MainApp.vue';
-import NavBar from "../layout/NavBar.vue";
-import SideBar from "../layout/SideBar.vue";
+import MainApp from '../layout/MainApp.vue'
+import NavBar from "../layout/NavBar.vue"
+import SideBar from "../layout/SideBar.vue"
+
+const openGithub = () => {
+  let href = 'https://github.com/simple321vip'
+  window.open(href, '_blank')
+}
+
+const openSiteQuery = () => {
+  let href = 'https://beian.miit.gov.cn/#/Integrated/index'
+  window.open(href, '_blank')
+}
+
+
 </script>
 
 <style scoped>
@@ -69,4 +83,8 @@ body > .el-container {
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
 } */
+.el-footer {
+  display: flex;
+  justify-content: space-around;
+}
 </style>

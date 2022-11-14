@@ -1,5 +1,6 @@
 <template>
-  <div class="yuliu"></div>
+  <div class="yuliu" :style="style">
+  </div>
   <el-card class="box-card">
 
     <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
@@ -13,7 +14,8 @@
       <el-form-item label="用户凭证" prop="checkPass">
         <el-input v-model="loginForm.password" type="password" autocomplete="off" />
       </el-form-item> -->
-      <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="new">请使用微信扫一扫登录</a></p>
+      <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="_self">请使用微信扫一扫登录</a></p>
+      <!-- <el-link :icon="Edit">Edit</el-link> -->
       <!-- <el-button @click="loginWithBaiDu">
         百度App
       </el-button> -->
@@ -34,28 +36,21 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { useUserStore } from '../../store/user'
+import { tenantStore } from '../../store/tenant'
 import router from '../../router'
 import baiduCloudImage from "../../assets/baiducloud.png"
 import config from '../../const/config'
-import { getQrCode } from '../../api/login'
+
 
 let qrcode = config.BAIDU_CLOUD_URL + config.RESPONSE_TYPE + config.CLIENT_ID + config.REDIRECT_URI + config.SCOPE + config.DEVICE_ID + config.QR_CODE + config.DISPLAY
 
-const user = useUserStore()
+const tenant = tenantStore()
 
 const ruleFormRef = ref<FormInstance>()
 const loginForm = reactive({
   user_id: '',
   password: ''
 })
-
-const loginWithBaiDu = () => {
-  window.open("", "11");
-  // getQrCode().then((response) => {
-
-  // })
-}
 
 const validateUserName = (rule: any, value: string, callback: Function) => {
   if (!value) {
@@ -83,7 +78,7 @@ const dologin = (form: any) => {
     return
   form.validate((valid: any) => {
     if (valid) {
-      user.login(loginForm.user_id, loginForm.password).then(res => {
+      tenant.login(loginForm.user_id, loginForm.password).then(res => {
         console.log(1)
         router.push({
           path: '/home'
@@ -96,7 +91,8 @@ const dologin = (form: any) => {
   })
 }
 
-
+const style = reactive({} as any)
+style.width = window.innerWidth * 0.7 + 'px'
 
 </script>
 <style scoped>
@@ -109,15 +105,17 @@ const dologin = (form: any) => {
 }
 
 .box-card {
-  width: 480px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
+
+  /* top: 50%;
+  left: 50%; */
 }
 
 .yuliu {
-  width: 600px;
+  /* width: 600px; */
   height: 600px;
-  background-color: antiquewhite;
+  float: left;
+  /* background-color: antiquewhite; */
+  background: url('../../assets/have_a_nice_day.jpeg') center top no-repeat;
+  background-size: cover;
 }
 </style>
