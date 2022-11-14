@@ -63,7 +63,7 @@ spec:
   node(label) {
     def myRepo = checkout([
       $class: 'GitSCM',
-      branches: [[name: "*/dev"]],
+      branches: [[name: "*/master"]],
       doGenerateSubmoduleConfigurations: false,
       extensions:  [[$class: 'CloneOption', noTags: false, reference: '', shallow: true, timeout: 1000]]+[[$class: 'CheckoutOption', timeout: 1000]],
       submoduleCfg: [],
@@ -97,19 +97,6 @@ spec:
               docker push ${image}
               """
           }
-        }
-    }
-    stage('预发布') {
-        withKubeConfig([
-            credentialsId: 'kubeconfig',
-            serverUrl: 'https://49.233.4.79:6443'
-        ]) {
-            container('kubectl') {
-                echo "查看 K8S 集群 Pod 列表"
-                sh 'kubectl delete deployment violin-home-deployment -n dev'
-                sh 'kubectl apply -f violin-home-dev.yaml'
-                sh 'kubectl get pod -n dev -owide | grep violin-home-deployment'
-            }
         }
     }
   }
