@@ -66,8 +66,8 @@
         </el-input>
 
         <div style="width: 60px;">
-          <span v-if="!updated">已保存</span>
-          <span v-if="updated">更新中</span>
+          <!-- <span v-if="!updated">已保存</span>
+          <span v-if="updated">更新中</span> -->
         </div>
       </div>
       <div :style="cWholeStyle">
@@ -165,8 +165,6 @@ let checkedIndex = ref<number>(0)
 let checkedBlogIndex = ref<number>(0)
 let isclicked = ref(false)
 let isReady = ref(false)
-let updated = ref(false)
-let startTime = reactive($moment());
 // tmp btName for create, edit, delete
 let btName = ref("")
 let deleteBtName = ref("")
@@ -232,18 +230,23 @@ const getTestData = async () => {
    * 获取上一次修改时间，startTime
    * 
    */
-  watch(current_blog, (newVal, oldVal) => {
-
-    let current = $moment() // 获取当前时间，current 09:00:00 09:00:00.500
-    const tmp = startTime // 获取开始时间，将值赋给tmp 8:30:00 09:00:00
-    startTime = current // 更新开始时间为当前 09:00:00 09:00:00.500
-    setTimeout(() => {
-      if ($moment(current).diff($moment(tmp), 'seconds') >= 1) {
-        saveContent()
+  let old_blog = {
+    bid: current_blog.bid,
+    content: current_blog.content,
+  }
+  setInterval(async () => {
+    if (current_blog.bid == old_blog.bid) {
+      if (old_blog.content == current_blog.content) {
+        return
       }
-    }, 1000)
-    updated.value = false
-  })
+      await saveContent().then(() => {
+        old_blog.content = current_blog.content
+      })
+    } else {
+      old_blog.bid = current_blog.bid
+      old_blog.content = current_blog.content
+    }
+  }, 5000)
 }
 
 /**
@@ -254,7 +257,6 @@ const onclickTypeTab = (order: number) => {
   const bid = blogTypes[order].blogs[0].bid
   deleteBtName.value = ""
   getContent(bid).then(response => {
-    updated.value = true
     blogTypes[order].blogs[0].content = response.data.content
     checkedBlogIndex.value = order
     checkedIndex.value = 0
@@ -268,7 +270,6 @@ const onclickBlogTab = (blog: Blog) => {
     checkedIndex.value = blog.order
     blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
     copy(current_blog, blog)
-    updated.value = true
   }).catch(() => {
     checkedIndex.value = blog.order
   })
@@ -277,18 +278,13 @@ const onclickBlogTab = (blog: Blog) => {
 /**
  * Blog内容修正
  */
-const saveContent = () => {
-  updated.value = true
+const saveContent = async () => {
   const query = {
     bid: current_blog.bid,
     content: current_blog.content
   }
   updateContent(query).then(() => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "文章保存成功"),
-      ]),
-    })
+
   }).catch(() => {
     ElMessage({
       message: h('p', null, [
