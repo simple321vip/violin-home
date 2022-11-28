@@ -8,21 +8,11 @@
       <div class="title-container">
         <h3>秘密基地</h3>
       </div>
-      <!-- <el-form-item label="用户名" prop="pass">
-        <el-input v-model="loginForm.user_id" type="password" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="用户凭证" prop="checkPass">
-        <el-input v-model="loginForm.password" type="password" autocomplete="off" />
-      </el-form-item> -->
-      <p class="tang-pass-qrcode-title">百度网盘扫码登陆<a class="pass-link" :href="qrcode" target="_self">请使用微信扫一扫登录</a></p>
-      <!-- <el-link :icon="Edit">Edit</el-link> -->
-      <!-- <el-button @click="loginWithBaiDu">
-        百度App
-      </el-button> -->
-      <el-avatar :size="28" :src="baiduCloudImage" />
+      <div>
+        <el-avatar :size="28" :src="baiduCloudImage" @click="scan(qrcode)" />
+      </div>
       <el-form-item>
-        其他登录方式
-        <!-- <el-button type="primary" @click="dologin(ruleFormRef)">login</el-button> -->
+        其他登录方式暂时还没有哦
       </el-form-item>
     </el-form>
     ------------------------------------------------------------
@@ -39,7 +29,7 @@ import type { FormInstance } from 'element-plus'
 import { tenantStore } from '../../store/tenant'
 import router from '../../router'
 import baiduCloudImage from "../../assets/baiducloud.png"
-import config from '../../const/config'
+import { config, scan } from '../../const/config'
 
 
 let qrcode = config.BAIDU_CLOUD_URL + config.RESPONSE_TYPE + config.CLIENT_ID + config.REDIRECT_URI + config.SCOPE + config.DEVICE_ID + config.QR_CODE + config.DISPLAY
@@ -102,12 +92,6 @@ style.width = window.innerWidth * 0.7 + 'px'
 
 .item {
   padding: 18px 0;
-}
-
-.box-card {
-
-  /* top: 50%;
-  left: 50%; */
 }
 
 .yuliu {

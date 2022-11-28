@@ -1,4 +1,5 @@
-import { type } from "os";
+import router from '../router'
+import { setToken, setTenant } from '../utils/auth'
 
 // config/index.js
 const env = process.env.NODE_ENV!;
@@ -34,6 +35,29 @@ const configObj: any = {
     QR_CODE: '&qrcode=' + '1',
     DISPLAY: '&display=popup'
   },
-};
+}
 
-export default { ...configObj[env] };
+const scan_method: any = {
+  production: (qrcode: string) => {
+    window.location.href = qrcode
+  },
+  development: () => {
+    setToken("token")
+    setTenant(
+      {
+        tenantId: "111"
+      }
+    )
+    router.push({
+      path: '/home'
+    })
+  },
+  test: (qrcode: string) => {
+    window.location.href = qrcode
+  },
+}
+
+const scan = scan_method[env]
+const config = configObj[env]
+
+export { scan, config }
