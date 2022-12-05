@@ -7,7 +7,7 @@ const headers = {
 
 const getBlogs = (params: Object) => {
   return service({
-    url: '/auth/api/v1/reader/blogs',
+    url: '/wiki/api/v1/reader/blogs',
     method: 'GET',
     params: params,
     paramsSerializer: (params) => {
@@ -18,7 +18,7 @@ const getBlogs = (params: Object) => {
 
 const getBtName = () => {
   return service({
-    url: '/auth/api/v1/reader/blog_type',
+    url: '/wiki/api/v1/reader/blog_type',
     method: 'GET',
     headers: headers
   })
@@ -26,7 +26,7 @@ const getBtName = () => {
 
 const getBlog = (bid: string) => {
   return service({
-    url: '/auth/api/v1/reader/blog/' + bid,
+    url: '/wiki/api/v1/reader/blog/' + bid,
     method: 'GET',
     headers: headers
   })
@@ -34,14 +34,14 @@ const getBlog = (bid: string) => {
 
 const publishAll = () => {
   return service({
-    url: '/auth/api/v1/reader/blogs/publish/all',
+    url: '/wiki/api/v1/reader/blogs/publish/all',
     method: 'GET'
   })
 }
 
 const publish = (bid: string) => {
   return service({
-    url: '/auth/api/v1/reader/blogs/publish/' + bid,
+    url: '/wiki/api/v1/reader/blogs/publish/' + bid,
     method: 'GET'
   })
 }

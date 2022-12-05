@@ -2,7 +2,7 @@ import { MockMethod } from 'vite-plugin-mock'
 
 export default [
   {
-    url: '/auth/api/v1/reader/blogs',
+    url: '/wiki/api/v1/reader/blogs',
     method: 'get',
     response: () => {
       return [
@@ -26,7 +26,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/reader/blog_type',
+    url: '/wiki/api/v1/reader/blog_type',
     method: 'get',
     response: () => {
       return [

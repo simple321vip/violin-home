@@ -69,7 +69,7 @@ spec:
       submoduleCfg: [],
       userRemoteConfigs: [[
         credentialsId: '2448e943-479f-4796-b5a0-fd3bf22a5d30',
-        url: 'https://gitee.com/guan-xiangwei/violin-home-manage.git'
+        url: 'https://gitee.com/guan-xiangwei/violin-home.git'
         ]]
       ])
 

@@ -2,7 +2,7 @@ import { MockMethod } from 'vite-plugin-mock'
 
 export default [
   {
-    url: '/auth/api/v1/author/blog/list',
+    url: '/wiki/api/v1/author/blog/list',
     method: 'get',
     response: ({ body, query }) => {
       return [
@@ -73,7 +73,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/author/blog_types',
+    url: '/wiki/api/v1/author/blog_types',
     method: 'post',
     response: () => {
       return [
@@ -123,7 +123,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'put',
     response: () => {
       return {
@@ -143,7 +143,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'post',
     response: () => {
       return {
@@ -151,7 +151,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'delete',
     response: ({ body, query }) => {
       return [

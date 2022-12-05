@@ -6,7 +6,7 @@ const headers = {
 
 const listAll = () => {
   return service({
-    url: '/auth/api/v1/author/blog/list',
+    url: '/wiki/api/v1/author/blog/list',
     method: 'GET',
     headers: headers
   })
@@ -14,7 +14,7 @@ const listAll = () => {
 
 const updateBtName = (data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'POST',
     headers: headers,
     data: data
@@ -23,7 +23,7 @@ const updateBtName = (data: Object) => {
 
 const putBlogType = (data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'PUT',
     headers: headers,
     data: data
@@ -32,7 +32,7 @@ const putBlogType = (data: Object) => {
 
 const removeBlogType = (data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/blog_type',
     method: 'DELETE',
     headers: headers,
     data: data
@@ -41,7 +41,7 @@ const removeBlogType = (data: Object) => {
 
 const sortBlogTypes = (data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog_types',
+    url: '/wiki/api/v1/author/blog_types',
     method: 'POST',
     headers: headers,
     data: data
@@ -50,7 +50,7 @@ const sortBlogTypes = (data: Object) => {
 
 const getContent = (id: string) => {
   return service({
-    url: '/auth/api/v1/author/blog/content/' + id,
+    url: '/wiki/api/v1/author/blog/content/' + id,
     method: 'GET',
     headers: headers,
   })
@@ -58,7 +58,7 @@ const getContent = (id: string) => {
 
 const putBlog = (postData: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog/content',
+    url: '/wiki/api/v1/author/blog/content',
     method: 'PUT',
     headers: headers,
     data: postData
@@ -67,7 +67,7 @@ const putBlog = (postData: Object) => {
 
 const updateContent = (post_data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog/content',
+    url: '/wiki/api/v1/author/blog/content',
     method: 'POST',
     headers: headers,
     data: post_data
@@ -76,7 +76,7 @@ const updateContent = (post_data: Object) => {
 
 const deleteContent = (bid: string, delete_data: Object) => {
   return service({
-    url: '/auth/api/v1/author/blog/' + bid,
+    url: '/wiki/api/v1/author/blog/' + bid,
     method: 'DELETE',
     headers: headers,
     data: delete_data
@@ -85,7 +85,7 @@ const deleteContent = (bid: string, delete_data: Object) => {
 
 const sortBlogs = (data: Object, btId: string) => {
   return service({
-    url: '/auth/api/v1/author/blogs/' + btId,
+    url: '/wiki/api/v1/author/blogs/' + btId,
     method: 'POST',
     headers: headers,
     data: data
