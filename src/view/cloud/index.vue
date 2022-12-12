@@ -1,7 +1,7 @@
 <template>
-  <el-table :data="dirContexts" @row-contextmenu="showContext" @row-click="leftClickRow"
-    @selection-change="handleSelectionChange">
-    <el-table-column type="selection" width="55" />
+  <el-table :data="dirContexts" @cell-mouse-enter="rowMouseEnter" @cell-mouse-leave="rowMouseLeave"
+    :row-style="handleRowStyle" @row-contextmenu="showContext" @row-click="leftClickRow"
+    @selection-change="handleSelectionChange" ref="multipleTableRef">
     <el-table-column prop="name" width="200px">
     </el-table-column>
     <el-table-column prop="isDir" width="130px">
@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, toRaw } from 'vue';
 import { getFileList } from '../../api/cloud'
 import { Contextmenu, ContextmenuDivider, ContextmenuItem } from "v-contextmenu";
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref } from "vue";
@@ -60,32 +60,91 @@ interface DirContext {
 const currentInstance = getCurrentInstance();
 const dirContexts = reactive<DirContext[]>([])
 let url = ""
+const multipleSelection = reactive<DirContext[]>([])
+const hoverUnSelection = ref<DirContext>()
 
 const isSelect = ref(false)
 const selection = ref()
 
-const handleSelectionChange = (val: DirContext) => {
-  selection.value = val
-}
-const createFolder = () => {
-
+const handleSelectionChange = (val: DirContext[]) => {
+  // multipleSelection.value = val
 }
 
+const rowMouseEnter = (row: any, column: any, cell: any, event: any) => {
+  if (!multipleSelection.includes(row)) {
+    hoverUnSelection.value = row
+  }
+}
+
+const rowMouseLeave = (row: any, column: any, cell: any, event: any) => {
+  if (!multipleSelection.includes(row)) {
+    hoverUnSelection.value = undefined
+  }
+}
+
+const handleRowStyle = ({ row, rowIndex }: any) => {
+  if (multipleSelection.includes(row)) {
+    return {
+      "background": "#B4C7E7"
+    }
+  }
+
+  console.log(toRaw(hoverUnSelection.value))
+  console.log(row)
+  if (toRaw(hoverUnSelection.value)?.name == toRaw(row).name) {
+    return {
+      "background": "#DAE3F3"
+    }
+  }
+}
 
 
 const toggleSelection = (row: DirContext) => {
-  multipleTableRef.value.toggleRowSelection(row, true)
+  multipleTableRef.value!.toggleRowSelection(row, true)
+  isSelect.value = true
   // multipleTableRef.value!.clearSelection()
 }
 
 
 const leftClickRow = (row: any, column: any, event: any) => {
-  isSelect.value = true
-  console.log(1)
-  toggleSelection(row)
+  if (multipleSelection.includes(row)) {
+    multipleSelection.forEach(element => {
+      if (element != row) {
+        multipleTableRef.value?.toggleRowSelection(element, false)
+      }
+    })
+  } else {
+    multipleTableRef.value?.clearSelection()
+    multipleSelection.length = 0
+    multipleSelection.push(row)
+    toggleSelection(row)
+  }
 }
 
+const showContext = (row: any, column: any, event: any) => {
+  let contextmenuRef: any = currentInstance?.proxy?.$refs.contextmenu
+  if (!multipleSelection.includes(row)) {
+    multipleSelection.length = 0
+    multipleSelection.push(row)
+    toggleSelection(row)
+  }
+  event.preventDefault();
+  contextmenuRef.show({
+    top: event.clientY,
+    left: event.clientX
+  });
 
+  window.onclick = () => {
+    contextmenuRef.hide();
+    // contextMenuTargetBlank.value = false;
+    // contextMenuTargetFile.value = false;
+  };
+
+}
+
+const createFolder = () => {
+
+}
 
 getFileList(url).then(response => {
 
@@ -100,29 +159,11 @@ getFileList(url).then(response => {
   });
 
 })
-
-const showContext = (row: any, column: any, event: any) => {
-  let contextmenuRef: any = currentInstance?.proxy?.$refs.contextmenu
-
-  event.preventDefault();
-  contextmenuRef.show({
-    top: event.clientY,
-    left: event.clientX
-  });
-  console.log(row)
-  console.log(column)
-  console.log(event)
-  window.onclick = () => {
-    contextmenuRef.hide();
-    // contextMenuTargetBlank.value = false;
-    // contextMenuTargetFile.value = false;
-  };
-
-}
-
 </script>
 
 
 <style>
-
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+  background-color: transparent !important;
+}
 </style>
