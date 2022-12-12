@@ -15,6 +15,10 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
+import contentmenu from 'v-contextmenu'
+import 'v-contextmenu/dist/themes/default.css'
+app.use(contentmenu)
+
 import { setupMock } from '../mock'
 
 if (process.env.NODE_ENV === 'development') {

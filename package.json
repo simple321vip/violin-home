@@ -29,6 +29,7 @@
     "type-fest": "^2.12.2",
     "vue": "^3.2.25",
     "vue-router": "^4.0.14",
+    "vue-runtime-helpers": "^1.1.2",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "vite": "^2.9.13",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-mock": "^2.9.6",
+    "v-contextmenu": "^3.0.0",
     "vue-tsc": "^0.29.8"
   }
 }
