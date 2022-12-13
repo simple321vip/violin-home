@@ -1,7 +1,6 @@
 <template>
   <el-table :data="dirContexts" @cell-mouse-enter="rowMouseEnter" @cell-mouse-leave="rowMouseLeave"
-    :row-style="handleRowStyle" @row-contextmenu="showContext" @row-click="leftClickRow"
-    @selection-change="handleSelectionChange" ref="multipleTableRef">
+    :row-style="handleRowStyle" @row-contextmenu="rightClickRow" @row-click="leftClickRow" ref="multipleTableRef">
     <el-table-column prop="name" width="200px">
     </el-table-column>
     <el-table-column prop="isDir" width="130px">
@@ -37,6 +36,12 @@
       </el-icon>
       <label> _delete</label>
     </ContextmenuItem>
+    <ContextmenuItem v-if="isSelect" @click="createFolder">
+      <el-icon class="contextmenu-icon">
+        <FolderOpened />
+      </el-icon>
+      <label> _delete</label>
+    </ContextmenuItem>
 
   </Contextmenu>
 
@@ -47,95 +52,88 @@ import { reactive, toRaw } from 'vue';
 import { getFileList } from '../../api/cloud'
 import { Contextmenu, ContextmenuDivider, ContextmenuItem } from "v-contextmenu";
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref } from "vue";
-
 import { ElTable } from 'element-plus'
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 
+// -- INTERFACE OR TYPE DEFINITION --
 interface DirContext {
   size: number
   isDir: number
   name: string
   path: string
 }
-const currentInstance = getCurrentInstance();
-const dirContexts = reactive<DirContext[]>([])
-let url = ""
-const multipleSelection = reactive<DirContext[]>([])
-const hoverUnSelection = ref<DirContext>()
 
-const isSelect = ref(false)
-const selection = ref()
-
-const handleSelectionChange = (val: DirContext[]) => {
-  // multipleSelection.value = val
+interface KeyBoard {
+  isCtrl: boolean
+  isShift: boolean
 }
 
+
+// -- REACTIVE OBJECT --
+const dirContexts = reactive<DirContext[]>([])
+const multipleSelection = reactive<Set<DirContext>>(new Set())
+const keyBoard = reactive<KeyBoard>({
+  isCtrl: false,
+  isShift: false
+})
+
+// -- REF OBJECT --
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const hoverUnSelection = ref<DirContext>()
+const isSelect = ref(true)
+const selection = ref()
+const isRightClick = ref(false)
+
+// -- IMPORT DATA --
+const currentInstance = getCurrentInstance()
+let url = ""
+
+
+// -- KEYBOARD AND MOUSE EVENT --
 const rowMouseEnter = (row: any, column: any, cell: any, event: any) => {
-  if (!multipleSelection.includes(row)) {
+  if (!multipleSelection.has(row)) {
     hoverUnSelection.value = row
   }
 }
 
 const rowMouseLeave = (row: any, column: any, cell: any, event: any) => {
-  if (!multipleSelection.includes(row)) {
+  if (!multipleSelection.has(row)) {
     hoverUnSelection.value = undefined
   }
 }
 
-const handleRowStyle = ({ row, rowIndex }: any) => {
-  if (multipleSelection.includes(row)) {
-    return {
-      "background": "#B4C7E7"
-    }
-  }
-
-  console.log(toRaw(hoverUnSelection.value))
-  console.log(row)
-  if (toRaw(hoverUnSelection.value)?.name == toRaw(row).name) {
-    return {
-      "background": "#DAE3F3"
-    }
-  }
-}
-
-
-const toggleSelection = (row: DirContext) => {
-  multipleTableRef.value!.toggleRowSelection(row, true)
-  isSelect.value = true
-  // multipleTableRef.value!.clearSelection()
-}
-
-
 const leftClickRow = (row: any, column: any, event: any) => {
-  if (multipleSelection.includes(row)) {
-    multipleSelection.forEach(element => {
-      if (element != row) {
-        multipleTableRef.value?.toggleRowSelection(element, false)
-      }
-    })
+
+  // CTRL KEY + LEFT CLICK
+  if (keyBoard.isCtrl) {
+    if (multipleSelection.has(row)) {
+      multipleSelection.delete(row)
+    } else {
+      multipleSelection.add(row)
+    }
+
+    // ONLY LEFT CLICK
   } else {
-    multipleTableRef.value?.clearSelection()
-    multipleSelection.length = 0
-    multipleSelection.push(row)
-    toggleSelection(row)
+    multipleSelection.clear()
+    multipleSelection.add(row)
   }
 }
 
-const showContext = (row: any, column: any, event: any) => {
+const rightClickRow = (row: any, column: any, event: any) => {
+  isRightClick.value = true
   let contextmenuRef: any = currentInstance?.proxy?.$refs.contextmenu
-  if (!multipleSelection.includes(row)) {
-    multipleSelection.length = 0
-    multipleSelection.push(row)
-    toggleSelection(row)
+  if (!multipleSelection.has(row)) {
+    multipleSelection.clear()
+    multipleSelection.add(row)
   }
-  event.preventDefault();
+  event.preventDefault()
   contextmenuRef.show({
     top: event.clientY,
     left: event.clientX
-  });
+  })
 
   window.onclick = () => {
-    contextmenuRef.hide();
+    contextmenuRef.hide()
+    isRightClick.value = false
     // contextMenuTargetBlank.value = false;
     // contextMenuTargetFile.value = false;
   };
@@ -146,19 +144,75 @@ const createFolder = () => {
 
 }
 
-getFileList(url).then(response => {
 
-  response.data.forEach((element: any) => {
-    const dirContext: DirContext = {
-      size: element.size,
-      isDir: element.isDir,
-      name: element.server_filename,
-      path: element.path
+// -- STYLE --
+const handleRowStyle = ({ row, rowIndex }: any) => {
+  if (multipleSelection.has(row)) {
+    return {
+      "background": "#B4C7E7"
     }
-    dirContexts.push(dirContext)
-  });
+  }
 
-})
+  if (toRaw(hoverUnSelection.value)?.name == toRaw(row).name) {
+    return {
+      "background": "#DAE3F3"
+    }
+  }
+}
+
+/**
+ * AUTO INVOKE FUNCTION
+ */
+(() => {
+
+  // MOUSE KEYDOWM EVENT
+  document.onkeydown = (event) => {
+
+    switch (event.key) {
+      case 'Control':
+        keyBoard.isCtrl = true
+        break;
+    }
+
+  }
+
+  // MOUSE KEYUP EVENT
+  document.onkeyup = (event) => {
+
+    switch (event.key) {
+      case 'Control':
+        keyBoard.isCtrl = false
+        break
+      case 'Escape':
+        if (isRightClick.value) {
+          let contextmenuRef: any = currentInstance?.proxy?.$refs.contextmenu
+          contextmenuRef.hide()
+          isRightClick.value = false
+        } else {
+          multipleSelection.clear()
+        }
+
+        keyBoard.isCtrl = true
+        break
+    }
+
+  }
+
+  // INITIALIZE DATA QUERY
+  getFileList(url).then(response => {
+
+    response.data.forEach((element: any) => {
+      const dirContext: DirContext = {
+        size: element.size,
+        isDir: element.isDir,
+        name: element.server_filename,
+        path: element.path
+      }
+      dirContexts.push(dirContext)
+    })
+
+  })
+})()
 </script>
 
 
