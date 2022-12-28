@@ -59,6 +59,14 @@ const get_subscribe_vt_symbols = () => {
   })
 }
 
+"cancel a subscribe for vt_symbol"
+const concel_subscribe = (symbol: string) => {
+  return service({
+    url: '/trader/api/v1/subscribe/' + symbol,
+    method: 'DELETE',
+  })
+}
+
 "get all vt_symbols"
 const get_vt_symbols = () => {
   return service({
@@ -81,6 +89,7 @@ export {
   get_tick,
   get_ticks,
   subscribe,
+  concel_subscribe,
   send_order,
   get_vt_symbols,
   get_subscribe_vt_symbols,

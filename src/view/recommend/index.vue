@@ -27,7 +27,8 @@
         </el-row>
       </el-collapse-item>
       <el-collapse-item title="订阅一览" name="1">
-        <el-table :data="ticks_data" style="width: 100%">
+        <el-table @row-contextmenu="rightClickRow" @cell-mouse-enter="rowMouseEnter" @cell-mouse-leave="rowMouseLeave"
+          :data="ticks_data" style="width: 100%">
           <el-table-column fixed prop="symbol" label="symbol" width="80" />
           <el-table-column fixed prop="exchange" label="exchange" width="100" />
           <el-table-column fixed prop="name" label="Name" width="120" />
@@ -40,16 +41,29 @@
       </el-collapse-item>
     </el-collapse>
   </div>
+  <Contextmenu auto-ajust-placement ref="contextmenu">
+    <ContextmenuItem @click="concelSubscribe">
+      <el-icon class="contextmenu-icon">
+        <CircleClose />
+      </el-icon>
+      <label> concel subscribe</label>
+    </ContextmenuItem>
+  </Contextmenu>
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted, onUnmounted, reactive } from 'vue'
+import { ref, h, onMounted, onUnmounted, reactive, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
-import { get_ticks, subscribe } from '../../api/capital'
+import { get_ticks, subscribe, concel_subscribe } from '../../api/capital'
 import { strategyStore } from '../../store/strategy'
+import { Contextmenu, ContextmenuItem } from "v-contextmenu";
 
 import * as echarts from 'echarts'
+// -- IMPORT --
+const currentInstance = getCurrentInstance()
+const store = strategyStore()
 
+// -- INTERFACE OR TYPE DEFINITION --
 interface TickData {
   symbol: string
   exchange: string
@@ -61,15 +75,20 @@ interface TickData {
   low_price: number
 }
 
-const store = strategyStore()
+
+// -- REACTIVE OBJECT --
+const ticks_data = reactive<TickData[]>([])
+
+
+// -- REF OBJECT --
 const vt_symbol = ref<string>()
 const exchange = ref<string>()
 const timer = ref(0)
-
-
-const ticks_data = reactive<TickData[]>([])
 const activeNames = ref(['1'])
+const selection = ref<string>("")
 
+
+// -- EVENT DEFINITION
 const on_subscribe = () => {
   if (!vt_symbol.value) {
     return
@@ -89,6 +108,32 @@ const on_subscribe = () => {
   })
 }
 
+const rowMouseEnter = (row: any, column: any, cell: any, event: any) => {
+  selection.value = row.symbol + "." + row.exchange
+  console.log(selection.value)
+}
+
+const rowMouseLeave = (row: any, column: any, cell: any, event: any) => {
+
+}
+
+const rightClickRow = (row: any, column: any, event: any) => {
+
+  let contextmenuRef: any = currentInstance?.proxy?.$refs.contextmenu
+
+  event.preventDefault()
+  contextmenuRef.show({
+    top: event.clientY,
+    left: event.clientX
+  })
+
+  window.onclick = () => {
+    contextmenuRef.hide()
+    // contextMenuTargetBlank.value = false;
+    // contextMenuTargetFile.value = false;
+  }
+}
+
 const on_ticks = () => {
   get_ticks().then(res => {
     ticks_data.length = 0
@@ -98,6 +143,24 @@ const on_ticks = () => {
   })
 }
 
+const concelSubscribe = () => {
+  if (!selection.value) {
+    return
+  }
+  concel_subscribe(selection.value).then(res => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: green' }, "取消订阅成功"),
+      ]),
+    })
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: red' }, "取消订阅失败"),
+      ]),
+    })
+  })
+}
 
 /**
  * AUTO INVOKE FUNCTION
