@@ -64,14 +64,10 @@
         <el-input v-model="blogTypes[checkedBlogIndex].blogs[checkedIndex].title" @keyup.enter.native="saveTitle"
           @blur="saveTitle">
         </el-input>
-
-        <div style="width: 60px;">
-          <!-- <span v-if="!updated">已保存</span>
-          <span v-if="updated">更新中</span> -->
-        </div>
       </div>
       <div :style="cWholeStyle">
-        <md-editor theme="light" v-model="current_blog.content" @save="saveContent" :style="{ height: innerHeight }" />
+        <md-editor theme="light" v-model="current_blog.content" @save="saveContent" @upload-img="onUploadImg"
+          :style="{ height: innerHeight }" />
       </div>
     </div>
 
@@ -140,20 +136,20 @@ import {
 import { copy } from '../../utils/copyutil'
 import draggable from "vuedraggable"
 
-type Blog = {
-  bid: string,
-  btId: string,
-  title: string,
-  blog_prex: string,
-  autosave_control: string,
-  content: string,
+interface Blog {
+  bid: string
+  btId: string
+  title: string
+  blog_prex: string
+  autosave_control: string
+  content: string
   order: number
 }
 
-type BlogType = {
-  btId: string,
-  btName: string,
-  blogs: Blog[],
+interface BlogType {
+  btId: string
+  btName: string
+  blogs: Blog[]
   order: number
 }
 const blogTypes = reactive<BlogType[]>([])
@@ -173,22 +169,7 @@ let current_blog = reactive({
   content: "",
 })
 
-/*
-draggable 对CSS样式没有什么要求万物皆可拖拽
-:list="state.list"         //需要绑定的数组 
-animation="300"            //动画效果
-@start="onStart"           //拖拽开始的事件
-@end="onEnd"               //拖拽结束的事件
-*/
-const state = reactive({
-  modules: {
-    group1: [
-
-    ]
-  },
-})
-
-// 関数定義
+// FUNCTION DEFINITION
 /**
  * Blog一覧取得
  */
@@ -543,6 +524,25 @@ window.addEventListener('keydown', async function (event) {
     saveContent()
   }
 })
+
+const onUploadImg = async (files: FileList, callback: (urls: string[]) => void) => {
+  const res = await Promise.all(
+    Array.from(files).map((file) => {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData()
+        formData.append('img', file)
+        onUploadImg(formData,)
+      })
+    })
+  )
+  callback(res.map((item: any) => item.data.data))
+}
+
+const onUploadProcess = (e: number) => {
+  if (e == 100) {
+    setTimeout(() => { }, 1000)
+  }
+}
 
 // サイズ調整部分
 //拖拽开始的事件

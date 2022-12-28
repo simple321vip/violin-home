@@ -75,4 +75,3 @@ export default [
     },
   },
 ] as MockMethod[]
-// /auth/api/v1/author/blog/content

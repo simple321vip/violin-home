@@ -45,14 +45,21 @@
 
   </Contextmenu>
 
+  <!-- aplayer -->
+
 </template>
 
 <script setup lang="ts">
-import { reactive, toRaw } from 'vue';
+import { defineAsyncComponent, reactive, toRaw } from 'vue';
 import { getFileList } from '../../api/cloud'
 import { Contextmenu, ContextmenuDivider, ContextmenuItem } from "v-contextmenu";
 import { computed, getCurrentInstance, onBeforeUnmount, onMounted, ref } from "vue";
 import { ElTable } from 'element-plus'
+
+// -- IMPORT --
+
+
+const currentInstance = getCurrentInstance()
 
 // -- INTERFACE OR TYPE DEFINITION --
 interface DirContext {
@@ -82,10 +89,6 @@ const hoverUnSelection = ref<DirContext>()
 const isSelect = ref(true)
 const selection = ref()
 const isRightClick = ref(false)
-
-// -- IMPORT DATA --
-const currentInstance = getCurrentInstance()
-let url = ""
 
 
 // -- KEYBOARD AND MOUSE EVENT --
@@ -199,7 +202,7 @@ const handleRowStyle = ({ row, rowIndex }: any) => {
   }
 
   // INITIALIZE DATA QUERY
-  getFileList(url).then(response => {
+  getFileList("").then(response => {
 
     response.data.forEach((element: any) => {
       const dirContext: DirContext = {

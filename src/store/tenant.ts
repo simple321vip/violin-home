@@ -37,9 +37,9 @@ export const tenantStore = defineStore({
     },
 
     /**
-     * Attempt to login a user
-     * @param {string} user_id
-     * @param {string} user_password
+     * Attempt to login a tenant
+     * @param {object} tenant
+     * @param {string} token
      */
     async login(tenant: any, token: string) {
 

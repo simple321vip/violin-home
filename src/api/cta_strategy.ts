@@ -1,10 +1,10 @@
-import { trader_service } from '../utils/request'
+import { service } from '../utils/request'
 
 "CTA strategy"
 
 "strategy file list"
 const get_strategy_files = () => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file',
     method: 'GET',
   })
@@ -12,7 +12,7 @@ const get_strategy_files = () => {
 
 "strategy file list"
 const get_strategy_load_files = () => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file/load',
     method: 'GET',
   })
@@ -22,7 +22,7 @@ const get_strategy_load_files = () => {
 const upload_strategy_file = (file: any) => {
   const formData = new FormData();
   formData.append("file", file)
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file',
     method: 'POST',
     data: formData,
@@ -34,7 +34,7 @@ const upload_strategy_file = (file: any) => {
 
 "load a strategy file"
 const load_strategy_file = (file_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file/' + file_name,
     method: 'PUT',
   })
@@ -42,7 +42,7 @@ const load_strategy_file = (file_name: string) => {
 
 "unload a strategy file"
 const unload_strategy_file = (class_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file/' + class_name,
     method: 'PATCH',
   })
@@ -50,7 +50,7 @@ const unload_strategy_file = (class_name: string) => {
 
 "remove a strategy file"
 const remove_strategy_file = (file_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy_file/' + file_name,
     method: 'DELETE',
   })
@@ -59,7 +59,7 @@ const remove_strategy_file = (file_name: string) => {
 
 "get strategy list"
 const get_strategies = () => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategies',
     method: 'GET',
   })
@@ -67,7 +67,7 @@ const get_strategies = () => {
 
 "create a strategy"
 const create_strategy = (ruleForm: any) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/' + ruleForm.strategy_name,
     method: 'POST',
     data: ruleForm
@@ -76,7 +76,7 @@ const create_strategy = (ruleForm: any) => {
 
 "init a strategy"
 const init_strategy = (strategy_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/init/' + strategy_name,
     method: 'PUT',
   })
@@ -84,7 +84,7 @@ const init_strategy = (strategy_name: string) => {
 
 "start a strategy"
 const start_strategy = (strategy_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/' + strategy_name,
     method: 'PUT',
   })
@@ -92,7 +92,7 @@ const start_strategy = (strategy_name: string) => {
 
 "stop a strategy"
 const stop_strategy = (strategy_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/' + strategy_name,
     method: 'PATCH',
   })
@@ -100,7 +100,7 @@ const stop_strategy = (strategy_name: string) => {
 
 "remove a strategy"
 const remove_strategy = (strategy_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/' + strategy_name,
     method: 'DELETE',
   })
@@ -108,7 +108,7 @@ const remove_strategy = (strategy_name: string) => {
 
 "get a strategy status"
 const get_strategy_status = (strategy_name: string) => {
-  return trader_service({
+  return service({
     url: '/trader/api/v1/strategy/status/' + strategy_name,
     method: 'GET',
   })

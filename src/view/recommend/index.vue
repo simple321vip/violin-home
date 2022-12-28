@@ -5,14 +5,14 @@
         <el-row>
           <el-col :span="4">
             <el-select v-model="exchange" placeholder="select a exchange">
-              <el-option v-for="ex in exchanges" :value="ex" />
+              <el-option v-for="ex in store.exchanges" :value="ex" />
             </el-select>
           </el-col>
           <el-col :span="1">
           </el-col>
           <el-col :span="4">
             <el-select v-model="vt_symbol" placeholder="select a vt_symbol">
-              <el-option v-for="symbol in vt_symbols" :value="symbol" />
+              <el-option v-for="symbol in store.vt_symbols.get(exchange)" :value="symbol" />
             </el-select>
           </el-col>
           <el-col :span="1">
@@ -43,30 +43,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted, onUnmounted, reactive, watch } from 'vue'
+import { ref, h, onMounted, onUnmounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { get_ticks, subscribe } from '../../api/capital'
 import { strategyStore } from '../../store/strategy'
 
-type TickData = {
-  symbol: string,
-  exchange: string,
-  name: string,
-  last_price: number,
-  volume: number,
-  open_price: number,
-  high_price: number,
-  low_price: number,
+import * as echarts from 'echarts'
+
+interface TickData {
+  symbol: string
+  exchange: string
+  name: string
+  last_price: number
+  volume: number
+  open_price: number
+  high_price: number
+  low_price: number
 }
 
 const store = strategyStore()
 const vt_symbol = ref<string>()
-const vt_symbols = reactive<string[]>([])
 const exchange = ref<string>()
-const exchanges = reactive<string[]>([])
-store.exchanges.forEach(exchange => {
-  exchanges.push(exchange)
-})
 const timer = ref(0)
 
 
@@ -101,21 +98,48 @@ const on_ticks = () => {
   })
 }
 
-watch(exchange, (newVal, oldVal) => {
-  vt_symbols.length = 0
-  // let sp_vt_symbol: [] = store.vt_symbols.get(vt_symbol.value)
-  // sp_vt_symbol.forEach((record: string) => {
-  //   vt_symbols.push(record)
-  // })
-})
 
-onMounted(() => {
-  clearInterval(timer.value)
-  timer.value = window.setInterval(on_ticks, 3000);
-})
-onUnmounted(() => {
-  window.clearInterval(timer.value);
-})
+/**
+ * AUTO INVOKE FUNCTION
+ */
+(() => {
+
+  onMounted(() => {
+    clearInterval(timer.value)
+    timer.value = window.setInterval(on_ticks, 3000);
+  })
+  onUnmounted(() => {
+    window.clearInterval(timer.value)
+  })
+
+  store.select_subscribe_vt_symbols()
+    .catch(error => {
+      ElMessage({
+        message: h('p', null, [
+          h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
+        ]),
+      })
+    })
+
+  store.select_vt_symbols()
+    .catch((error) => {
+      ElMessage({
+        message: h('p', null, [
+          h('i', { style: 'color: teal' }, "读取vt_symbols失败"),
+        ]),
+      })
+    })
+
+  store.select_exchanges()
+    .catch((error) => {
+      ElMessage({
+        message: h('p', null, [
+          h('i', { style: 'color: teal' }, "读取exchanges失败"),
+        ]),
+      })
+    })
+
+})()
 
 </script>
 
