@@ -30,13 +30,15 @@
         <el-table @row-contextmenu="rightClickRow" @cell-mouse-enter="rowMouseEnter" @cell-mouse-leave="rowMouseLeave"
           :data="ticks_data" style="width: 100%">
           <el-table-column fixed prop="symbol" label="symbol" width="80" />
-          <el-table-column fixed prop="exchange" label="exchange" width="100" />
-          <el-table-column fixed prop="name" label="Name" width="120" />
-          <el-table-column fixed prop="last_price" label="last_price" width="120" />
-          <el-table-column fixed prop="volume" label="volume" width="100" />
-          <el-table-column fixed prop="open_price" label="open_price" width="120" />
-          <el-table-column fixed prop="high_price" label="high_price" width="120" />
-          <el-table-column fixed prop="low_price" label="low_price" width="120" />
+          <el-table-column prop="exchange" label="exchange" width="100" />
+          <el-table-column prop="name" label="Name" width="120" />
+          <el-table-column prop="last_price" label="last_price" width="120" />
+          <el-table-column prop="volume" label="volume" width="100" />
+          <el-table-column prop="open_price" label="open_price" width="120" />
+          <el-table-column prop="high_price" label="high_price" width="120" />
+          <el-table-column prop="low_price" label="low_price" width="100" />
+          <el-table-column prop="differ" label="differ" width="70" />
+          <el-table-column prop="differ_percent" label="differ_per" :formatter="Formatter" width="120" />
         </el-table>
       </el-collapse-item>
     </el-collapse>
@@ -56,7 +58,8 @@ import { ref, h, onMounted, onUnmounted, reactive, getCurrentInstance } from 'vu
 import { ElMessage } from 'element-plus'
 import { get_ticks, subscribe, concel_subscribe } from '../../api/capital'
 import { strategyStore } from '../../store/strategy'
-import { Contextmenu, ContextmenuItem } from "v-contextmenu";
+import { Contextmenu, ContextmenuItem } from "v-contextmenu"
+import { toPercent } from '../../utils/number'
 
 import * as echarts from 'echarts'
 // -- IMPORT --
@@ -73,6 +76,8 @@ interface TickData {
   open_price: number
   high_price: number
   low_price: number
+  differ: number
+  differ_percent: number
 }
 
 
@@ -99,6 +104,8 @@ const on_subscribe = () => {
         h('i', { style: 'color: green' }, "行情订阅成功"),
       ]),
     })
+    store.select_subscribe_vt_symbols()
+    on_ticks()
   }).catch(error => {
     ElMessage({
       message: h('p', null, [
@@ -106,6 +113,31 @@ const on_subscribe = () => {
       ]),
     })
   })
+}
+
+const concelSubscribe = () => {
+  if (!selection.value) {
+    return
+  }
+  concel_subscribe(selection.value).then(res => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: green' }, "取消订阅成功"),
+      ]),
+    })
+    on_ticks()
+  }).catch(error => {
+    ElMessage({
+      message: h('p', null, [
+        h('i', { style: 'color: red' }, "取消订阅失败"),
+      ]),
+    })
+  })
+}
+
+const Formatter = (row, column) => {
+  let diff = (row.last_price - row.open_price) / row.open_price
+  return toPercent(diff)
 }
 
 const rowMouseEnter = (row: any, column: any, cell: any, event: any) => {
@@ -141,25 +173,7 @@ const on_ticks = () => {
       ticks_data.push(element)
     });
   })
-}
-
-const concelSubscribe = () => {
-  if (!selection.value) {
-    return
-  }
-  concel_subscribe(selection.value).then(res => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: green' }, "取消订阅成功"),
-      ]),
-    })
-  }).catch(error => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: red' }, "取消订阅失败"),
-      ]),
-    })
-  })
+  return on_ticks
 }
 
 /**
@@ -169,7 +183,7 @@ const concelSubscribe = () => {
 
   onMounted(() => {
     clearInterval(timer.value)
-    timer.value = window.setInterval(on_ticks, 3000);
+    timer.value = window.setInterval(on_ticks(), 3000);
   })
   onUnmounted(() => {
     window.clearInterval(timer.value)

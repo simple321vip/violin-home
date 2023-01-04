@@ -3,11 +3,11 @@
     <el-upload ref="upload" class="upload-demo" action="http://localhost:5000/trader/api/v1/strategy_file" :limit="1"
       :on-exceed="handleExceed" :auto-upload="false">
       <template #trigger>
-        <el-button type="primary">添加策略文件</el-button>
+        <el-button type="primary">添加策略模板</el-button>
       </template>
       ->
       <el-button class="ml-3" type="success" @click="on_upload">
-        上传策略文件
+        上传策略模板
       </el-button>
       <template #tip>
         <div class="el-upload__tip text-red">
@@ -78,23 +78,20 @@ import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
 import { h } from 'vue'
 import { ElMessage } from 'element-plus'
 
-const upload = ref<UploadInstance>()
-const handleExceed: UploadProps['onExceed'] = (files) => {
-  upload.value!.clearFiles()
-  const file = files[0] as UploadRawFile
-  file.uid = genFileId()
-  upload.value!.handleStart(file)
-}
-
-
-type StrategyFile = {
-  file_name: string,
-  class_name: string,
+// -- INTERFACE OR TYPE DEFINITION --
+interface StrategyFile {
+  file_name: string
+  class_name: string
   status: string
 }
 
+// -- REACTIVE OBJECT --
 const strategy_file_list = reactive<StrategyFile[]>([])
 
+// -- REF OBJECT --
+const upload = ref<UploadInstance>()
+
+// -- EVENT DEFINITION
 const on_list = () => {
   get_strategy_files().then(res => {
     strategy_file_list.length = 0
@@ -102,6 +99,13 @@ const on_list = () => {
       strategy_file_list.push(item)
     })
   })
+}
+
+const handleExceed: UploadProps['onExceed'] = (files) => {
+  upload.value!.clearFiles()
+  const file = files[0] as UploadRawFile
+  file.uid = genFileId()
+  upload.value!.handleStart(file)
 }
 
 const on_upload = () => {
@@ -145,10 +149,15 @@ const on_remove = (row: any) => {
   })
 }
 
-// init process
-on_list()
 
+/**
+ * AUTO INVOKE FUNCTION
+ */
+(() => {
 
+  on_list()
+
+})()
 </script>
 
 <style scoped>

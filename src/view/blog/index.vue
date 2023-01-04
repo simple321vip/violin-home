@@ -34,8 +34,8 @@
     <h3 style="cursor: pointer; width: min-content;white-space:nowrap" @click="openBlog(item.bid)">{{ item.title }}</h3>
     <div style="display: flex; justify-content: space-between; align-items: center">
       <p style="font-size: 12px; height: 16px;line-height: 16px;overflow: hidden;text-overflow: ellipsis;">{{
-          item.content
-      }}</p>
+    item.content
+}}</p>
       <el-button size="small" type="success" @click="publishbyBid(item.bid)">重新发布
       </el-button>
     </div>
@@ -52,20 +52,22 @@ import Cookies from 'js-cookie';
 import { reactive } from 'vue';
 import { getBlogs, getBtName, publish, publishAll } from '../../api/blogView'
 import router from '../../router/index'
-type Blog = {
-  bid: string,
-  btId: string,
-  btName: string,
-  title: string,
-  blog_prex: string,
+
+// -- INTERFACE OR TYPE DEFINITION --
+interface Blog {
+  bid: string
+  btId: string
+  btName: string
+  title: string
+  blog_prex: string
   content: string
 }
-type Blog_Type = {
-  btId: string,
+interface Blog_Type {
+  btId: string
   btName: string
 }
 
-//　変数定義
+// -- REACTIVE OBJECT --
 const form = reactive({
   key_word: '',
   btId: '',
@@ -78,26 +80,7 @@ const form = reactive({
 const data_list = reactive<Blog[]>([])
 const btNameList = reactive<Blog_Type[]>([])
 
-// 関数定義
-const init = () => {
-  getBlogs({}).then(response => {
-    response.data.forEach((item: Blog) => {
-      data_list.push(item)
-    })
-  })
-  getBtName().then(response => {
-    btNameList.push({ btId: "", btName: "选择分类" })
-    response.data.forEach((item: any) => {
-      const bts = {
-        btId: item.btId,
-        btName: item.btName
-      }
-      btNameList.push(bts)
-    })
-  })
-}
-
-
+// -- EVENT DEFINITION
 const onSubmit = () => {
   getBlogs(form).then(response => {
     data_list.splice(0, data_list.length);
@@ -134,9 +117,28 @@ const publishbyBid = (bid: string) => {
   publish(bid)
 }
 
-// 初期化処理
-init()
+/**
+ * AUTO INVOKE FUNCTION
+ */
+(() => {
 
+  getBlogs({}).then(response => {
+    response.data.forEach((item: Blog) => {
+      data_list.push(item)
+    })
+  })
+  getBtName().then(response => {
+    btNameList.push({ btId: "", btName: "选择分类" })
+    response.data.forEach((item: any) => {
+      const bts = {
+        btId: item.btId,
+        btName: item.btName
+      }
+      btNameList.push(bts)
+    })
+  })
+
+})()
 </script>
 
 <style>

@@ -531,7 +531,7 @@ const onUploadImg = async (files: FileList, callback: (urls: string[]) => void) 
       return new Promise((resolve, reject) => {
         const formData = new FormData()
         formData.append('img', file)
-        onUploadImg(formData,)
+        // onUploadImg(formData,)
       })
     })
   )

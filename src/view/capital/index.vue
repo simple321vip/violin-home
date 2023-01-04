@@ -11,7 +11,7 @@
             </div>
           </el-col>
           <el-col :span="3">
-            <el-tag size="small"> {{account_data.account_id}}</el-tag>
+            <el-tag size="small"> {{ account_data.account_id }}</el-tag>
           </el-col>
           <el-col :span="1">
             <div class="cell-item">
@@ -21,7 +21,7 @@
             </div>
           </el-col>
           <el-col :span="3">
-            <el-tag size="small"> {{account_data.balance}}</el-tag>
+            <el-tag size="small"> {{ account_data.balance }}</el-tag>
           </el-col>
           <el-col :span="1">
             <div class="cell-item">
@@ -31,7 +31,7 @@
             </div>
           </el-col>
           <el-col :span="3">
-            <el-tag size="small"> {{account_data.frozen}}</el-tag>
+            <el-tag size="small"> {{ account_data.frozen }}</el-tag>
           </el-col>
           <el-col :span="1">
             <div class="cell-item">
@@ -41,32 +41,34 @@
             </div>
           </el-col>
           <el-col :span="3">
-            <el-tag size="small"> {{account_data.gateway_name}}</el-tag>
+            <el-tag size="small"> {{ account_data.gateway_name }}</el-tag>
           </el-col>
         </el-row>
       </el-collapse-item>
-      <el-collapse-item title="手动下单" name="2" style="display: flex;">
+      <el-collapse-item title="手动下单" name="2">
+
+        <el-select v-model="vt_symbol" placeholder="select a vt_symbol" @change="select_contract">
+          <el-option v-for="symbol in store.subscribe_vt_symbols" :value="symbol" />
+        </el-select>
+        <div style="height: 10px;"></div>
         <el-row>
-          <el-col :span="2">
+          <el-col :span="5">
             <el-radio-group v-model="direction">
               <el-radio-button label="多" />
               <el-radio-button label="空" />
             </el-radio-group>
           </el-col>
-          <el-col :span="2">
+          <el-col :span="4">
             <el-radio-group v-model="offset">
               <el-radio-button label="开" />
               <el-radio-button label="平" />
             </el-radio-group>
           </el-col>
-          <el-col :span="1"></el-col>
-          <el-col :span="3">
-            <el-select v-model="vt_symbol" placeholder="select a vt_symbol" @change="select_contract">
-              <el-option v-for="symbol in store.subscribe_vt_symbols" :value="symbol" />
-            </el-select>
-          </el-col>
-          <el-col :span="1"></el-col>
-          <el-col :span="4">
+        </el-row>
+        <div style="height: 10px;"></div>
+        <el-row>
+
+          <el-col :span="5">
             <el-input-number v-model="volume" :min="1" :max="10" @change="handleChange" />
           </el-col>
           <el-col :span="4">
@@ -75,7 +77,9 @@
           <el-col :span="4">
             <el-button type="primary" @click="on_order">下单</el-button>
           </el-col>
+          <el-col :span="7"></el-col>
         </el-row>
+
       </el-collapse-item>
       <el-collapse-item title="持仓一览" name="3">
         <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
@@ -134,14 +138,19 @@
 import { ElMessage, TabsPaneContext } from 'element-plus'
 import { reactive, ref, h, onMounted, onUnmounted } from 'vue'
 import { get_accounts, send_order, get_tick } from '../../api/capital'
-import { strategyStore } from '../../store/strategy';
-type AccountData = {
+import { strategyStore } from '../../store/strategy'
+
+// -- IMPORT --
+const store = strategyStore()
+
+// -- INTERFACE OR TYPE DEFINITION --
+interface AccountData {
   gateway_name: string
   account_id: string
   balance: number
   frozen: number
 }
-type PositionData = {
+interface PositionData {
   symbol: string
   exchange: string
   direction: string
@@ -151,7 +160,7 @@ type PositionData = {
   pnl: number
   yd_volume: number
 }
-type OrderData = {
+interface OrderData {
   symbol: string
   exchange: string
   direction: string
@@ -165,7 +174,7 @@ type OrderData = {
   // datetime :datetime
   reference: string
 }
-type TradeData = {
+interface TradeData {
   symbol: string
   exchange: string
   direction: string
@@ -176,7 +185,14 @@ type TradeData = {
   offset: string
   // datetime: datetime
 }
-const store = strategyStore()
+
+// -- REACTIVE OBJECT --
+const account_datas = reactive<AccountData[]>([])
+const positions_data = reactive<PositionData[]>([])
+const trades_data = reactive<TradeData[]>([])
+const orders_data = reactive<OrderData[]>([])
+
+// -- REF OBJECT --
 const vt_symbol = ref<string>("")
 const direction = ref('多')
 const offset = ref('开')
@@ -184,12 +200,9 @@ const activeName = ref(1)
 const volume = ref(1)
 const price = ref(3000)
 const timer = ref(0)
-const account_datas = reactive<AccountData[]>([])
-const positions_data = reactive<PositionData[]>([])
-const trades_data = reactive<TradeData[]>([])
-const orders_data = reactive<OrderData[]>([])
 const activeNames = ref(['1'])
 
+// -- EVENT DEFINITION
 const on_query_accounts = () => {
   get_accounts().then(res => {
     account_datas.length = 0
@@ -212,13 +225,14 @@ const on_query_accounts = () => {
     })
 
   })
+  return on_query_accounts
 }
+
 const select_contract = () => {
   get_tick(vt_symbol.value).then(res => {
     price.value = res.data.tick.last_price
   })
 }
-
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
   console.log(tab, event)
@@ -227,6 +241,7 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
 const handleChange = (value: number) => {
   console.log(value)
 }
+
 const on_order = () => {
 
   ""
@@ -251,13 +266,21 @@ const on_order = () => {
   })
 }
 
-onMounted(() => {
-  clearInterval(timer.value)
-  timer.value = window.setInterval(on_query_accounts, 3000);
-})
-onUnmounted(() => {
-  window.clearInterval(timer.value);
-})
+
+/**
+ * AUTO INVOKE FUNCTION
+ */
+(() => {
+
+  store.select_subscribe_vt_symbols()
+  onMounted(() => {
+    clearInterval(timer.value)
+    timer.value = window.setInterval(on_query_accounts(), 3000);
+  })
+  onUnmounted(() => {
+    window.clearInterval(timer.value);
+  })
+})()
 
 </script>
 
