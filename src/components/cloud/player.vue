@@ -4,7 +4,7 @@
 
 
 <script setup lang="ts">
-import APlayer from 'aplayer';
+// import APlayer from 'aplayer';
 import 'aplayer/dist/APlayer.min.css';
 import { reactive, nextTick, onBeforeUnmount, getCurrentInstance, onMounted, ref } from 'vue'
 

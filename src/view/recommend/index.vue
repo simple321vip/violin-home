@@ -135,7 +135,7 @@ const concelSubscribe = () => {
   })
 }
 
-const Formatter = (row, column) => {
+const Formatter = (row: any, column: any) => {
   let diff = (row.last_price - row.open_price) / row.open_price
   return toPercent(diff)
 }

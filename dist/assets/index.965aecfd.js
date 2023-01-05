@@ -1,0 +1,1 @@
+import{_ as e,c as o,o as t}from"./index.b616fdab.js";const r={},s={class:"about",ref:"bookmarks",id:"bookmarks",style:{width:"600px",height:"400px"}};function c(a,n){return t(),o("div",s,null,512)}var i=e(r,[["render",c]]);export{i as default};
