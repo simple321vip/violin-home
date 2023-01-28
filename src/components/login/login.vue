@@ -26,7 +26,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { tenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/modules/tenant'
 import router from '../../router'
 import baiduCloudImage from "../../assets/baiducloud.png"
 import { config, scan } from '../../const/config'
@@ -34,7 +34,7 @@ import { config, scan } from '../../const/config'
 
 let qrcode = config.BAIDU_CLOUD_URL + config.RESPONSE_TYPE + config.CLIENT_ID + config.REDIRECT_URI + config.SCOPE + config.DEVICE_ID + config.QR_CODE + config.DISPLAY
 
-const tenant = tenantStore()
+const useTenantStore = tenantStore()
 
 const ruleFormRef = ref<FormInstance>()
 const loginForm = reactive({
@@ -66,19 +66,19 @@ const dologin = (form: any) => {
 
   if (!form)
     return
-  form.validate((valid: any) => {
-    if (valid) {
-      tenant.login(loginForm.user_id, loginForm.password).then(res => {
-        console.log(1)
-        router.push({
-          path: '/home'
-        })
-      })
+  // form.validate((valid: any) => {
+  //   if (valid) {
+  //     useTenantStore.login(loginForm.user_id, loginForm.password).then(res => {
+  //       console.log(1)
+  //       router.push({
+  //         path: '/home'
+  //       })
+  //     })
 
-    } else {
-      return false
-    }
-  })
+  //   } else {
+  //     return false
+  //   }
+  // })
 }
 
 const style = reactive({} as any)

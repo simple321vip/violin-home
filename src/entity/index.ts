@@ -1,5 +1,5 @@
 type Tenant = {
-  id: string,
+  tenant_id: string,
   account: string
 }
 

@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
 import { put_bookmark_type } from '../../api/bookmark_type'
 
 const bookmark_type_name = ref<String>('')

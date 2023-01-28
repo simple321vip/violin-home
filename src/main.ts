@@ -3,8 +3,7 @@ import App from './App.vue'
 import ElementPlus from "element-plus";
 import 'element-plus/dist/index.css'
 import router from './router'
-import { createPinia } from 'pinia'
-const store = createPinia()
+import { store } from './store'
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
@@ -31,7 +30,7 @@ app.use(store)
 import { getToken, getTenant, setToken, setTenant } from './utils/auth'
 import { Tenant } from './entity/index'
 import Cookies from 'js-cookie'
-import { tenantStore } from './store/tenant'
+import { tenantStore } from './store/modules/tenant'
 const whiteList = ['/login', '/register', '/sorryPage']
 let url = window.location.href
 

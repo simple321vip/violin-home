@@ -17,7 +17,7 @@
         </el-icon>&nbsp 21:00-23:00
       </div>
     </div>
-    <el-dropdown trigger="click" v-show="tenant.account">
+    <el-dropdown trigger="click" v-show="useTenantStore.tenant.account">
       <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
       <template #dropdown>
         <el-dropdown-menu>
@@ -36,18 +36,18 @@
       </span>
     </template>
   </el-dialog>
-  <span @click="doLogin" v-show="!tenant.account">登录</span>
+  <span @click="doLogin" v-show="!useTenantStore.tenant.account">登录</span>
 </template>
 
 <script setup lang='ts'>
 import $moment from "moment";
 import { reactive, ref } from "vue";
 import router from '../../router'
-import { tenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/modules/tenant'
 import { logout } from '../../api/user'
 // obtain user infomation 
-const tenant = tenantStore()
-tenant.reflush()
+const useTenantStore = tenantStore()
+useTenantStore.reflush()
 const dialogVisible = ref(false)
 
 // show time 
@@ -64,8 +64,8 @@ const doLogin = () => {
 }
 const doLogout = () => {
   dialogVisible.value = false
-  logout(tenant.id).catch(() => { console.log(1) }).finally(() => {
-    tenant.logout()
+  logout(useTenantStore.tenant.id).catch(() => { console.log(1) }).finally(() => {
+    useTenantStore.logout()
     router.push({
       path: '/login'
     })

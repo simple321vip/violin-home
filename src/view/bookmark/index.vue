@@ -14,12 +14,12 @@
       <div class="tag_list">
         <el-tag class="ml-2 click-icon" :type="item.clicked ? 'danger' : 'info'" v-for="(item) in bookmark_types"
           @click="handleTags(item)">{{ item.bk_type_name }}</el-tag>
-        <el-button type="primary" @click="handleAddType" v-show="Tenant.account">增加</el-button>
-        <el-button type="primary" @click="handleManageType" v-show="Tenant.account">自定义</el-button>
+        <el-button type="primary" @click="handleAddType" v-show="useTenantStore.tenant.account">增加</el-button>
+        <el-button type="primary" @click="handleManageType" v-show="useTenantStore.tenant.account">自定义</el-button>
       </div>
     </el-form>
     <div class="create_dialog">
-      <el-button type="primary" @click="handleInsert" v-show="Tenant.account">新建</el-button>
+      <el-button type="primary" @click="handleInsert" v-show="useTenantStore.tenant.account">新建</el-button>
     </div>
 
     <el-table ref="multipleTableRef" :data="tableData" @selection-change="handleSelectionChange" style="width: 100%">
@@ -39,9 +39,10 @@
             <CopyDocument />
           </el-icon>
           <el-button class="click-icon" size="small" @click="handleEdit(scope.$index, scope.row)"
-            v-show="Tenant.account">编辑
+            v-show="useTenantStore.tenant.account">编辑
           </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-show="Tenant.account">
+          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)"
+            v-show="useTenantStore.tenant.account">
             删除
           </el-button>
         </template>
@@ -72,34 +73,33 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { search_bookmark, delete_bookmark } from '../../api/bookmark'
-import { get_bookmark_type } from '../../api/bookmark_type'
+import { reactive, ref, h } from 'vue'
+import type { ElTable } from 'element-plus'
+import { CopyDocument } from "@element-plus/icons-vue"
+import { ElNotification } from 'element-plus'
+import copy from 'copy-to-clipboard'
 import bookmark_dialog from './dialog.vue'
 import bookmarkType_dialog from './Typedialog.vue'
 import createType_dialog from './createTypedialog.vue'
 import delete_dialog from '../../components/operate/deleteDialog.vue'
-import type { ElTable } from 'element-plus'
-import { CopyDocument } from "@element-plus/icons-vue";
-import { ElNotification } from 'element-plus'
-import copy from 'copy-to-clipboard';
-import { h } from 'vue'
-import { tenantStore } from '../../store/tenant'
+import { tenantStore } from '../../store/modules/tenant'
+import { search_bookmark, delete_bookmark } from '../../api/bookmark'
+import { get_bookmark_type } from '../../api/bookmark_type'
 // obtain user infomation 
-const Tenant = tenantStore()
+const useTenantStore = tenantStore()
 
 // 定义书签格式
 type Bookmark = {
   bk_id: string,
   bk_type_id: number,
-  bk_type_name: String,
-  comment: String,
-  url: String
+  bk_type_name: string,
+  comment: string,
+  url: string
 }
 // 定义 表单格式
 type Searchform = {
   bk_type_ids: number[],
-  comment: String
+  comment: string
 }
 
 // 操作code

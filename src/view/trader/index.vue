@@ -6,10 +6,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue'
 import * as echarts from 'echarts'
-import { EChartsOption } from 'echarts';
-import { onMounted, ref } from 'vue'
+import { EChartsOption } from 'echarts'
 import { generateOHLC, option } from '../../service/trader'
 import { get_stock_data } from '../../api/trader'
 

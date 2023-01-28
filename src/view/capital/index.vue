@@ -48,7 +48,7 @@
       <el-collapse-item title="手动下单" name="2">
 
         <el-select v-model="vt_symbol" placeholder="select a vt_symbol" @change="select_contract">
-          <el-option v-for="symbol in store.subscribe_vt_symbols" :value="symbol" />
+          <el-option v-for="symbol in useStrategyStore.strategy.subscribe_vt_symbols" :value="symbol" />
         </el-select>
         <div style="height: 10px;"></div>
         <el-row>
@@ -134,14 +134,13 @@
 </template>
 
 <script setup lang="ts">
-
 import { ElMessage, TabsPaneContext } from 'element-plus'
 import { reactive, ref, h, onMounted, onUnmounted } from 'vue'
 import { get_accounts, send_order, get_tick } from '../../api/capital'
-import { strategyStore } from '../../store/strategy'
+import { strategyStore } from '../../store/modules/strategy'
 
 // -- IMPORT --
-const store = strategyStore()
+const useStrategyStore = strategyStore()
 
 // -- INTERFACE OR TYPE DEFINITION --
 interface AccountData {
@@ -272,7 +271,7 @@ const on_order = () => {
  */
 (() => {
 
-  store.select_subscribe_vt_symbols()
+  useStrategyStore.select_subscribe_vt_symbols()
   onMounted(() => {
     clearInterval(timer.value)
     timer.value = window.setInterval(on_query_accounts(), 3000);

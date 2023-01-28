@@ -45,9 +45,6 @@ spec:
   - name: "volume-m2"
     hostPath:
       path: "/root/.m2/repository"
-  - name: "maven-config"
-    configMap:
-      name: maven-config
   - name: "volume-docker"
     hostPath:
       path: "/var/run/docker.sock"

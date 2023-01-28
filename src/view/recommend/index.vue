@@ -5,14 +5,14 @@
         <el-row>
           <el-col :span="4">
             <el-select v-model="exchange" placeholder="select a exchange">
-              <el-option v-for="ex in store.exchanges" :value="ex" />
+              <el-option v-for="ex in useStrategyStore.strategy.exchanges" :value="ex" />
             </el-select>
           </el-col>
           <el-col :span="1">
           </el-col>
           <el-col :span="4">
             <el-select v-model="vt_symbol" placeholder="select a vt_symbol">
-              <el-option v-for="symbol in store.vt_symbols.get(exchange)" :value="symbol" />
+              <el-option v-for="symbol in useStrategyStore.strategy.vt_symbols.get(exchange)" :value="symbol" />
             </el-select>
           </el-col>
           <el-col :span="1">
@@ -56,15 +56,16 @@
 <script setup lang="ts">
 import { ref, h, onMounted, onUnmounted, reactive, getCurrentInstance } from 'vue'
 import { ElMessage } from 'element-plus'
-import { get_ticks, subscribe, concel_subscribe } from '../../api/capital'
-import { strategyStore } from '../../store/strategy'
+import * as echarts from 'echarts'
 import { Contextmenu, ContextmenuItem } from "v-contextmenu"
+import { get_ticks, subscribe, concel_subscribe } from '../../api/capital'
+import { strategyStore } from '../../store/modules/strategy'
 import { toPercent } from '../../utils/number'
 
-import * as echarts from 'echarts'
+
 // -- IMPORT --
 const currentInstance = getCurrentInstance()
-const store = strategyStore()
+const useStrategyStore = strategyStore()
 
 // -- INTERFACE OR TYPE DEFINITION --
 interface TickData {
@@ -104,7 +105,7 @@ const on_subscribe = () => {
         h('i', { style: 'color: green' }, "行情订阅成功"),
       ]),
     })
-    store.select_subscribe_vt_symbols()
+    useStrategyStore.select_subscribe_vt_symbols()
     on_ticks()
   }).catch(error => {
     ElMessage({
@@ -189,7 +190,7 @@ const on_ticks = () => {
     window.clearInterval(timer.value)
   })
 
-  store.select_subscribe_vt_symbols()
+  useStrategyStore.select_subscribe_vt_symbols()
     .catch(error => {
       ElMessage({
         message: h('p', null, [
@@ -198,7 +199,7 @@ const on_ticks = () => {
       })
     })
 
-  store.select_vt_symbols()
+  useStrategyStore.select_vt_symbols()
     .catch((error) => {
       ElMessage({
         message: h('p', null, [
@@ -207,7 +208,7 @@ const on_ticks = () => {
       })
     })
 
-  store.select_exchanges()
+  useStrategyStore.select_exchanges()
     .catch((error) => {
       ElMessage({
         message: h('p', null, [
