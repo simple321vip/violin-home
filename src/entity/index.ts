@@ -12,4 +12,11 @@ type Theme = {
   hoverText: string,
 }
 
-export { Tenant, Theme }
+type DataTimeline = {
+  from: string,
+  title: string,
+  showDayAndMonth: boolean,
+  message: string,
+}
+
+export { Tenant, Theme, DataTimeline }

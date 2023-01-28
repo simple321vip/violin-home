@@ -52,54 +52,12 @@
       </div>
     </el-col>
   </el-row>
-  <!-- <div class="nav-main">
-    <div style="width: 800px;">
-      <div>
-        当前时间：{{ time }}
-      </div>
-      <div>
-        期货交易时间&nbsp
-        <el-icon color="yellow">
-          <Sunrise />
-        </el-icon>&nbsp 9:00-11:30 &nbsp
-        <el-icon color="gold">
-          <Sunny />
-        </el-icon>&nbsp 13:30-15:00 &nbsp
-        <el-icon color="blue">
-          <Moon />
-        </el-icon>&nbsp 21:00-23:00
-      </div>
-    </div>
-    <el-dropdown trigger="click" v-show="useTenantStore.tenant.account">
-      <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item>profile</el-dropdown-item>
-          <el-dropdown-item @click="dialogVisible = true">退出</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-  </div>
-  <el-dialog v-model="dialogVisible" title="提示" width="30%">
-    <span>确认你的登出操作么？</span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="doLogout">确认</el-button>
-      </span>
-    </template>
-  </el-dialog>
-  <span @click="doLogin" v-show="!useTenantStore.tenant.account">登录</span> -->
 </template>
 
 <script setup lang='ts'>
-import { reactive, ref } from "vue"
-import $moment from "moment"
-import router from '@/router/index'
 import CustomPic from "@/components/customPic/index.vue";
 import { tenantStore } from '@/store/modules/tenant'
 import { settingsStore } from '@/store/modules/settings'
-import { logout } from '@/api/user'
 
 // -- IMPORT --
 const useTenantStore = tenantStore()
@@ -108,56 +66,17 @@ const useSettingsStore = settingsStore()
 // -- REACTIVE OBJECT --
 
 // -- REF OBJECT --
-const dialogVisible = ref(false)
-
-
-// obtain user infomation 
-
-useTenantStore.reflush()
 
 // -- EVENT DEFINITION
 const toPerson = () => {
 
 }
 
-const doLogin = () => {
-  router.push({
-    path: '/login'
-  })
-}
-const doLogout = () => {
-  dialogVisible.value = false
-  logout(useTenantStore.tenant.id).catch(() => { console.log(1) }).finally(() => {
-    useTenantStore.logout()
-    router.push({
-      path: '/login'
-    })
-  })
-}
-
-
-// show time 
-let time = ref<String>($moment().format("YYYY年MM月DD日  HH:mm:ss"));
-setInterval(() => {
-  time.value = $moment().format("YYYY年MM月DD日  HH:mm:ss");
-}, 1000);
-
+useTenantStore.reflush()
 
 </script>
 
 <style lang="scss" scoped>
-.open_side {
-  background: url("../../assets/logo.png") center no-repeat;
-  background-size: cover;
-}
-
-.nav-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* background-color: bisque; */
-}
-
 .right-box {
   padding-top: 16px;
   display: flex;

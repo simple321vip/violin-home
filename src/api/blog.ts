@@ -92,5 +92,24 @@ const sortBlogs = (data: Object, btId: string) => {
   })
 }
 
+const countBlogs = () => {
+  return service({
+    url: '/wiki/api/v1/author/blogs/count',
+    method: 'GET',
+    headers: headers,
+  })
+}
 
-export { listAll, updateBtName, putBlogType, removeBlogType, sortBlogTypes, getContent, putBlog, updateContent, deleteContent, sortBlogs }
+export {
+  listAll,
+  updateBtName,
+  putBlogType,
+  removeBlogType,
+  sortBlogTypes,
+  getContent,
+  putBlog,
+  updateContent,
+  deleteContent,
+  sortBlogs,
+  countBlogs
+}
