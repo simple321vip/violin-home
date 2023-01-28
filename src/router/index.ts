@@ -34,10 +34,10 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/thinking',
-        component: () => import('../view/thinking/index.vue'),
+        path: '/calendar',
+        component: () => import('../view/calendar/index.vue'),
         meta: {
-          name: '感悟人生'
+          name: '日历'
         }
       },
       {

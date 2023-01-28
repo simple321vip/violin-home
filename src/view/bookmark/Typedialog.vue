@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref } from 'vue'
 import { delete_bookmark_type, post_bookmark_type, get_bookmark_type } from '../../api/bookmark_type'
 import type { FormInstance } from 'element-plus'
 const formLabelWidth = '140px'
