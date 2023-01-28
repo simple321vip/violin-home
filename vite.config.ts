@@ -17,6 +17,12 @@ export default defineConfig(({ mode }) => {
         localEnabled: true,
       }),
     ],
+    pluginOptions: {
+      'style-resources-loader': {
+        preProcessor: 'scss',
+        patterns: []
+      }
+    },
     base: env.VITE_RES_URL,
     resolve: {
       alias: {
@@ -25,7 +31,9 @@ export default defineConfig(({ mode }) => {
     },
     css: {
       preprocessorOptions: {
-
+        scss: {
+          additionalData: `@import "@/style/mixin.scss";`
+        }
       }
     }
   }

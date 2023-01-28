@@ -1,5 +1,5 @@
 <template>
-  <section class="section-main" style="height:100%;">
+  <section class="section-main">
     <router-view />
   </section>
 </template>
@@ -8,4 +8,8 @@
 </script>
 
 <style>
+.section-main {
+  height: 100%;
+  padding: 14px;
+}
 </style>

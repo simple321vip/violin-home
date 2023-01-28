@@ -3,4 +3,13 @@ type Tenant = {
   account: string
 }
 
-export { Tenant }
+type Theme = {
+  background: string,
+  activeBackground: string,
+  activeText: string,
+  normalText: string,
+  hoverBackground: string,
+  hoverText: string,
+}
+
+export { Tenant, Theme }
