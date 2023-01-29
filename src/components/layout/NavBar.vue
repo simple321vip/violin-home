@@ -17,10 +17,6 @@
     </el-col>
     <el-col :xs="12" :lg="9" :md="9" :sm="14" :xl="9">
       <div class="right-box">
-        <el-icon class="dashboard-icon" @click="open">
-          <avatar />
-        </el-icon>
-        <!-- <Search /> -->
         <el-dropdown>
           <div class="dp-flex justify-content-center align-items height-full width-full">
             <span class="header-avatar" style="cursor: pointer">
@@ -61,7 +57,6 @@
 import CustomPic from "@/components/customPic/index.vue";
 import { tenantStore } from '@/store/modules/tenant'
 import { settingsStore } from '@/store/modules/settings'
-import { Action, ElMessage, ElMessageBox } from "element-plus";
 
 // -- IMPORT --
 const useTenantStore = tenantStore()
@@ -73,20 +68,6 @@ const useSettingsStore = settingsStore()
 
 // -- EVENT DEFINITION
 const toPerson = () => {
-
-}
-const open = () => {
-  ElMessageBox.alert('This is a message', 'Title', {
-    // if you want to disable its autofocus
-    // autofocus: false,
-    confirmButtonText: 'OK',
-    callback: (action: Action) => {
-      ElMessage({
-        type: 'info',
-        message: `action: ${action}`,
-      })
-    },
-  })
 }
 
 useTenantStore.reflush()

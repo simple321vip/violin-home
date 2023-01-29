@@ -3,7 +3,7 @@
     <div class="gva-card-box">
       <div class="gva-card gva-top-card">
         <div class="gva-top-card-left">
-          <div class="gva-top-card-left-title">早安，管理员，请开始一天的工作吧</div>
+          <div class="gva-top-card-left-title">我的主人，我们又见面了，我有什么能帮助你么^_^</div>
           <div class="gva-top-card-left-dot">{{ weatherInfo }}</div>
           <div class="gva-top-card-left-rows">
             <el-row>

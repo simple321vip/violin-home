@@ -212,7 +212,7 @@ export default [
           strategy_name: 'string',
           class_name: 'string',
           vt_symbol: 'string',
-          setting: Object,
+          setting: {},
           status: 1,
         }
       ]

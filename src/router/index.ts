@@ -27,10 +27,10 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: '/school',
-        component: () => import('../view/school/index.vue'),
+        path: '/onenote',
+        component: () => import('../view/onenote/index.vue'),
         meta: {
-          name: '学习'
+          name: 'onenote'
         }
       },
       {
@@ -61,13 +61,6 @@ const routes: Array<RouteRecordRaw> = [
           name: '资金管理'
         }
       },
-      // {
-      //   path: '/trader',
-      //   component: () => import('../view/trader/index.vue'),
-      //   meta: {
-      //     name: 'trader'
-      //   }
-      // },
       {
         path: '/strategy',
         component: () => import('../view/trader/cta_strategy_file.vue'),

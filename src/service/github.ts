@@ -4,7 +4,7 @@ const service = axios.create()
 
 export function Commits(page: number) {
   return service({
-    url: 'https://api.github.com/repos/flipped-aurora/gin-vue-admin/commits?page=' + page,
+    url: 'https://api.github.com/repos/simple321vip/violin-home/commits?page=' + page,
     method: 'get'
   })
 }

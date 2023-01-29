@@ -29,6 +29,7 @@ export const tenantStore = defineStore('tenant', () => {
     tenant.value.token = ''
     tenant.value.id = ''
     resetToken()
+    window.location.reload()
   }
 
   const reflush = async () => {
