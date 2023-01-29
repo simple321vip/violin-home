@@ -1,6 +1,7 @@
 <template>
-  <el-calendar v-model="value">
-    <template #dateCell="{ data }">
+  <el-calendar v-model="value" v-if="isComponentActive" v-loading="isComponentLoading"
+    element-loading-text="主人，别着急我在努力加载中^_^">
+    <template #dateCell="{ data }" lo>
       <div class="date-cell-holiday" v-if="Object.keys(holidays).includes(toLocalDate(data.date))">
         <span style="color: red;" @click="onclick(data.date)"> {{ data.date.getDate() }}</span><br>
         <span>{{ holidays[toLocalDate(data.date)] }}</span>
@@ -55,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 import { get_holiday } from '@/service/calendar'
 import { toLocalDate } from '@/utils/date'
 import { get_event, put_event } from "@/api/calendar"
@@ -80,6 +81,8 @@ const form = reactive({
 const value = ref(new Date())
 const dialogFormVisible = ref(false)
 const formLabelWidth = '140px'
+const isComponentActive = ref(false)
+const isComponentLoading = ref(true)
 
 const checkedalerts = ref([])
 const alerts = ['email', 'messageBox', '手机短信', '微信通知']
@@ -116,18 +119,23 @@ const handleCommand = (command: string) => {
 /**
  * AUTO INVOKE FUNCTION
  */
-get_holiday().then((resp) => {
-  Object.keys(resp.data).forEach(element => {
-    holidays[element] = resp.data[element]
+onMounted(async () => {
+  await get_holiday().then((resp) => {
+    Object.keys(resp.data).forEach(element => {
+      holidays[element] = resp.data[element]
+    })
   })
-})
-get_event().then((response) => {
-  eventDataList.length = 0
-  response.data.forEach((record: Event) => {
-    eventDataList.push(record)
-    eventDataObject[record.date] = record.title
+  await get_event().then((response) => {
+    eventDataList.length = 0
+    response.data.forEach((record: Event) => {
+      eventDataList.push(record)
+      eventDataObject[record.date] = record.title
+    })
   })
+  isComponentActive.value = true
+  isComponentLoading.value = false
 })
+
 
 </script>
 
