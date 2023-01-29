@@ -82,6 +82,13 @@ const routes: Array<RouteRecordRaw> = [
           name: 'CTA策略'
         }
       },
+      {
+        path: '/settings',
+        component: () => import('../view/settings/index.vue'),
+        meta: {
+          name: '设置'
+        }
+      },
     ]
   },
   {

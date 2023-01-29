@@ -82,13 +82,16 @@ iniPage()
 
 .el-main {
   padding: 16px;
+  overflow: hidden;
 }
 
 .el-aside {
   margin-left: -10px;
+  background: #191a23;
 }
 
 .el-footer {
+  margin-top: 20px;
   display: flex;
   justify-content: space-around;
 }

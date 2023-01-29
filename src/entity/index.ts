@@ -19,4 +19,10 @@ type DataTimeline = {
   message: string,
 }
 
-export { Tenant, Theme, DataTimeline }
+type Event = {
+  date: string,
+  title: string,
+  eventInfo: string,
+}
+
+export { Tenant, Theme, DataTimeline, Event }

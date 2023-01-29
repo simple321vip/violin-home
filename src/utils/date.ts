@@ -1,3 +1,5 @@
+import { addZero } from "./number"
+
 // 对Date的扩展，将 Date 转化为指定格式的String
 // 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
 // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
@@ -30,6 +32,12 @@ const formatTimeToStr = (times: any, pattern: string) => {
   return date.toLocaleString()
 }
 
+// 2023-01-03
+const toLocalDate = (date: Date) => {
+  return date.getFullYear() + '-' + addZero(date.getMonth() + 1) + '-' + addZero(date.getDate())
+}
+
 export {
-  formatTimeToStr
+  formatTimeToStr,
+  toLocalDate,
 }
