@@ -7,9 +7,7 @@ import { tenantStore } from './store/modules/tenant'
 const whiteList = ['/login', '/register', '/sorryPage']
 let url = window.location.href
 
-router.beforeEach(async (to, from, next) => {
-  console.log(url)
-  console.log(from.path, to.path)
+router.beforeEach((to, from, next) => {
 
   const token = getToken()
 
@@ -51,7 +49,6 @@ router.beforeEach(async (to, from, next) => {
         path: '/register',
         query: query_data
       })
-      return
     }
     if (url.search("/home/") != -1) {
       let arr = url.split('?')
@@ -66,7 +63,7 @@ router.beforeEach(async (to, from, next) => {
         account: query_data.account
       }
       const tenant_store = tenantStore()
-      await tenant_store.login(tenant, query_data.token).then(() => {
+      tenant_store.login(tenant, query_data.token).then(() => {
         const { href } = router.resolve({
           path: '/'
         });
@@ -82,7 +79,6 @@ router.beforeEach(async (to, from, next) => {
       router.push({
         path: '/sorryPage',
       })
-      return
     }
     if (whiteList.indexOf(to.path) !== -1) {
       next()
