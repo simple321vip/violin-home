@@ -20,21 +20,21 @@
   </el-calendar>
   <span>待办事项</span>
   <el-table :data="eventDataList">
-    <el-table-column property="date" label="Date" width="150" />
+    <el-table-column property="event_date" label="Date" width="150" />
     <el-table-column property="title" label="title" width="200" />
-    <el-table-column property="eventInfo" label="eventInfo" />
+    <el-table-column property="event_info" label="eventInfo" />
   </el-table>
 
   <el-dialog v-model="dialogFormVisible" title="待办事项">
     <el-form :model="form">
       <el-form-item label="日期" :label-width="formLabelWidth">
-        <span>{{ form.date }}</span>
+        <span>{{ form.event_date }}</span>
       </el-form-item>
       <el-form-item label="title" :label-width="formLabelWidth">
         <el-input v-model="form.title" autocomplete="off" />
       </el-form-item>
       <el-form-item label="eventInfo" :label-width="formLabelWidth">
-        <el-input v-model="form.eventInfo" autocomplete="off" type="textarea" />
+        <el-input v-model="form.event_info" autocomplete="off" type="textarea" />
       </el-form-item>
       <el-form-item label="alert" :label-width="formLabelWidth">
         <el-checkbox-group v-model="checkedalerts" :min="0" :max="2">
@@ -73,9 +73,9 @@ const holidays = reactive<any>({})
 const eventDataList = reactive<Event[]>([])
 const eventDataObject = reactive<any>({})
 const form = reactive({
-  date: '',
+  event_date: '',
   title: '',
-  eventInfo: '',
+  event_info: '',
 })
 // -- REF OBJECT --
 const value = ref(new Date())
@@ -89,7 +89,7 @@ const alerts = ['email', 'messageBox', '手机短信', '微信通知']
 
 // -- EVENT DEFINITION
 const onclick = (date: Date) => {
-  form.date = toLocalDate(date)
+  form.event_date = toLocalDate(date)
   dialogFormVisible.value = true
 }
 
@@ -129,7 +129,7 @@ onMounted(async () => {
     eventDataList.length = 0
     response.data.forEach((record: Event) => {
       eventDataList.push(record)
-      eventDataObject[record.date] = record.title
+      eventDataObject[record.event_date] = record.title
     })
   })
   isComponentActive.value = true

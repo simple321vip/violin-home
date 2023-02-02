@@ -51,7 +51,7 @@ const delete_bookmarks = (params: Object) => {
 
 const bookmarks_count = () => {
   return service({
-    url: '/wiki/api/v1/author/blogs/count',
+    url: '/bookmark/api/v1/bookmark/count',
     method: 'GET',
   })
 }

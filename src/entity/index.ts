@@ -20,9 +20,9 @@ type DataTimeline = {
 }
 
 type Event = {
-  date: string,
+  event_date: string,
   title: string,
-  eventInfo: string,
+  event_info: string,
 }
 
 export { Tenant, Theme, DataTimeline, Event }

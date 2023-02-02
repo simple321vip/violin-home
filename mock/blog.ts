@@ -75,7 +75,7 @@ export default [
     },
   },
   {
-    url: '/wiki/api/v1/author/blogs/count',
+    url: '/wiki/api/v1/reader/blogs/count',
     method: 'GET',
     response: () => {
       return {

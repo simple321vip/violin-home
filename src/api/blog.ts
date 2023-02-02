@@ -94,7 +94,7 @@ const sortBlogs = (data: Object, btId: string) => {
 
 const countBlogs = () => {
   return service({
-    url: '/wiki/api/v1/author/blogs/count',
+    url: '/wiki/api/v1/reader/blogs/count',
     method: 'GET',
     headers: headers,
   })

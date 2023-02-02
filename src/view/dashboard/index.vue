@@ -125,7 +125,7 @@ const statistics = ref({
 
 const toolCards = ref([
   {
-    label: 'Jenjins',
+    label: 'Jenkins',
     icon: 'camera',
     name: 'Jenkins',
     color: '#ff9c6e',
