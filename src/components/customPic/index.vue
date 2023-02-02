@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { tenantStore } from '@/store/modules/tenant'
-import noAvatarPng from '@/assets/noBody.png'
+import noAvatarPng from '@/assets/nobody.jpg'
 
 const props = defineProps({
   picType: {
