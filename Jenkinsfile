@@ -73,7 +73,15 @@ spec:
     def gitCommit = myRepo.GIT_COMMIT
     def gitBranch = myRepo.GIT_BRANCH
 
-    def imageTag = "v1.00"
+    def imageTag
+    def localDateTime
+    stage('obtain release tag') {
+      imageTag = sh returnStdout: true, script: "git tag --sort=-creatordate | head -n 1"
+      imageTag = imageTag.trim()
+      localDateTime = sh returnStdout: true, script: "echo `date +%s`"
+      localDateTime = localDateTime.trim()
+    }
+
     def registryUrl = "ccr.ccs.tencentyun.com"
     def imageEndpoint = "violin/violin-home"
     def image = "${registryUrl}/${imageEndpoint}:${imageTag}"
@@ -95,6 +103,42 @@ spec:
               """
           }
         }
+    }
+
+    def violin_cicd_repo = checkout([
+      $class: 'GitSCM',
+      branches: [[name: "*/master"]],
+      doGenerateSubmoduleConfigurations: false,
+      extensions:  [[$class: 'CloneOption', noTags: false, reference: '', shallow: true, timeout: 1000]]+[[$class: 'CheckoutOption', timeout: 1000]],
+      submoduleCfg: [],
+      userRemoteConfigs: [[
+        credentialsId: '2448e943-479f-4796-b5a0-fd3bf22a5d30',
+        url: 'https://gitee.com/guan-xiangwei/violin-cicd.git'
+        ]]
+      ])
+
+    stage('update k8s deployment') {
+      script{
+        wrap([$class: 'BuildUser']) {
+          withCredentials([usernamePassword(
+              credentialsId: '2448e943-479f-4796-b5a0-fd3bf22a5d30',
+              usernameVariable: 'GIT_USERNAME',
+              passwordVariable: 'GIT_PASSWORD'
+          )]) {
+            sh """
+                git config --global user.email "${env.BUILD_USER_EMAIL}"
+                git config --global user.name "${env.BUILD_USER_ID}"
+                git config --local credential.helper "!p() { echo username=\$GIT_USERNAME; echo password=\$GIT_PASSWORD;}; p"
+                
+            """
+            sh "sed -i -e s/tagUpdateTime:.*/tagUpdateTime:' '${localDateTime}/g ./prod/violin-home-deployment-prod.yaml"
+            sh "sed -i -e s/violin-home:.*/violin-home:${imageTag}/g ./prod/violin-home-deployment-prod.yaml"
+            sh "git add ./prod/violin-home-deployment-prod.yaml"
+            sh "git commit -m 'update tag ${imageTag}'"
+            sh "git push -u origin HEAD:master"
+          }
+        }
+      }
     }
   }
 }
