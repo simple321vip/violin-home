@@ -1,84 +1,86 @@
 import { createRouter, createMemoryHistory, RouteRecordRaw } from 'vue-router'
 
+const login = () => import('@/components/login/login.vue')
+const home = () => import('@/view/dashboard/index.vue')
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    component: () => import('../components/layout/layout.vue'),
+    component: () => import('@/components/layout/layout.vue'),
     children: [
       {
         path: '/home',
-        component: () => import('../view/dashboard/index.vue'),
+        component: home,
         meta: {
           name: '控制台'
         }
       },
       {
         path: '/blog',
-        component: resolve => (require('@/view/blog/index.vue'), resolve),
+        component: () => import('@/view/blog/index.vue'),
         meta: {
           name: '博客'
         }
       },
       {
         path: '/bookmark',
-        component: resolve => (require('@/view/bookmark/index.vue'), resolve),
+        component: () => import('@/view/bookmark/index.vue'),
         meta: {
           name: '书签'
         }
       },
       {
         path: '/onenote',
-        component: resolve => (require('@/view/onenote/index.vue'), resolve),
+        component: () => import('@/view/onenote/index.vue'),
         meta: {
           name: 'onenote'
         }
       },
       {
         path: '/calendar',
-        component: resolve => (require('@/view/calendar/index.vue'), resolve),
+        component: () => import('@/view/calendar/index.vue'),
         meta: {
           name: '日历'
         }
       },
       {
         path: '/cloud',
-        component: resolve => (require('@/view/cloud/index.vue'), resolve),
+        component: () => import('@/view/cloud/index.vue'),
         meta: {
           name: '个人云盘'
         }
       },
       {
         path: '/market',
-        component: resolve => (require('@/view/recommend/index.vue'), resolve),
+        component: () => import('@/view/recommend/index.vue'),
         meta: {
           name: '市场行情'
         }
       },
       {
         path: '/capital',
-        component: resolve => (require('@/view/capital/index.vue'), resolve),
+        component: () => import('@/view/capital/index.vue'),
         meta: {
           name: '资金管理'
         }
       },
       {
         path: '/strategy',
-        component: resolve => (require('@/view/trader/cta_strategy_file.vue'), resolve),
+        component: () => import('@/view/trader/cta_strategy_file.vue'),
         meta: {
           name: '策略模板'
         }
       },
       {
         path: '/strategy_instance',
-        component: resolve => (require('@/view/trader/cta_strategy.vue'), resolve),
+        component: () => import('@/view/trader/cta_strategy.vue'),
         meta: {
           name: 'CTA策略'
         }
       },
       {
         path: '/settings',
-        component: resolve => (require('@/view/settings/index.vue'), resolve),
+        component: () => import('@/view/settings/index.vue'),
         meta: {
           name: '设置'
         }
@@ -87,31 +89,31 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/feedback",
-    component: resolve => (require('@/view/blog/mdview.vue'), resolve),
+    component: () => import('@/view/blog/mdview.vue'),
   },
   {
     path: "/BlogEditer",
-    component: resolve => (require('@/view/blog/createBlog.vue'), resolve),
+    component: () => import('@/view/blog/createBlog.vue'),
   },
   {
     path: "/BlogViewer",
-    component: resolve => (require('@/view/blog/mdview.vue'), resolve),
+    component: () => import('@/view/blog/mdview.vue'),
   },
   {
     path: "/login",
-    component: () => import('@/components/login/login.vue')
+    component: login
   },
   {
     path: "/illustration",
-    component: resolve => (require('../components/illustration/login.vue'), resolve)
+    component: () => import('@/components/illustration/login.vue')
   },
   {
     path: "/register",
-    component: resolve => (require('../components/login/register.vue'), resolve)
+    component: () => import('@/components/login/register.vue')
   },
   {
     path: "/sorryPage",
-    component: resolve => (require('../components/login/sorry.vue'), resolve)
+    component: () => import('@/components/login/sorry.vue')
   },
 ]
 
