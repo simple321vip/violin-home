@@ -105,7 +105,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/illustration",
-    component: () => import('@/components/illustration/login.vue')
+    component: () => import('@/components/illustration/index.vue')
   },
   {
     path: "/register",
