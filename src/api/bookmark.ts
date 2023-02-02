@@ -49,10 +49,18 @@ const delete_bookmarks = (params: Object) => {
   })
 }
 
+const bookmarks_count = () => {
+  return service({
+    url: '/bookmark/api/v1/bookmark/count',
+    method: 'GET',
+  })
+}
+
 export {
   search_bookmark,
   put_bookmark,
   delete_bookmark,
   delete_bookmarks,
-  update_bookmark
+  update_bookmark,
+  bookmarks_count
 }

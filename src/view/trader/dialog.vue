@@ -7,12 +7,12 @@
       </el-form-item>
       <el-form-item label="vt_symbol" prop="vt_symbol">
         <el-select v-model="ruleForm.vt_symbol" placeholder="select a vt_symbol">
-          <el-option v-for="vt_symbol in store.subscribe_vt_symbols" :value="vt_symbol" />
+          <el-option v-for="vt_symbol in useStrategyStore.strategy.subscribe_vt_symbols" :value="vt_symbol" />
         </el-select>
       </el-form-item>
       <el-form-item label="class_name" prop="class_name">
         <el-select v-model="ruleForm.class_name" placeholder="select a class_name">
-          <el-option v-for="name in store.class_names" :value="name" />
+          <el-option v-for="name in useStrategyStore.strategy.class_names" :value="name" />
         </el-select>
       </el-form-item>
       <el-form-item label="setting:">
@@ -47,9 +47,9 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { create_strategy } from '../../api/cta_strategy'
 import { h } from 'vue'
 import { ElMessage } from 'element-plus'
-import { strategyStore } from '../../store/strategy'
+import { strategyStore } from '../../store/modules/strategy'
 
-const store = strategyStore()
+const useStrategyStore = strategyStore()
 
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()

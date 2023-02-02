@@ -66,17 +66,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, h } from 'vue'
+import { UploadInstance, UploadProps, UploadRawFile, genFileId, ElMessage, ElButton, ElIcon, ElTable, ElTableColumn, ElUpload } from 'element-plus'
 import {
   get_strategy_files,
   load_strategy_file,
   unload_strategy_file,
   remove_strategy_file
 } from '../../api/cta_strategy'
-import { genFileId } from 'element-plus'
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus'
-import { h } from 'vue'
-import { ElMessage } from 'element-plus'
 
 // -- INTERFACE OR TYPE DEFINITION --
 interface StrategyFile {

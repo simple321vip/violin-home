@@ -61,8 +61,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, h } from 'vue'
+import { ElMessage } from 'element-plus'
 import create_strategy_dialog from './dialog.vue'
+import { strategyStore } from '../../store/modules/strategy'
 import {
   get_strategies,
   init_strategy,
@@ -72,9 +74,6 @@ import {
   get_strategy_status,
   get_strategy_load_files,
 } from '../../api/cta_strategy'
-import { h } from 'vue'
-import { ElMessage } from 'element-plus'
-import { strategyStore } from '../../store/strategy'
 
 type Strategy = {
   strategy_name: string,
@@ -84,7 +83,7 @@ type Strategy = {
   status: number,
 }
 
-const store = strategyStore()
+const useStrategyStore = strategyStore()
 let createStrategyDialogVisible = ref(false)
 const strategy_list = reactive<Strategy[]>([])
 const dialogRef = ref()
@@ -133,7 +132,7 @@ const on_status = (row: any) => {
 onMounted(() => {
   on_list()
   get_strategy_load_files().then(res => {
-    store.$patch({ class_names: res.data.class_names })
+    useStrategyStore.strategy.class_names = res.data.class_names
   }).catch(error => {
     ElMessage({
       message: h('p', null, [

@@ -1,12 +1,11 @@
 <template>
-  <div class="4444">
+  <div>
     <el-container>
-      <el-aside width="150px">
+      <el-aside width="180px">
         <SideBar></SideBar>
       </el-aside>
       <el-container>
-        <el-header
-          style="border-bottom-style:solid; border-bottom-width: 0.5px; border-bottom-color:rgba(151, 151, 151, 0.3);">
+        <el-header>
           <NavBar></NavBar>
         </el-header>
         <el-main>
@@ -20,7 +19,6 @@
           <div>
             <el-avatar @click="openGithub" src="https://github.githubassets.com/favicons/favicon.svg" />
           </div>
-
         </el-footer>
       </el-container>
     </el-container>
@@ -31,6 +29,32 @@
 import MainApp from '../layout/MainApp.vue'
 import NavBar from "../layout/NavBar.vue"
 import SideBar from "../layout/SideBar.vue"
+import { settingsStore } from "@/store/modules/settings"
+
+// -- IMPORT --
+const useSettingsStore = settingsStore()
+
+// -- REACTIVE OBJECT --
+
+// -- REF OBJECT --
+
+// -- EVENT DEFINITION
+const iniPage = () => {
+  const screenWidth = document.body.clientWidth
+  if (screenWidth < 1000) {
+    useSettingsStore.settings.isMobile = true
+    // isSider.value = false
+    // isCollaps.value = true
+  } else if (screenWidth >= 1000 && screenWidth < 1200) {
+    useSettingsStore.settings.isMobile = false
+    // isSider.value = false
+    // isCollaps.value = true
+  } else {
+    useSettingsStore.settings.isMobile = false
+    // isSider.value = true
+    // isCollaps.value = false
+  }
+}
 
 const openGithub = () => {
   let href = 'https://github.com/simple321vip'
@@ -42,48 +66,32 @@ const openSiteQuery = () => {
   window.open(href, '_blank')
 }
 
+/**
+ * AUTO INVOKE FUNCTION
+ */
+iniPage()
 
 </script>
 
 <style scoped>
-/* .el-header,
-.el-footer {
-
-  color: rgb(51, 51, 51);
-  text-align: center;
-  line-height: 60px;
-} */
-/* 
-
-
-.el-aside {
-  background-color: #e9eef3;
-  color: #333;
-  text-align: left;
-  line-height: 200px;
+.el-header {
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+  border-bottom-color: rgba(151, 151, 151, 0.3);
 }
 
 .el-main {
-  background-color: #e9eef3;
-  color: #333;
-  /* line-height: 450px; */
-/* vertical-align: top;
-  padding: 5px;
+  padding: 16px;
+  overflow: hidden;
 }
 
-body > .el-container {
-  margin-bottom: 40px;
+.el-aside {
+  margin-left: -10px;
+  background: #191a23;
 }
 
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
-} */
 .el-footer {
+  margin-top: 20px;
   display: flex;
   justify-content: space-around;
 }

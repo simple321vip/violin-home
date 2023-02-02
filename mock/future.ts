@@ -130,5 +130,107 @@ export default [
       }
     }
   },
+  {
+    url: '/trader/api/v1/accounts',
+    method: 'get',
+    response: ({ body, query }) => {
+      return {
+        accounts: [
+          {
+            gateway_name: 'cpt',
+            account_id: '7788',
+            balance: '7',
+            frozen: '8',
+          },
+          {
+            gateway_name: 'cpt',
+            account_id: '778899',
+            balance: '8',
+            frozen: '9',
+          }
+        ],
+        positions: [
+          {
+            symbol: 'czce',
+            exchange: 'RM301',
+            direction: '1',
+            volume: 222,
+            price: 2500,
+            frozen: 3,
+            pnl: 2,
+            yd_volume: 1,
+          }
+        ],
+        trades: [
+          {
+            symbol: 'string',
+            exchange: 'string',
+            direction: 'string',
+            volume: 2,
+            price: 4,
+            orderid: 'string',
+            tradeid: 'string',
+            offset: 'string',
+          }
+        ],
+        orders: [{
+          symbol: 'string',
+          exchange: 'string',
+          direction: 'string',
+          volume: 6,
+          price: 4,
+          orderid: 'string',
+          type: 'string',
+          offset: 'string',
+          traded: 7,
+          status: 'string',
+          // datetime :datetime
+          reference: 'string',
+        }]
+      }
+    }
+  },
+  {
+    url: '/trader/api/v1/strategy_file',
+    method: 'get',
+    response: ({ body, query }) => {
+      return [
+        {
+          file_name: 'string',
+          class_name: 'string',
+          status: 'string',
+        }
+      ]
+    }
+  },
+  {
+    url: '/trader/api/v1/strategies',
+    method: 'get',
+    response: ({ body, query }) => {
+      return [
+        {
+          strategy_name: 'string',
+          class_name: 'string',
+          vt_symbol: 'string',
+          setting: {},
+          status: 1,
+        }
+      ]
+    }
+  },
+  {
+    url: '/trader/api/v1/strategy_file/load',
+    method: 'get',
+    response: ({ body, query }) => {
+      return [
+        {
+          class_names: 'asdasdas'
+        }
+      ]
+    }
+  },
+
+
+
 ] as MockMethod[]
 

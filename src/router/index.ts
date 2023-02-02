@@ -1,5 +1,6 @@
 import { createRouter, createMemoryHistory, RouteRecordRaw } from 'vue-router'
 
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -14,103 +15,103 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: '/blog',
-        component: () => import('../view/blog/index.vue'),
+        component: resolve => (require('@/view/blog/index.vue'), resolve),
         meta: {
           name: '博客'
         }
       },
       {
         path: '/bookmark',
-        component: () => import('../view/bookmark/index.vue'),
+        component: resolve => (require('@/view/bookmark/index.vue'), resolve),
         meta: {
           name: '书签'
         }
       },
       {
-        path: '/school',
-        component: () => import('../view/school/index.vue'),
+        path: '/onenote',
+        component: resolve => (require('@/view/onenote/index.vue'), resolve),
         meta: {
-          name: '学习'
+          name: 'onenote'
         }
       },
       {
-        path: '/thinking',
-        component: () => import('../view/thinking/index.vue'),
+        path: '/calendar',
+        component: resolve => (require('@/view/calendar/index.vue'), resolve),
         meta: {
-          name: '感悟人生'
+          name: '日历'
         }
       },
       {
         path: '/cloud',
-        component: () => import('../view/cloud/index.vue'),
+        component: resolve => (require('@/view/cloud/index.vue'), resolve),
         meta: {
           name: '个人云盘'
         }
       },
       {
         path: '/market',
-        component: () => import('../view/recommend/index.vue'),
+        component: resolve => (require('@/view/recommend/index.vue'), resolve),
         meta: {
           name: '市场行情'
         }
       },
       {
         path: '/capital',
-        component: () => import('../view/capital/index.vue'),
+        component: resolve => (require('@/view/capital/index.vue'), resolve),
         meta: {
           name: '资金管理'
         }
       },
-      // {
-      //   path: '/trader',
-      //   component: () => import('../view/trader/index.vue'),
-      //   meta: {
-      //     name: 'trader'
-      //   }
-      // },
       {
         path: '/strategy',
-        component: () => import('../view/trader/cta_strategy_file.vue'),
+        component: resolve => (require('@/view/trader/cta_strategy_file.vue'), resolve),
         meta: {
           name: '策略模板'
         }
       },
       {
         path: '/strategy_instance',
-        component: () => import('../view/trader/cta_strategy.vue'),
+        component: resolve => (require('@/view/trader/cta_strategy.vue'), resolve),
         meta: {
           name: 'CTA策略'
+        }
+      },
+      {
+        path: '/settings',
+        component: resolve => (require('@/view/settings/index.vue'), resolve),
+        meta: {
+          name: '设置'
         }
       },
     ]
   },
   {
     path: "/feedback",
-    component: () => import('../view/blog/mdview.vue')
+    component: resolve => (require('@/view/blog/mdview.vue'), resolve),
   },
   {
     path: "/BlogEditer",
-    component: () => import('../view/blog/createBlog.vue')
+    component: resolve => (require('@/view/blog/createBlog.vue'), resolve),
   },
   {
     path: "/BlogViewer",
-    component: () => import('../view/blog/mdview.vue')
+    component: resolve => (require('@/view/blog/mdview.vue'), resolve),
   },
   {
     path: "/login",
-    component: () => import('../components/login/login.vue')
+    component: () => import('@/components/login/login.vue')
   },
   {
     path: "/illustration",
-    component: () => import('../components/illustration/index.vue')
+    component: resolve => (require('../components/illustration/login.vue'), resolve)
   },
   {
     path: "/register",
-    component: () => import('../components/login/register.vue')
+    component: resolve => (require('../components/login/register.vue'), resolve)
   },
   {
     path: "/sorryPage",
-    component: () => import('../components/login/sorry.vue')
+    component: resolve => (require('../components/login/sorry.vue'), resolve)
   },
 ]
 

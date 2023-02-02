@@ -1,3 +1,5 @@
+import { Tenant } from '@/entity';
+import { tenantStore } from '@/store/modules/tenant';
 import router from '../router'
 import { setToken, setTenant } from '../utils/auth'
 
@@ -41,7 +43,27 @@ const scan_method: any = {
   production: (qrcode: string) => {
     window.location.href = qrcode
   },
-  development: () => {
+  development: async () => {
+
+    const useTenantStore = tenantStore()
+    const tenant: Tenant = {
+      tenant_id: '7788',
+      account: '小小的测试账户'
+    }
+    let token = 'ABCDEFG'
+
+    await useTenantStore.login(tenant, token).then(() => {
+      const { href } = router.resolve({
+        path: '/'
+      })
+      window.open(href, '_self')
+    }).catch((error) => {
+      const { href } = router.resolve({
+        path: '/login'
+      })
+      window.open(href, '_self')
+    })
+
     setToken("token")
     setTenant(
       {
