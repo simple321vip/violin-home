@@ -4,10 +4,11 @@ import { getToken, getTenant } from './utils/auth'
 import { Tenant } from './entity/index'
 import { tenantStore } from './store/modules/tenant'
 
-const whiteList = ['/login', '/register', '/sorryPage']
+const whiteList = ['/login', '/register', '/sorryPage', '/BlogViewer']
 let url = window.location.href
 
 router.beforeEach((to, from, next) => {
+  console.log(to.path)
 
   const token = getToken()
 
@@ -20,13 +21,16 @@ router.beforeEach((to, from, next) => {
         const tenant = <Tenant>(JSON.parse(getTenant() as string))
         if (url.search("write") != -1) {
           next('/BlogEditer')
-        } else if (url.search("view") != -1) {
-          let bid = Cookies.get('bid')
+        }
+        if (url.search("view") != -1) {
+          let arr = url.split('?')
+          let bid = arr[1].split('=')[1]
           router.push({
             path: '/BlogViewer',
             query: { bid: bid }
           })
-        } else {
+        }
+        else {
           router.push({
             path: '/home',
             query: tenant
@@ -75,6 +79,7 @@ router.beforeEach((to, from, next) => {
         window.open(href, '_self');
       })
     }
+
     if (url.search("sorryPage") != -1) {
       router.push({
         path: '/sorryPage',
@@ -86,4 +91,5 @@ router.beforeEach((to, from, next) => {
       next('/login')
     }
   }
+
 })

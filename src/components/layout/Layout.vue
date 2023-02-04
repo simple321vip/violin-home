@@ -1,10 +1,10 @@
 <template>
-  <div>
-    <el-container>
+  <div class="homeWrap">
+    <el-container class="main_container">
       <el-aside width="180px">
         <SideBar></SideBar>
       </el-aside>
-      <el-container>
+      <el-container style="margin-left: 180px;">
         <el-header>
           <NavBar></NavBar>
         </el-header>
@@ -83,16 +83,29 @@ iniPage()
 .el-main {
   padding: 16px;
   overflow: hidden;
+  height: 100%;
 }
 
 .el-aside {
   margin-left: -10px;
   background: #191a23;
+  position: fixed;
 }
 
 .el-footer {
   margin-top: 20px;
   display: flex;
   justify-content: space-around;
+}
+
+.main_container {
+  /* height: 100%; */
+}
+
+.homeWrap {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
 }
 </style>
