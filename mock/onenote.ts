@@ -67,6 +67,13 @@ export default [
   },
   {
     url: '/onenote/api/v1/item',
+    method: 'post',
+    response: () => {
+      return {}
+    }
+  },
+  {
+    url: '/onenote/api/v1/item',
     method: 'delete',
     response: () => {
       return {}
