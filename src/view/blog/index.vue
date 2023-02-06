@@ -34,8 +34,8 @@
     <h3 style="cursor: pointer; width: min-content;white-space:nowrap" @click="openBlog(item.bid)">{{ item.title }}</h3>
     <div style="display: flex; justify-content: space-between; align-items: center">
       <p style="font-size: 12px; height: 16px;line-height: 16px;overflow: hidden;text-overflow: ellipsis;">{{
-    item.content
-}}</p>
+        item.content
+      }}</p>
       <el-button size="small" type="success" @click="publishbyBid(item.bid)">重新发布
       </el-button>
     </div>
@@ -91,8 +91,6 @@ const onSubmit = () => {
 }
 
 const openBlog = (bid: string) => {
-
-  Cookies.set('bid', bid)
   const { href } = router.resolve({
     path: '/view',
     query: {
