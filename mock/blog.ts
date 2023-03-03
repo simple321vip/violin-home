@@ -83,4 +83,12 @@ export default [
       }
     },
   },
+  {
+    url: '/wiki/api/v1/author/blogs/001',
+    method: 'POST',
+    response: () => {
+      return {
+      }
+    },
+  },
 ] as MockMethod[]

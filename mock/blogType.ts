@@ -24,6 +24,20 @@ export default [
               btId: "001",
               order: 1,
             },
+            {
+              bid: "0003",
+              title: "three",
+              content: "xxxxxxxxx",
+              btId: "001",
+              order: 2,
+            },
+            {
+              bid: "0004",
+              title: "four",
+              content: "xxyyyyxxxxxxx",
+              btId: "001",
+              order: 3,
+            },
           ],
           order: 0
         },

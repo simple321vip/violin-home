@@ -43,8 +43,8 @@
       </div>
       <draggable :list="blogTypes[checkedBlogIndex].blogs" ghost-class="ghost" handle=".move" animation="300"
         :force-fallback="true" itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true"
-        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog"
-        @end="sortBlog" group="group2" :move="onMove">
+        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog" @end="sortBlog"
+        group="group2" :move="onMove">
         <template #item="{ element }">
           <div class="item">
             <label class="move"></label>
@@ -247,6 +247,9 @@ const onclickTypeTab = (order: number) => {
 
 const onclickBlogTab = (blog: Blog) => {
   deleteBtName.value = ""
+  if (blog.order == checkedIndex.value) {
+    return
+  }
   getContent(blog.bid).then(response => {
     checkedIndex.value = blog.order
     blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
@@ -466,16 +469,19 @@ const sortBlogType = () => {
 
   const sortData: BlogType[] = []
   blogTypes.forEach((blogType: BlogType, index) => {
-    blogType.order = index
+
     if (blogType.btId == id.value) {
       checkedBlogIndex.value = index
     }
-    sortData.push({
-      btId: blogType.btId,
-      btName: blogType.btName,
-      blogs: [],
-      order: blogType.order
-    })
+    if (blogType.order != index) {
+      sortData.push({
+        btId: blogType.btId,
+        btName: blogType.btName,
+        blogs: [],
+        order: index
+      })
+      blogType.order = index
+    }
   })
 
   sortBlogTypes(sortData).then(() => {
@@ -489,19 +495,24 @@ const sortBlogType = () => {
   })
 }
 
+/**
+ * @desc wikiソート機能
+ * 
+ */
 const sortBlog = () => {
-
   const sortData: any[] = []
 
   blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog, index) => {
-    blog.order = index
     if (blog.bid == id.value) {
       checkedIndex.value = index
     }
-    sortData.push({
-      bid: blog.bid,
-      order: blog.order
-    })
+    if (index != blog.order) {
+      sortData.push({
+        bid: blog.bid,
+        order: index
+      })
+      blog.order = index
+    }
   })
 
   sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(() => {
@@ -553,13 +564,7 @@ const onStartBlogType = () => {
 };
 
 const onStartBlog = () => {
-  console.log("开始拖拽");
   id.value = blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid
-};
-
-//拖拽结束的事件
-const onEnd = () => {
-
 }
 
 const onMove = (e: any) => {

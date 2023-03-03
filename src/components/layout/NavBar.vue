@@ -17,6 +17,40 @@
     </el-col>
     <el-col :xs="12" :lg="9" :md="9" :sm="14" :xl="9">
       <div class="right-box">
+        <el-dropdown class="item">
+          <div class="dp-flex justify-content-center align-items height-full width-full">
+            <el-button v-show="!useSettingsStore.isMobile" type="success" round>appStatus</el-button>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu class="dropdown-group">
+              <el-dropdown-item v-for="status in appStatus">
+                <el-icon v-if="status.status" color="green">
+                  <CircleCheck />
+                </el-icon>
+                <el-icon v-if="!status.status" color="red">
+                  <Warning />
+                </el-icon>
+                {{ status.appName }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
+        <el-badge :value="messageCount" class="item">
+          <el-button round @click="drawer = true">
+            <template #icon>
+              <el-icon>
+                <Message />
+              </el-icon>
+              <el-drawer v-model="drawer" title="I am the title" :with-header="false">
+                <span>站内信呢</span>
+                <div v-for="msg in messageList">
+
+                </div>
+              </el-drawer>
+            </template>
+          </el-button>
+        </el-badge>
         <el-dropdown>
           <div class="dp-flex justify-content-center align-items height-full width-full">
             <span class="header-avatar" style="cursor: pointer">
@@ -57,18 +91,45 @@
 import CustomPic from "@/components/customPic/index.vue";
 import { tenantStore } from '@/store/modules/tenant'
 import { settingsStore } from '@/store/modules/settings'
+import { Message } from "@element-plus/icons-vue"
+import { reactive, ref } from "vue";
 
 // -- IMPORT --
 const useTenantStore = tenantStore()
 const useSettingsStore = settingsStore()
 
 // -- REACTIVE OBJECT --
+const appStatus = reactive([
+  {
+    appName: "wiki",
+    status: true,
+  },
+  {
+    appName: "bookmark",
+    status: true,
+  },
+  {
+    appName: "calendar",
+    status: false,
+  },
+])
 
 // -- REF OBJECT --
+const messageCount = ref()
+const drawer = ref(false)
+const messageList = reactive<any[]>([
+  {
+    title: "过期通知",
+    type: "",
+    message: "尊敬的用户，你的账号余额已不足，请充值",
+    Unread: true,
+  }
+])
 
 // -- EVENT DEFINITION
 const toPerson = () => {
 }
+
 
 useTenantStore.reflush()
 
@@ -86,6 +147,11 @@ useTenantStore.reflush()
     border: 1px solid #ccc;
     border-radius: 6px;
   }
+}
+
+.item {
+  margin-top: 5px;
+  margin-right: 30px;
 }
 
 .header-avatar {

@@ -23,8 +23,7 @@
     <el-form :model="dialog_form">
       <el-form-item label="分类" :label-width="formLabelWidth">
         <el-select v-model="dialog_form.bk_type_id" placeholder>
-          <el-option v-for="(item) in types" :key="item.bk_type_id" :value="item.bk_type_id"
-            :label="item.bk_type_name" />
+          <el-option v-for="(item) in types" :key="item.bk_type_id" :value="item.bk_type_id" :label="item.bk_type_name" />
         </el-select>
         <el-form-item label="备注" :label-width="formLabelWidth">
           <el-input v-model="dialog_form.comment" autocomplete="off" />
