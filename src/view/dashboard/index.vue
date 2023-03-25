@@ -106,7 +106,7 @@ import EchartsLine from '@/view/dashboard/dashboardCharts/index.vue'
 import DashboardTable from '@/view/dashboard/dashboardTable/index.vue'
 import { useRouter } from 'vue-router'
 import { useWeatherInfo } from '@/service/weather'
-import { countBlogs } from "@/api/blog"
+import { countWiki } from "@/api/blog"
 import { bookmarks_count } from "@/api/bookmark"
 
 // -- IMPORT --
@@ -146,9 +146,9 @@ const toolCards = ref([
     bg: 'rgba(185, 192, 255,.3)'
   },
   {
-    label: '代码生成器',
+    label: 'scrum',
     icon: 'cpu',
-    name: 'autoCode',
+    name: 'scrum',
     color: '#ffd666',
     bg: 'rgba(255, 214, 102,.3)'
   },
@@ -182,6 +182,9 @@ const toTarget = (name: string) => {
     case 'wiki':
       window.open('https://www.violin-home.cn/docs#/guan/', '_blank')
       break;
+    case 'scrum':
+      window.open('https://www.leangoo.com/kanban/board_list?#/home/list', '_blank')
+      break;
   }
 }
 
@@ -192,7 +195,7 @@ setInterval(() => {
   time.value = $moment().format("YYYY年MM月DD日  HH:mm:ss")
 }, 1000)
 
-countBlogs().then((resp) => {
+countWiki().then((resp) => {
   const data = resp.data
   statistics.value.wiki_count = data.count
 })

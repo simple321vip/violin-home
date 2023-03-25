@@ -29,7 +29,7 @@ export default [
     }
   },
   {
-    url: '/auth/api/v1/author/blog/0001',
+    url: '/auth/api/v1/author/wiki/0001',
     method: 'delete',
     response: () => {
       return {
@@ -49,8 +49,8 @@ export default [
     },
   },
   {
-    url: '/auth/api/v1/author/blog/content',
-    method: 'PUT',
+    url: '/auth/api/v1/author/wiki',
+    method: 'POST',
     response: () => {
       return {
         bid: "0003",
@@ -62,8 +62,8 @@ export default [
     },
   },
   {
-    url: '/auth/api/v1/author/blog/content',
-    method: 'POST',
+    url: '/auth/api/v1/author/wiki',
+    method: 'PUT',
     response: () => {
       return {
         bid: "0003",
