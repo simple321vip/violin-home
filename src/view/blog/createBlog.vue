@@ -15,14 +15,14 @@
 
       <draggable :list="blogTypes" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true" itemKey=""
         filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
-        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlogType" @end="sortBlogType" group="group1"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlogType" @end="onSortWikiType" group="group1"
         :move="onMove">
         <template #item="{ element }">
           <div class="item">
             <label class="move"></label>
-            <p class="bt-input" @click="onclickTypeTab(element.order)">{{ element.btName }}</p>
+            <p class="bt-input" @click="onclickTypeTab(element)">{{ element.btName }}</p>
             <div>
-              <el-button class="operate_button" :icon="Setting" size="small" v-show="checkedBlogIndex == element.order"
+              <el-button class="operate_button" :icon="Setting" size="small" v-show="showWikiTypeIcon(element)"
                 @click="handleCreateBlogType()" />
             </div>
           </div>
@@ -39,18 +39,18 @@
     </div>
     <div class="b_section" :style="bWholeStyle" v-show="collapsible[1] == 0">
       <div class="item_header">
-        <el-button class="item_header_button" :disabled="isclicked" @click="insertBlog">增加一个博客</el-button>
+        <el-button class="item_header_button" :disabled="isclicked" @click="onCreateWiki">增加一个博客</el-button>
       </div>
-      <draggable :list="blogTypes[checkedBlogIndex].blogs" ghost-class="ghost" handle=".move" animation="300"
-        :force-fallback="true" itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true"
-        :fallback-on-body="true" :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog"
-        @end="sortBlog" group="group2" :move="onMove">
+      <draggable :list="checkedWikiType.blogs" ghost-class="ghost" handle=".move" animation="300" :force-fallback="true"
+        itemKey="" filter=".forbid" chosen-class="chosenClass" :fallback-class="true" :fallback-on-body="true"
+        :touch-start-threshold="50" :fallback-tolerance="50" @start="onStartBlog" @end="onSortWiki" group="group2"
+        :move="onMove">
         <template #item="{ element }">
           <div class="item">
             <label class="move"></label>
             <p class="bt-input" @click="onclickBlogTab(element)">{{ element.title }}</p>
             <div>
-              <el-button class="operate_button" v-show="checkedIndex == element.order" :icon="Delete" size="small"
+              <el-button class="operate_button" v-show="showWikiIcon(element)" :icon="Delete" size="small"
                 @click="deleteDialogVisible = true" />
             </div>
           </div>
@@ -61,12 +61,11 @@
 
     <div class="c_section">
       <div class="title_style">
-        <el-input v-model="blogTypes[checkedBlogIndex].blogs[checkedIndex].title" @keyup.enter.native="saveTitle"
-          @blur="saveTitle">
+        <el-input v-model="checkedWiki.title" @keyup.enter.native="onUpdateTitle" @blur="onUpdateTitle">
         </el-input>
       </div>
       <div :style="cWholeStyle">
-        <md-editor theme="light" v-model="current_blog.content" @save="saveContent" @upload-img="onUploadImg"
+        <md-editor theme="light" v-model="checkedWiki.content" @save="onUpdateContent" @upload-img="onUploadImg"
           :style="{ height: innerHeight }" />
       </div>
     </div>
@@ -78,35 +77,35 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="blogTypeCreateDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="insertBlogType">确认</el-button>
+          <el-button type="primary" @click="onCreateWikiType">确认</el-button>
         </span>
       </template>
     </el-dialog>
 
     <!-- edit and delete blogtype dialog -->
     <el-dialog v-model="blogTypeEditDialogVisible" title="博客分类 Setting" width="30%">
-      你正在对「 {{ blogTypes[checkedBlogIndex].btName }}」进行操作
+      你正在对「 {{ checkedWikiType.btName }}」进行操作
       <div style="display: flex; margin: 10px">
-        <el-button type="primary" @click="saveBlogType()">修改</el-button>
-        <el-input v-model="btName">
+        <el-button type="primary" @click="onUpdateWikiType()">修改</el-button>
+        <el-input v-model="checkedWikiType.btName">
         </el-input>
       </div>
       <div style="display: flex; margin: 10px">
-        <el-button type="danger" @click="deleteBlogType()">删除</el-button>
-        <el-input v-model="deleteBtName" :placeholder="'请输入 ' + blogTypes[checkedBlogIndex].btName + ' 进行删除'">
+        <el-button type="danger" @click="deleteWikiType()">删除</el-button>
+        <el-input v-model="deleteBtName" :placeholder="'请输入 ' + checkedWikiType.btName + ' 进行删除'">
         </el-input>
       </div>
     </el-dialog>
 
     <!-- delete blog dialog -->
     <el-dialog v-model="deleteDialogVisible" title="删除博客" width="30%">
-      你正在对 {{ blogTypes[checkedBlogIndex].blogs[checkedIndex].title }}
+      你正在对 {{ checkedWiki.title }}
       <el-input v-model="btName" :placeholder="'请输入<删除>'">
       </el-input>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="deleteDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="deleteBlog">确认</el-button>
+          <el-button type="primary" @click="onDeleteWiki">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -119,89 +118,323 @@ import $moment from "moment"
 import MdEditor from 'md-editor-v3'
 import { CaretRight, CaretLeft, Setting, Delete } from "@element-plus/icons-vue"
 import 'md-editor-v3/lib/style.css'
-import { h } from 'vue'
-import { ElMessage } from 'element-plus'
+import { Wiki, WikiType, wiki, wikiType } from "../../entity"
+import { setErrorMessage } from "../../utils/common"
 import {
-  updateBtName,
-  updateContent,
+  createWikiType,
+  removeWikiType,
+  updateWikiType,
+  getWikiType,
+  sortWikiType,
+  createWiki,
+  deleteWiki,
+  updateWiki,
+  getWiki,
+  sortWiki,
   listAll,
-  putBlogType,
-  removeBlogType,
-  getContent,
-  putBlog,
-  deleteContent,
-  sortBlogTypes,
-  sortBlogs
 } from '../../api/blog'
 import { copy } from '../../utils/copyutil'
 import draggable from "vuedraggable"
 
-interface Blog {
-  bid: string
-  btId: string
-  title: string
-  blog_prex: string
-  autosave_control: string
-  content: string
-  order: number
-}
-
-interface BlogType {
-  btId: string
-  btName: string
-  blogs: Blog[]
-  order: number
-}
-const blogTypes = reactive<BlogType[]>([])
 const blogTypeCreateDialogVisible = ref(false)
 const blogTypeEditDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
 
-let checkedIndex = ref<number>(0)
-let checkedBlogIndex = ref<number>(0)
 let isclicked = ref(false)
 let isReady = ref(false)
 // tmp btName for create, edit, delete
 let btName = ref("")
 let deleteBtName = ref("")
-let current_blog = reactive({
-  bid: "",
-  content: "",
-})
+const blogTypes = reactive<WikiType[]>([])
+const checkedWikiType = reactive<WikiType>(wikiType({
+  btId: "",
+  btName: "",
+  blogs: [],
+  order: 0
+}))
+const checkedWiki = reactive<Wiki>(wiki(
+  {
+    bid: "",
+    btId: "",
+    title: "",
+    content: "",
+  }
+))
 
 // FUNCTION DEFINITION
+
+/**
+ * FUNCTION DEFINITION LIST
+ * {@link onCreateWikiType 创建 wiki Type}
+ * {@link deleteWikiType 删除 wiki Type}
+ * {@link onUpdateWikiType 更新 wiki Type}
+ * {@link onCreateWiki 创建wiki}
+ * {@link onDeleteWiki 删除wiki}
+ * {@link onUpdateContent 修改Wiki文本内容}
+ * {@link onUpdateTitle 修改Wikititle}
+ * {@link onclickTypeTab 点击type Tag触发}
+ * {@link onclickBlogTab 点击wiki Tag触发}
+ * {@link handleCreateBlogType }
+ * {@link getTestData 初始数据加载}
+ * 
+ */
+
+const showWikiTypeIcon = (data: any) => {
+  return checkedWikiType.btId == data.btId
+}
+const showWikiIcon = (data: any) => {
+  return checkedWiki.bid == data.bid
+}
+
+
+/**
+ * create blogType
+ */
+const onCreateWikiType = () => {
+  if (btName.value == "") {
+    blogTypeCreateDialogVisible.value = false
+    return
+  }
+  const data = {
+    btName: btName.value,
+    order: blogTypes.length
+  }
+  createWikiType(data).then(response => {
+    const blog_type = wikiType(response.data)
+    blogTypes.push(blog_type)
+    response.data.blog_list.forEach((item: any) => {
+      const blog = wiki(item)
+      blog_type.blogs.push(blog as Wiki)
+    })
+    copy(checkedWikiType, blog_type)
+    copy(checkedWiki, blog_type.blogs[0])
+
+  }).catch(() => {
+    setErrorMessage("创建博客分类失败")
+  }).finally(() => {
+    btName.value = ""
+    blogTypeCreateDialogVisible.value = false
+  })
+}
+
+const deleteWikiType = async () => {
+  if (deleteBtName.value == checkedWikiType.btName) {
+    const data = {
+      btId: checkedWikiType.btId
+    }
+    await removeWikiType(data).then((response) => {
+      blogTypes.length = 0
+      response.data.forEach((element: any) => {
+        const wiki_Type = wikiType(element)
+        blogTypes.push(wiki_Type)
+      })
+      response.data[0].blog_list.forEach((item: any) => {
+        const blog = wiki(item)
+        blogTypes[0].blogs.push(blog)
+      })
+
+      copy(checkedWikiType, blogTypes[0])
+      copy(checkedWiki, blogTypes[0].blogs[0])
+      blogTypeEditDialogVisible.value = false
+    })
+  } else {
+    blogTypeEditDialogVisible.value = false
+  }
+}
+
+/**
+ * edit blogType
+ */
+const onUpdateWikiType = () => {
+  if (checkedWikiType.btName == "") {
+    blogTypeEditDialogVisible.value = false
+    return
+  }
+  const query = {
+    btId: checkedWikiType.btId,
+    btName: checkedWikiType.btName,
+  }
+  updateWikiType(query).then(() => {
+    blogTypes.forEach((item) => {
+      if (item.btId == checkedWikiType.btId) {
+        item.btName = checkedWikiType.btName
+      }
+    })
+  }).catch(() => {
+    setErrorMessage("文章保存失败")
+  }).finally(() => {
+    blogTypeEditDialogVisible.value = false
+  })
+}
+
+/**
+ * ブログ新規作成
+ */
+const onCreateWiki = () => {
+  isclicked.value = true
+  const data = {
+    btId: checkedWikiType.btId,
+    title: $moment().format("YYYY-MM-DD"),
+  }
+  createWiki(data).then(response => {
+    const blog = wiki(response.data)
+    checkedWikiType.blogs.push(blog)
+    copy(checkedWiki, blog)
+  }).finally(() => {
+    isclicked.value = false
+  })
+}
+
+/**
+ * ブログ削除
+ */
+const onDeleteWiki = async () => {
+  if (btName.value == "删除") {
+    let delete_data = {
+      bid: checkedWiki.bid,
+      btId: checkedWiki.btId
+    }
+    await deleteWiki(delete_data).then(response => {
+      checkedWikiType.blogs.length = 0
+      response.data.blog_list.forEach((item: any) => {
+        const blog = wiki(item)
+        checkedWikiType.blogs.push(blog)
+      })
+      copy(checkedWiki, checkedWikiType.blogs[0])
+    }).finally(() => {
+      deleteDialogVisible.value = false
+      btName.value = ""
+    })
+  }
+}
+
+/**
+ * Blog内容修正
+ */
+const onUpdateContent = async () => {
+  const query = {
+    bid: checkedWiki.bid,
+    content: checkedWiki.content
+  }
+  updateWiki(query).catch(() => {
+    setErrorMessage("文章保存失败")
+  })
+}
+
+
+/**
+ * Blogタイトル修正
+ */
+const onUpdateTitle = () => {
+  const query = {
+    bid: checkedWiki.bid,
+    title: checkedWiki.title
+  }
+  updateWiki(query).then(() => {
+    checkedWikiType.blogs.forEach((e) => {
+      if (e.bid == checkedWiki.bid) {
+        e.title = checkedWiki.title
+      }
+    })
+  }).catch(() => {
+    setErrorMessage("文章标题保存失败")
+  })
+}
+
+
+/**
+ * 点击 【博客分类】
+ * @param wikiType BlogType 
+ */
+const onclickTypeTab = async (wikiType: WikiType) => {
+
+  if (wikiType.btId == checkedWikiType.btId) {
+    return
+  }
+  deleteBtName.value = ""
+  await getWikiType(wikiType.btId).then(response => {
+    wikiType.blogs.length = 0
+    response.data.blog_list.forEach((item: any) => {
+      const blog = wiki(item)
+      wikiType.blogs.push(blog)
+    })
+    copy(checkedWikiType, wikiType)
+    copy(checkedWiki, wikiType.blogs[0])
+  }).catch(err => {
+    console.log(err)
+  })
+}
+
+/**
+* 点击 【博客】
+* @param w Blog 
+*/
+const onclickBlogTab = (w: Wiki) => {
+  deleteBtName.value = ""
+  if (w.bid == checkedWiki.bid) {
+    return
+  }
+  getWiki(w.bid).then(response => {
+    copy(checkedWiki, wiki(response.data))
+  }).catch((err) => {
+    setErrorMessage(err)
+  })
+}
+
+/**
+ * @desc wiki 分类排序
+ * 
+ */
+const onSortWikiType = async () => {
+
+  const sortData: string[] = []
+  blogTypes.forEach((blogType: WikiType) => {
+    sortData.push(blogType.btId)
+  })
+
+  sortWikiType({ btIds: sortData }).catch(() => {
+    setErrorMessage("分类排序失败")
+  })
+}
+
+/**
+ * @desc wikiソート機能
+ * 
+ */
+const onSortWiki = async () => {
+
+  const sortData: string[] = []
+
+  checkedWikiType.blogs.forEach((blog: Wiki) => {
+    sortData.push(blog.bid)
+  })
+
+  sortWiki({ bIds: sortData }, checkedWikiType.btId).catch(() => {
+    setErrorMessage("blog排序失败")
+  })
+}
+
+
+const handleCreateBlogType = () => {
+  blogTypeEditDialogVisible.value = true
+}
+
 /**
  * Blog一覧取得
  */
 const getTestData = async () => {
   await listAll().then(response => {
-    response.data.sort((x: any, y: any) => { x.order - y.order })
     response.data.forEach((element: any) => {
-      const blog_type: BlogType = {
-        btId: element.btId,
-        btName: element.btName,
-        blogs: [],
-        order: element.order
-      }
-      element.blog_list.forEach((item: any) => {
-        const blog: Blog = {
-          bid: item.bid,
-          btId: item.btId,
-          title: item.title,
-          blog_prex: item.blog_prex,
-          autosave_control: item.autosave_control,
-          content: item.content,
-          order: item.order
-        }
-        blog_type.blogs.push(blog)
-      })
+      const blog_type = wikiType(element)
       blogTypes.push(blog_type)
     })
+    response.data[0].blog_list.forEach((item: any) => {
+      const blog = wiki(item)
+      blogTypes[0].blogs.push(blog)
+    })
     isReady.value = true
-    checkedBlogIndex.value = blogTypes[0].order
-    checkedIndex.value = 0
-    console.log(blogTypes[0].blogs[0])
-    copy(current_blog, blogTypes[0].blogs[0])
+    copy(checkedWikiType, blogTypes[0])
+    copy(checkedWiki, blogTypes[0].blogs[0])
   })
 
   // TODO 需要优化部分
@@ -212,308 +445,27 @@ const getTestData = async () => {
    * 
    */
   let old_blog = {
-    bid: current_blog.bid,
-    content: current_blog.content,
+    bid: checkedWiki.bid,
+    content: checkedWiki.content,
   }
   setInterval(async () => {
-    if (current_blog.bid == old_blog.bid) {
-      if (old_blog.content == current_blog.content) {
+    if (checkedWiki.bid == old_blog.bid) {
+      if (old_blog.content == checkedWiki.content) {
         return
       }
-      await saveContent().then(() => {
-        old_blog.content = current_blog.content
+      await updateWiki({
+        bid: checkedWiki.bid,
+        content: checkedWiki.content
+      }).then(() => {
+        old_blog.content = checkedWiki.content
       })
     } else {
-      old_blog.bid = current_blog.bid
-      old_blog.content = current_blog.content
+      old_blog.bid = checkedWiki.bid
+      old_blog.content = checkedWiki.content
     }
   }, 5000)
 }
 
-/**
- * BlogTypeを選べる
- * @param order
- */
-const onclickTypeTab = (order: number) => {
-  const bid = blogTypes[order].blogs[0].bid
-  deleteBtName.value = ""
-  getContent(bid).then(response => {
-    blogTypes[order].blogs[0].content = response.data.content
-    checkedBlogIndex.value = order
-    checkedIndex.value = 0
-    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
-  })
-}
-
-const onclickBlogTab = (blog: Blog) => {
-  deleteBtName.value = ""
-  getContent(blog.bid).then(response => {
-    checkedIndex.value = blog.order
-    blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].content = response.data.content
-    copy(current_blog, blog)
-  }).catch(() => {
-    checkedIndex.value = blog.order
-  })
-}
-
-/**
- * Blog内容修正
- */
-const saveContent = async () => {
-  const query = {
-    bid: current_blog.bid,
-    content: current_blog.content
-  }
-  updateContent(query).then(() => {
-
-  }).catch(() => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "文章保存失败"),
-      ]),
-    })
-  })
-}
-
-
-/**
- * Blogタイトル修正
- */
-const saveTitle = () => {
-  const query = {
-    bid: current_blog.bid,
-    title: blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].title
-  }
-  updateContent(query).then(() => {
-  }).catch(() => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "文章标题保存失败"),
-      ]),
-    })
-  })
-}
-
-/**
- * ブログ新規作成
- */
-const insertBlog = () => {
-  isclicked.value = true
-  const data = {
-    btId: blogTypes[checkedBlogIndex.value].btId,
-    title: $moment().format("YYYY-MM-DD"),
-    order: blogTypes[checkedBlogIndex.value].blogs.length
-  }
-  putBlog(data).then(response => {
-    const { bid, btid, title, content, order, autosave_control } = response.data
-    const blog = {
-      bid: bid,
-      btId: btid,
-      title: title,
-      blog_prex: "",
-      content: content,
-      autosave_control: autosave_control,
-      order: order
-    } as Blog
-
-    blogTypes[checkedBlogIndex.value].blogs.push(blog)
-    checkedIndex.value = order
-    isclicked.value = false
-    copy(current_blog, blog)
-  })
-}
-
-/**
- * ブログ削除
- */
-const deleteBlog = () => {
-  if (btName.value == "删除") {
-    let delete_data = {
-      btId: blogTypes[checkedBlogIndex.value].btId
-    }
-    deleteContent(blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid, delete_data).then(response => {
-      blogTypes[checkedBlogIndex.value].blogs.length = 0
-      response.data.blog_list.forEach((item: any) => {
-        const blog: Blog = {
-          bid: item.bid,
-          btId: item.btId,
-          title: item.title,
-          blog_prex: item.blog_prex,
-          autosave_control: item.autosave_control,
-          content: item.content,
-          order: item.order
-        }
-        blogTypes[checkedBlogIndex.value].blogs.push(blog)
-      })
-      checkedIndex.value = 0
-      copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
-      deleteDialogVisible.value = false
-      btName.value = ""
-    }).catch(() => {
-      deleteDialogVisible.value = false
-      btName.value = ""
-    })
-  }
-}
-
-const handleCreateBlogType = () => {
-  btName.value = blogTypes[checkedBlogIndex.value].btName
-  blogTypeEditDialogVisible.value = true
-  deleteBtName.value = ""
-}
-
-/**
- * create blogType
- */
-const insertBlogType = () => {
-  if (btName.value == "") {
-    blogTypeCreateDialogVisible.value = false
-    return
-  }
-  const data = {
-    btName: btName.value,
-    order: blogTypes.length
-  }
-  putBlogType(data).then(response => {
-    const blog_type: BlogType = {
-      btId: response.data.btId,
-      btName: response.data.btName,
-      blogs: [],
-      order: response.data.order
-    }
-    response.data.blog_list.forEach((item: any) => {
-      const blog: Blog = {
-        bid: item.bid,
-        btId: item.btId,
-        title: item.title,
-        blog_prex: item.blog_prex,
-        autosave_control: item.autosave_control,
-        content: item.content,
-        order: item.order
-      }
-      blog_type.blogs.push(blog)
-    })
-    blogTypes.push(blog_type)
-    checkedBlogIndex.value = response.data.order
-    checkedIndex.value = blog_type.blogs[0].order
-    copy(current_blog, blogTypes[checkedBlogIndex.value].blogs[0])
-    blogTypeCreateDialogVisible.value = false
-    btName.value = ""
-  })
-}
-
-/**
- * edit blogType
- */
-const saveBlogType = () => {
-  if (btName.value == "") {
-    blogTypeEditDialogVisible.value = false
-    return
-  }
-  const query = {
-    btId: blogTypes[checkedBlogIndex.value].btId,
-    btName: btName.value,
-  }
-  updateBtName(query).then(() => {
-    blogTypes[checkedBlogIndex.value].btName = btName.value
-    blogTypeEditDialogVisible.value = false
-    btName.value = ""
-  }).catch(() => {
-    btName.value = ""
-    blogTypeEditDialogVisible.value = false
-  })
-}
-
-const deleteBlogType = () => {
-  if (deleteBtName.value == blogTypes[checkedBlogIndex.value].btName) {
-    const data = {
-      btId: blogTypes[checkedBlogIndex.value].btId
-    }
-    removeBlogType(data).then((response) => {
-      blogTypes.length = 0
-      response.data.forEach((element: any) => {
-        const blog_type: BlogType = {
-          btId: element.btId,
-          btName: element.btName,
-          blogs: [],
-          order: element.order
-        }
-        element.blog_list.forEach((item: any) => {
-          const blog: Blog = {
-            bid: item.bid,
-            btId: item.btId,
-            title: item.title,
-            blog_prex: item.blog_prex,
-            autosave_control: item.autosave_control,
-            content: item.content,
-            order: item.order
-          }
-          blog_type.blogs.push(blog)
-        })
-        blogTypes.push(blog_type)
-      })
-      checkedBlogIndex.value = 0
-      checkedIndex.value = 0
-      copy(current_blog, blogTypes[0].blogs[0])
-      blogTypeEditDialogVisible.value = false
-    })
-  } else {
-    blogTypeEditDialogVisible.value = false
-  }
-}
-
-const sortBlogType = () => {
-
-  const sortData: BlogType[] = []
-  blogTypes.forEach((blogType: BlogType, index) => {
-    blogType.order = index
-    if (blogType.btId == id.value) {
-      checkedBlogIndex.value = index
-    }
-    sortData.push({
-      btId: blogType.btId,
-      btName: blogType.btName,
-      blogs: [],
-      order: blogType.order
-    })
-  })
-
-  sortBlogTypes(sortData).then(() => {
-
-  }).catch(() => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "分类排序失败"),
-      ]),
-    })
-  })
-}
-
-const sortBlog = () => {
-
-  const sortData: any[] = []
-
-  blogTypes[checkedBlogIndex.value].blogs.forEach((blog: Blog, index) => {
-    blog.order = index
-    if (blog.bid == id.value) {
-      checkedIndex.value = index
-    }
-    sortData.push({
-      bid: blog.bid,
-      order: blog.order
-    })
-  })
-
-  sortBlogs(sortData, blogTypes[checkedBlogIndex.value].btId).then(() => {
-
-  }).catch(() => {
-    ElMessage({
-      message: h('p', null, [
-        h('i', { style: 'color: teal' }, "blog排序失败"),
-      ]),
-    })
-  })
-}
 
 // Created　段階の関数呼び出す処理
 getTestData()
@@ -521,7 +473,7 @@ getTestData()
 window.addEventListener('keydown', async function (event) {
   if (event.ctrlKey && event.key == "s") {
     event.preventDefault();
-    saveContent()
+    onUpdateContent()
   }
 })
 
@@ -549,17 +501,11 @@ const onUploadProcess = (e: number) => {
 const id = ref("")
 const onStartBlogType = () => {
   console.log("开始拖拽");
-  id.value = blogTypes[checkedBlogIndex.value].btId
+  // id.value = blogTypes[checkedWikiTypeIndex.value].btId
 };
 
 const onStartBlog = () => {
-  console.log("开始拖拽");
-  id.value = blogTypes[checkedBlogIndex.value].blogs[checkedIndex.value].bid
-};
-
-//拖拽结束的事件
-const onEnd = () => {
-
+  // id.value = blogTypes[checkedWikiTypeIndex.value].blogs[checkedWikiIndex.value].bid
 }
 
 const onMove = (e: any) => {

@@ -20,9 +20,48 @@ type DataTimeline = {
 }
 
 type Event = {
-  event_date: string,
+  reminder_date: string,
   title: string,
-  event_info: string,
+  info: string,
+  type: string[],
 }
 
-export { Tenant, Theme, DataTimeline, Event }
+interface Wiki {
+  bid: string
+  btId: string
+  title: string
+  blog_prex: string
+  autosave_control: string
+  content: string
+  order: number
+}
+
+const wiki = (data: any) => {
+  const { bid, btId, content, title, order } = data
+  return {
+    bid: bid,
+    btId: btId,
+    content: content,
+    title: title,
+    order: order
+  } as Wiki
+}
+
+interface WikiType {
+  btId: string
+  btName: string
+  blogs: Wiki[]
+  order: number
+}
+
+const wikiType = (data: any) => {
+  const { btId, btName, order } = data
+  return {
+    btId: btId,
+    btName: btName,
+    blogs: [],
+    order: order,
+  } as WikiType
+}
+
+export { Tenant, Theme, DataTimeline, Event, Wiki, wiki, WikiType, wikiType }

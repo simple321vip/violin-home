@@ -2,7 +2,6 @@
   <div>
     <el-menu router class="el-menu-vertical" :style="{ height: sideHeight }" :background-color="theme.background"
       :active-text-color="theme?.background">
-
       <el-menu-item v-for="(route, index) in current_routes" :key="index" :index="route.path" :title="route.meta?.name"
         @click="onclick()">
         <template #title>

@@ -2,13 +2,13 @@ import { MockMethod } from 'vite-plugin-mock'
 
 export default [
   {
-    url: '/wiki/api/v1/author/blog/list',
+    url: '/wiki/api/v1/author/wiki/list',
     method: 'get',
-    response: ({ body, query }) => {
+    response: ({ }) => {
       return [
         {
           btId: "001",
-          btName: "your world---",
+          btName: "１",
           blog_list: [
             {
               bid: "0001",
@@ -24,12 +24,26 @@ export default [
               btId: "001",
               order: 1,
             },
+            {
+              bid: "0003",
+              title: "three",
+              content: "xxxxxxxxx",
+              btId: "001",
+              order: 2,
+            },
+            {
+              bid: "0004",
+              title: "four",
+              content: "xxyyyyxxxxxxx",
+              btId: "001",
+              order: 3,
+            },
           ],
           order: 0
         },
         {
           btId: "002",
-          btName: "my world",
+          btName: "２",
           blog_list: [
             {
               bid: "0003",
@@ -50,7 +64,7 @@ export default [
         },
         {
           btId: "003",
-          btName: "my world",
+          btName: "３",
           blog_list: [
             {
               bid: "0003",
@@ -73,8 +87,28 @@ export default [
     }
   },
   {
-    url: '/wiki/api/v1/author/blog_types',
+    url: '/wiki/api/v1/author/wiki/type', // create wikiType
     method: 'post',
+    response: () => {
+      return {
+        btId: "001",
+        btName: "your world---",
+        blog_list: [
+          {
+            bid: "0001",
+            title: "one",
+            content: "nothing",
+            btId: "001",
+            order: 0,
+          },
+        ],
+        order: 2,
+      }
+    }
+  },
+  {
+    url: '/wiki/api/v1/author/wiki/type', // update wikiType
+    method: 'put',
     response: () => {
       return [
         {
@@ -123,35 +157,7 @@ export default [
     }
   },
   {
-    url: '/wiki/api/v1/author/blog_type',
-    method: 'put',
-    response: () => {
-      return {
-        btId: "001",
-        btName: "your world---",
-        blog_list: [
-          {
-            bid: "0001",
-            title: "one",
-            content: "nothing",
-            btId: "001",
-            order: 0,
-          },
-        ],
-        order: 2,
-      }
-    }
-  },
-  {
-    url: '/wiki/api/v1/author/blog_type',
-    method: 'post',
-    response: () => {
-      return {
-      }
-    }
-  },
-  {
-    url: '/wiki/api/v1/author/blog_type',
+    url: '/wiki/api/v1/author/wiki/type', // delete wikiType
     method: 'delete',
     response: ({ body, query }) => {
       return [
@@ -200,4 +206,13 @@ export default [
       ]
     }
   },
+  {
+    url: '/wiki/api/v1/author/wiki/type/sort',
+    method: 'post',
+    response: () => {
+      return {
+      }
+    }
+  },
+
 ] as MockMethod[]

@@ -208,6 +208,7 @@ const handleTags = (tag: any) => {
   } else {
     tag.clicked = true
     search_form.bk_type_ids.push(tag.bk_type_id)
+    doSearch()
   }
 
 }
