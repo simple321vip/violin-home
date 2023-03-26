@@ -74,7 +74,7 @@ const scan_method: any = {
       path: '/home'
     })
   },
-  test: (qrcode: string) => {
+  test: async (qrcode: string) => {
     window.location.href = qrcode
   },
 }

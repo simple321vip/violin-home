@@ -87,7 +87,7 @@
       你正在对「 {{ checkedWikiType.btName }}」进行操作
       <div style="display: flex; margin: 10px">
         <el-button type="primary" @click="onUpdateWikiType()">修改</el-button>
-        <el-input v-model="btName">
+        <el-input v-model="checkedWikiType.btName">
         </el-input>
       </div>
       <div style="display: flex; margin: 10px">
@@ -152,7 +152,14 @@ const checkedWikiType = reactive<WikiType>(wikiType({
   blogs: [],
   order: 0
 }))
-const checkedWiki = reactive<Wiki>({} as Wiki)
+const checkedWiki = reactive<Wiki>(wiki(
+  {
+    bid: "",
+    btId: "",
+    title: "",
+    content: "",
+  }
+))
 
 // FUNCTION DEFINITION
 
@@ -190,6 +197,7 @@ const onCreateWikiType = () => {
   }
   const data = {
     btName: btName.value,
+    order: blogTypes.length
   }
   createWikiType(data).then(response => {
     const blog_type = wikiType(response.data)
@@ -209,21 +217,22 @@ const onCreateWikiType = () => {
   })
 }
 
-const deleteWikiType = () => {
+const deleteWikiType = async () => {
   if (deleteBtName.value == checkedWikiType.btName) {
     const data = {
       btId: checkedWikiType.btId
     }
-    removeWikiType(data).then((response) => {
+    await removeWikiType(data).then((response) => {
       blogTypes.length = 0
       response.data.forEach((element: any) => {
         const wiki_Type = wikiType(element)
-        element.blog_list.forEach((item: any) => {
-          const blog = wiki(item)
-          wiki_Type.blogs.push(blog)
-        })
         blogTypes.push(wiki_Type)
       })
+      response.data[0].blog_list.forEach((item: any) => {
+        const blog = wiki(item)
+        blogTypes[0].blogs.push(blog)
+      })
+
       copy(checkedWikiType, blogTypes[0])
       copy(checkedWiki, blogTypes[0].blogs[0])
       blogTypeEditDialogVisible.value = false
@@ -245,7 +254,13 @@ const onUpdateWikiType = () => {
     btId: checkedWikiType.btId,
     btName: checkedWikiType.btName,
   }
-  updateWikiType(query).catch(() => {
+  updateWikiType(query).then(() => {
+    blogTypes.forEach((item) => {
+      if (item.btId == checkedWikiType.btId) {
+        item.btName = checkedWikiType.btName
+      }
+    })
+  }).catch(() => {
     setErrorMessage("文章保存失败")
   }).finally(() => {
     blogTypeEditDialogVisible.value = false
@@ -265,6 +280,7 @@ const onCreateWiki = () => {
     const blog = wiki(response.data)
     checkedWikiType.blogs.push(blog)
     copy(checkedWiki, blog)
+  }).finally(() => {
     isclicked.value = false
   })
 }
@@ -315,6 +331,11 @@ const onUpdateTitle = () => {
     title: checkedWiki.title
   }
   updateWiki(query).then(() => {
+    checkedWikiType.blogs.forEach((e) => {
+      if (e.bid == checkedWiki.bid) {
+        e.title = checkedWiki.title
+      }
+    })
   }).catch(() => {
     setErrorMessage("文章标题保存失败")
   })
@@ -405,11 +426,11 @@ const getTestData = async () => {
   await listAll().then(response => {
     response.data.forEach((element: any) => {
       const blog_type = wikiType(element)
-      element.blog_list.forEach((item: any) => {
-        const blog = wiki(item)
-        blog_type.blogs.push(blog)
-      })
       blogTypes.push(blog_type)
+    })
+    response.data[0].blog_list.forEach((item: any) => {
+      const blog = wiki(item)
+      blogTypes[0].blogs.push(blog)
     })
     isReady.value = true
     copy(checkedWikiType, blogTypes[0])
