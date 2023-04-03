@@ -7,13 +7,15 @@ export const settingsStore = defineStore('settings', () => {
     sideMode: '#191a23',
     isMobile: false,
     isRouterAlive: true,
-    isLoading: false
+    isLoading: false,
+    profileName: null,
   })
 
   const sideMode = computed(() => settings.value.sideMode)
   const isMobile = computed(() => settings.value.isMobile)
   const isRouterAlive = computed(() => settings.value.isRouterAlive)
   const isLoading = computed(() => settings.value.isLoading)
+  const profileName = computed(() => settings.value.profileName)
 
   return {
     settings,
@@ -21,6 +23,7 @@ export const settingsStore = defineStore('settings', () => {
     isMobile,
     isRouterAlive,
     isLoading,
+    profileName,
   }
 })
 

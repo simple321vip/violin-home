@@ -97,26 +97,61 @@
       </div>
     </div>
   </div>
+  <!-- create blogtype dialog -->
+  <el-dialog v-model="profileNameCreateDialogVisible" title="发现主人还没有创建新的wiki个人主页, 来创建吧" width="30%"
+    @close="onCloseProfileDialog">
+    Profile name:
+    <el-autocomplete v-model="profileName" :fetch-suggestions="querySearchAsync" />
+    <el-input v-model="profileName">
+    </el-input>
+    <el-descriptions title="你的 wiki 主页将为">
+      <el-icon>
+        <Link />
+      </el-icon>
+      <el-descriptions-item>https://www.violin-home.cn/docs#/{{ profileName ? profileName : profileNameText
+      }}/</el-descriptions-item>
+      <!-- <el-descriptions-item label="Remarks">
+        <el-tag size="small">School</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="Address">No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu
+        Province</el-descriptions-item> -->
+    </el-descriptions>
+
+
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="onCloseProfileDialog">取消</el-button>
+        <el-button type="primary" @click="onCreateProfile">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import $moment from "moment"
+import { Link } from "@element-plus/icons-vue"
 import EchartsLine from '@/view/dashboard/dashboardCharts/index.vue'
 import DashboardTable from '@/view/dashboard/dashboardTable/index.vue'
 import { useRouter } from 'vue-router'
 import { useWeatherInfo } from '@/service/weather'
 import { countWiki } from "@/api/blog"
 import { bookmarks_count } from "@/api/bookmark"
+import { get_profileName, create_profile, judge_profile } from "@/api/profile"
+import { settingsStore } from "@/store/modules/settings"
 
 // -- IMPORT --
 const weatherInfo = useWeatherInfo()
 const router = useRouter()
+const useSettingsStore = settingsStore()
 
 // -- REACTIVE OBJECT --
 
 // -- REF OBJECT --
 let time = ref<String>($moment().format("YYYY年MM月DD日  HH:mm:ss"));
+const profileNameCreateDialogVisible = ref(false)
+const profileName = ref<string>()
+const profileNameText = ref<string>("{Profile name}")
 
 const statistics = ref({
   wiki_count: 0,
@@ -153,9 +188,9 @@ const toolCards = ref([
     bg: 'rgba(255, 214, 102,.3)'
   },
   {
-    label: '表单生成器',
+    label: 'wiki主页编辑',
     icon: 'document-checked',
-    name: 'formCreate',
+    name: 'profile',
     color: '#ff85c0',
     bg: 'rgba(255, 133, 192,.3)'
   },
@@ -185,7 +220,48 @@ const toTarget = (name: string) => {
     case 'scrum':
       window.open('https://www.leangoo.com/kanban/board_list?#/home/list', '_blank')
       break;
+    case 'profile':
+      if (useSettingsStore.settings.profileName) {
+        openTag()
+        break;
+      }
+      profileNameCreateDialogVisible.value = true
+      break;
   }
+}
+
+const onCreateProfile = async () => {
+
+  if (!profileName.value) {
+    return
+  }
+
+  await create_profile({ name: profileName.value }).then(() => {
+    openTag()
+  }).finally(() => {
+    profileNameCreateDialogVisible.value = false
+  })
+
+}
+
+const openTag = () => {
+  const { href } = router.resolve({
+    path: '/profile/'
+  })
+  window.open(href, '_blank')
+}
+
+const querySearchAsync = async (queryString: string, cb: any) => {
+  judge_profile({ name: profileName.value }).then(() => {
+
+  }).then(e => {
+
+  })
+}
+
+const onCloseProfileDialog = () => {
+  profileName.value = ""
+  profileNameCreateDialogVisible.value = false
 }
 
 /**
@@ -202,6 +278,11 @@ countWiki().then((resp) => {
 bookmarks_count().then((resp) => {
   const data = resp.data
   statistics.value.bookmark_count = data.count
+})
+get_profileName().then((resp) => {
+  if (resp.data) {
+    useSettingsStore.settings.profileName = resp.data.name
+  }
 })
 
 </script>
