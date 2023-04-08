@@ -101,13 +101,17 @@
   <el-dialog v-model="profileNameCreateDialogVisible" title="发现主人还没有创建新的wiki个人主页, 来创建吧" width="30%"
     @close="onCloseProfileDialog">
     Profile name:
-    <el-autocomplete v-model="profileName" :fetch-suggestions="querySearchAsync" />
-    <el-input v-model="profileName">
-    </el-input>
-    <el-descriptions title="你的 wiki 主页将为">
-      <el-icon>
-        <Link />
+    <div>
+      <el-autocomplete v-model="profileName" :fetch-suggestions="querySearchAsync" />
+      <el-icon v-if="profileNameCheckStatus == 1" color="green">
+        <CircleCheckFilled />
       </el-icon>
+      <el-icon v-if="profileNameCheckStatus == 0" color="red">
+        <WarningFilled />
+      </el-icon>
+    </div>
+    <el-descriptions title="你的 wiki 主页将为">
+
       <el-descriptions-item>https://www.violin-home.cn/docs#/{{ profileName ? profileName : profileNameText
       }}/</el-descriptions-item>
       <!-- <el-descriptions-item label="Remarks">
@@ -121,7 +125,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="onCloseProfileDialog">取消</el-button>
-        <el-button type="primary" @click="onCreateProfile">确认</el-button>
+        <el-button type="primary" @click="onCreateProfile" :disabled="profileNameCheckStatus != 1">确认</el-button>
       </span>
     </template>
   </el-dialog>
@@ -130,7 +134,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import $moment from "moment"
-import { Link } from "@element-plus/icons-vue"
+import { CircleCheckFilled, WarningFilled } from "@element-plus/icons-vue"
 import EchartsLine from '@/view/dashboard/dashboardCharts/index.vue'
 import DashboardTable from '@/view/dashboard/dashboardTable/index.vue'
 import { useRouter } from 'vue-router'
@@ -151,6 +155,11 @@ const useSettingsStore = settingsStore()
 let time = ref<String>($moment().format("YYYY年MM月DD日  HH:mm:ss"));
 const profileNameCreateDialogVisible = ref(false)
 const profileName = ref<string>()
+
+// 0 false
+// 1 true
+// -1 なにもしない
+const profileNameCheckStatus = ref<number>(-1)
 const profileNameText = ref<string>("{Profile name}")
 
 const statistics = ref({
@@ -236,8 +245,13 @@ const onCreateProfile = async () => {
     return
   }
 
-  await create_profile({ name: profileName.value }).then(() => {
-    openTag()
+  await create_profile({ name: profileName.value }).then((resp) => {
+
+    if (resp) {
+      profileNameCreateDialogVisible.value = false
+      openTag()
+    }
+
   }).finally(() => {
     profileNameCreateDialogVisible.value = false
   })
@@ -252,16 +266,23 @@ const openTag = () => {
 }
 
 const querySearchAsync = async (queryString: string, cb: any) => {
-  judge_profile({ name: profileName.value }).then(() => {
 
-  }).then(e => {
+  if (!queryString) {
+    profileNameCheckStatus.value = -1
+    return
+  }
 
+  judge_profile({ name: profileName.value }).then((resp) => {
+    profileNameCheckStatus.value = resp.data
+  }).catch(e => {
+    profileNameCheckStatus.value = -1
   })
 }
 
 const onCloseProfileDialog = () => {
   profileName.value = ""
   profileNameCreateDialogVisible.value = false
+  profileNameCheckStatus.value = -1
 }
 
 /**

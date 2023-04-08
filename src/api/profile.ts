@@ -20,6 +20,13 @@ const update_profile = (data: Object) => {
   })
 }
 
+const publish_profile = () => {
+  return service({
+    url: '/wiki/api/v1/author/profile/publish',
+    method: 'PUT'
+  })
+}
+
 const get_profile = () => {
   return service({
     url: '/wiki/api/v1/author/profile',
@@ -51,5 +58,6 @@ export {
   get_profile,
   update_profile,
   get_profileName,
-  judge_profile
+  judge_profile,
+  publish_profile
 }
