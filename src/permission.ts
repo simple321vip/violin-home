@@ -22,6 +22,9 @@ router.beforeEach((to, from, next) => {
         if (url.search("write") != -1) {
           next('/BlogEditer')
         }
+        if (url.search("profile") != -1) {
+          next('/ProfileEditer')
+        }
         if (url.search("view") != -1) {
           let arr = url.split('?')
           let bid = arr[1].split('=')[1]

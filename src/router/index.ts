@@ -96,6 +96,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/view/blog/createBlog.vue'),
   },
   {
+    path: "/ProfileEditer",
+    component: () => import('@/view/dashboard/editProfile.vue'),
+  },
+  {
     path: "/BlogViewer",
     component: () => import('@/view/blog/mdview.vue'),
   },

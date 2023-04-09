@@ -28,7 +28,8 @@
     </el-form-item>
   </el-form>
   <el-button @click="openBlogEditer">创作</el-button>
-  <el-button @click="publishbyBids">全部重新发布</el-button>
+  <el-button @click="publishbyBids">重新发布Wiki</el-button>
+  <el-button @click="publishProfile">重新发布profile</el-button>
 
   <div class="blog_list" v-for="item in data_list">
     <h3 style="cursor: pointer; width: min-content;white-space:nowrap" @click="openBlog(item.bid)">{{ item.title }}</h3>
@@ -48,9 +49,10 @@
 </template>
 
 <script setup lang="ts">
-import Cookies from 'js-cookie';
-import { reactive } from 'vue';
+import Cookies from 'js-cookie'
+import { reactive } from 'vue'
 import { getBlogs, getBtName, publish, publishAll } from '../../api/blogView'
+import { publish_profile } from '../../api/profile'
 import router from '../../router/index'
 
 // -- INTERFACE OR TYPE DEFINITION --
@@ -109,6 +111,10 @@ const openBlogEditer = () => {
 
 const publishbyBids = () => {
   publishAll()
+}
+
+const publishProfile = () => {
+  publish_profile()
 }
 
 const publishbyBid = (bid: string) => {
