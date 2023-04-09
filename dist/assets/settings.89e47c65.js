@@ -1,1 +1,0 @@
-import{O as n,b as l,J as s}from"./index.9e912d9b.js";const d=n("settings",()=>{const e=l({sideMode:"#191a23",isMobile:!1,isRouterAlive:!0,isLoading:!1}),i=s(()=>e.value.sideMode),o=s(()=>e.value.isMobile),t=s(()=>e.value.isRouterAlive),a=s(()=>e.value.isLoading);return{settings:e,sideMode:i,isMobile:o,isRouterAlive:t,isLoading:a}});export{d as s};
