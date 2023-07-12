@@ -23,7 +23,7 @@
         <el-time-picker v-model="form.end_day" placeholder="结束时间" style="width: 100%" />
       </el-col>
       <el-col :span="6" style="text-align: center;">
-        <el-button type="primary" @click="onSubmit">搜索</el-button>
+        <el-button type="primary" @click="onSearch">搜索</el-button>
       </el-col>
     </el-form-item>
   </el-form>
@@ -76,14 +76,14 @@ const form = reactive({
   start_day: '',
   end_day: '',
   page_number: 1,
-  page_size: 20,
+  page_size: 5,
   total: 1
 })
 const data_list = reactive<Blog[]>([])
 const btNameList = reactive<Blog_Type[]>([])
 
 // -- EVENT DEFINITION
-const onSubmit = () => {
+const onSearch = () => {
   getBlogs(form).then(response => {
     data_list.splice(0, data_list.length);
     response.data.forEach((item: Blog) => {
@@ -126,7 +126,7 @@ const publishbyBid = (bid: string) => {
  */
 (() => {
 
-  getBlogs({}).then(response => {
+  getBlogs(form).then(response => {
     response.data.forEach((item: Blog) => {
       data_list.push(item)
     })

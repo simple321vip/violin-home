@@ -1,26 +1,33 @@
 <template>
-  <div class="yuliu" :style="style">
-  </div>
-  <el-card class="box-card">
-
-    <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
-      class="demo-ruleForm">
-      <div class="title-container">
-        <h3>秘密基地</h3>
-      </div>
-      <div>
-        <el-avatar :size="28" :src="baiduCloudImage" @click="scan(qrcode)" />
-      </div>
-      <el-form-item>
-        其他登录方式暂时还没有哦
-      </el-form-item>
-    </el-form>
-    ------------------------------------------------------------
-    <div>
-      微信/支付宝
+  <div class="ttt">
+    <div class="yuliu" :style="style">
     </div>
-  </el-card>
+    <el-card class="box-card">
 
+      <el-form ref="ruleFormRef" :model="loginForm" :rules="loginRules" status-icon label-width="120px"
+        class="demo-ruleForm">
+        <div class="title-container">
+          <h3>秘密基地</h3>
+        </div>
+        <div>
+          <el-avatar :size="28" :src="baiduCloudImage" @click="scan(qrcode)" />
+        </div>
+        <el-form-item>
+          其他登录方式暂时还没有哦
+        </el-form-item>
+      </el-form>
+      ------------------------------------------------------------
+      <div>
+        微信/支付宝
+      </div>
+    </el-card>
+    <div class="footer">
+      <span>
+        管祥玮的个人网站 ©Copyright 2022-2022
+      </span>
+      <span @click="openSiteQuery">辽ICP备2022003637号-2</span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -81,6 +88,11 @@ const dologin = (form: any) => {
   // })
 }
 
+const openSiteQuery = () => {
+  let href = 'https://beian.miit.gov.cn/#/Integrated/index'
+  window.open(href, '_blank')
+}
+
 const style = reactive({} as any)
 style.width = window.innerWidth * 0.7 + 'px'
 
@@ -94,9 +106,14 @@ style.width = window.innerWidth * 0.7 + 'px'
   padding: 18px 0;
 }
 
+.ttt {
+  display: flex;
+  flex-direction: column;
+}
+
 .yuliu {
   /* width: 600px; */
-  height: 600px;
+  height: 300px;
   float: left;
   /* background-color: antiquewhite; */
   background: url('../../assets/have_a_nice_day.jpeg') center top no-repeat;
